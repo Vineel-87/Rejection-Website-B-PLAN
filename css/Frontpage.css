@@ -1,0 +1,36 @@
+@keyframes marquee {
+  0%   { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+.animate-marquee {
+  display: inline-block;
+  animation: marquee 15s linear infinite;
+}
+
+/* Add background image on left & right only */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 150px; /* Adjust width */
+  background: url('../Images/Violet.jpg') no-repeat center center;
+  background-size: cover;
+  z-index: 0;
+  opacity: 0.3; /* Optional transparency */
+}
+
+body::before {
+  left: 0;
+}
+
+body::after {
+  right: 0;
+}
+
+body > * {
+  position: relative;
+  z-index: 1;
+}

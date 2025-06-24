@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Profile | Rejection</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-950 text-white flex items-center justify-center h-screen">
+  <div class="bg-gray-900 rounded-xl p-10 shadow-lg w-full max-w-md text-center space-y-6">
+    <h1 class="text-3xl font-bold text-purple-400">Edit Your Profile</h1>
+
+    <!-- Profile Picture with Upload -->
+    <div class="relative mx-auto w-28 h-28">
+      <img id="profile-preview" src="Images/default-avatar.png" class="w-28 h-28 rounded-full object-cover border-4 border-purple-500">
+      <label for="edit-upload" class="absolute bottom-0 right-0 w-6 h-6 bg-pink-500 text-xs text-white flex items-center justify-center rounded-full cursor-pointer hover:bg-pink-600">+</label>
+      <input type="file" id="edit-upload" accept="image/*" class="hidden">
+    </div>
+
+    <!-- Name Input -->
+    <input type="text" placeholder="Enter your name" class="w-full px-4 py-2 rounded bg-gray-800 text-white border border-purple-500 focus:outline-none focus:border-pink-500" />
+
+    <!-- Save Button -->
+    <button class="bg-pink-500 hover:bg-pink-600 px-6 py-2 rounded-full font-semibold">Save</button>
+  </div>
+
+  <!-- External Script -->
+  <script src="JS/profile.js"></script>
+</body>
+</html>

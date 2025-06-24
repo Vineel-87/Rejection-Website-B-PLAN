@@ -1,0 +1,10 @@
+/* dashboard.css */
+.sidebar {
+  transition: transform 0.3s ease-in-out;
+  scrollbar-width: thin;
+  scrollbar-color: #a855f7 #1f2937;
+}
+
+.glow-text {
+  text-shadow: 0 0 6px rgba(255, 0, 0, 0.7), 0 0 12px rgba(255, 0, 0, 0.6);
+}

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard | Rejection</title>
+  <link rel="stylesheet" href="CSS/dashboard.css" />
+  <link rel="icon" href="Images/reorganization.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+
+<body class="bg-gray-950 text-white min-h-screen flex font-[Poppins]">
+
+ <!-- Top Row: Rejection + Profile -->
+  <div class="fixed top-4 left-7 w-full px-6 z-40 flex items-center justify-between pointer-events-none">
+    <!-- Violet Rejection Brand -->
+    <h1 class="text-3xl font-extrabold text-purple-400 drop-shadow-md pointer-events-auto" style="font-family: 'Great Vibes', cursive;">
+      Rejection
+    </h1>
+
+    <!-- Profile Area -->
+    <div class="flex items-center gap-2 pointer-events-auto min-w-[250px] justify-end pr-4">
+      <!-- Profile Image Upload -->
+      <div class="relative group w-10 h-10">
+        <img id="profile-pic" src="Images/default-avatar.png" alt="Profile" class="w-full h-full rounded-full border-2 border-purple-500 object-cover">
+        <label for="profile-upload" class="absolute bottom-0 right-0 bg-pink-500 text-white rounded-full text-xs w-4 h-3 flex items-center justify-center cursor-pointer hover:bg-pink-600 transition">+</label>
+        <input type="file" id="profile-upload" accept="image/*" class="hidden" />
+      </div>
+
+      <!-- Welcome Text -->
+      <a href="profile.html"
+        class="text-white font-semibold text-lg hover:underline hover:underline-offset-4 hover:decoration-pink-400 transition duration-200 whitespace-nowrap pl-2">
+        Welcome, <span id="user-name">Guest</span>
+      </a>
+    </div>
+  </div>
+
+
+  <!-- Hamburger -->
+  <button id="menu-toggle" class="fixed top-4 left-4 z-50 text-white focus:outline-none">
+    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar bg-gray-900 w-64 h-full fixed top-0 left-0 z-40 transform -translate-x-full flex flex-col">
+    <button id="close-sidebar" class="absolute top-4 right-4 text-white focus:outline-none">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+
+    <!-- Inside Rejection -->
+    <div class="px-6 pt-6 pb-4">
+      <h1 class="text-5xl font-extrabold text-pink-400 drop-shadow-md" style="font-family: 'Great Vibes', cursive;">
+        Rejection
+      </h1>
+    </div>
+
+    <div class="flex-1 overflow-y-auto px-6 pb-6">
+      <h2 class="text-2xl font-bold text-purple-300 tracking-wider mb-6">☰ Menu</h2>
+      <nav class="flex flex-col gap-6 text-lg font-semibold tracking-wide">
+        <a href="index.html" class="hover:text-purple-300 transition">🏠 Home</a>
+        <a href="#" class="hover:text-purple-300 transition">🔍 Search</a>
+        <a href="#" class="hover:text-purple-300 transition">👥 Friends</a>
+        <a href="#" class="hover:text-purple-300 transition">💬 Chat</a>
+        <a href="#" class="hover:text-purple-300 transition">❓ Queries</a>
+        <a href="#" class="hover:text-purple-300 transition">📧 Mail</a>
+        <a href="#" class="hover:text-purple-300 transition">🔗 Job Links</a>
+        <a href="#" class="hover:text-purple-300 transition">📁 Stories (Projects)</a>
+        <a href="#" class="hover:text-purple-300 transition">📝 Posts</a>
+        <div class="h-6"></div>
+        <a href="#" class="hover:text-purple-300 transition">⚙️ Settings</a>
+        <a href="#" class="hover:text-purple-300 transition">🐞 Report a Bug</a>
+      </nav>
+
+      <!-- Logout -->
+      <div class="mt-12">
+        <a href="signin.html" onclick="logout()" class="block font-bold text-red-500 glow-text hover:text-red-400 transition duration-300">
+           🚪 Log Out
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-grow flex items-center justify-center px-6 py-20 text-center">
+    <div class="bg-gray-900 border border-purple-700 rounded-xl p-10 shadow-lg w-full max-w-xl space-y-6">
+      <h1 class="text-4xl font-bold text-purple-400">🎉 Welcome Back!</h1>
+      <p class="text-lg text-gray-300">You’ve successfully signed in to <strong>Rejection</strong>.</p>
+      <a href="index.html" class="inline-block bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-full transition">Go to Home</a>
+    </div>
+  </main>
+
+  <!-- Loader -->
+  <div id="page-loader" class="fixed inset-0 bg-gradient-to-r from-pink-500 via-purple-600 to-pink-500 z-[9999] hidden flex items-center justify-center">
+    <div class="w-16 h-16 border-4 border-white border-dashed rounded-full animate-spin"></div>
+  </div>
+
+  <script src="JS/logout.js"></script>
+  <script src="JS/dashboard.js"></script>
+</body>
+</html>
