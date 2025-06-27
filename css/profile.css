@@ -1,0 +1,13 @@
+.font-[Poppins] {
+      font-family: 'Poppins', sans-serif;
+    }
+.scroll-container::-webkit-scrollbar {
+      width: 6px;
+    }
+.scroll-container::-webkit-scrollbar-track {
+      background: #1a1a1a;
+    }
+.scroll-container::-webkit-scrollbar-thumb {
+      background: #50c878;
+      border-radius: 3px;
+    }

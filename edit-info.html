@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Info | Rejection</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+  <style>
+    .font-[Poppins] {
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-950 text-white min-h-screen font-[Poppins] flex">
+
+  <!-- Sidebar -->
+  <div class="w-64 bg-gray-900 h-screen sticky top-0 overflow-y-auto p-4 hidden md:block">
+    <div class="mb-6 px-2">
+      <h1 class="text-4xl font-extrabold text-emerald-400 drop-shadow-lg tracking-wide" style="font-family: 'Great Vibes', cursive;">
+        Rejection
+      </h1>
+    </div>
+
+    <h2 class="text-xl font-bold text-emerald-400 mb-4 px-2 mt-4">Profile Users</h2>
+    <ul class="space-y-3 text-white">
+      <li class="hover:text-amber-300 cursor-pointer transition"><a href="profile.html">📌 Overview</a></li>
+      <li class="text-amber-300 cursor-pointer transition">🖊️ Edit Info</li>
+      <li class="hover:text-amber-300 cursor-pointer transition"><a href="linked-accounts.html">🌐 Linked Accounts</a></li>
+      <li class="hover:text-amber-300 cursor-pointer transition">💬 Messages</li>
+      <li class="hover:text-amber-300 cursor-pointer transition">⭐ Bookmarks</li>
+      <li class="hover:text-amber-300 cursor-pointer transition">🎓 Education</li>
+      <li class="hover:text-amber-300 cursor-pointer transition">⚙️ Account Settings</li>
+      <li class="hover:text-red-400 cursor-pointer transition">🚪 Log Out</li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex-1">
+    <header class="w-full h-32 bg-gradient-to-r from-emerald-800 to-amber-700 relative">
+      <a href="profile.html" class="absolute top-4 left-4 text-white hover:text-emerald-300 z-10">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+      </a>
+      <h2 class="absolute bottom-4 left-4 text-2xl font-bold text-amber-300">Edit Personal Information</h2>
+    </header>
+
+    <!-- Edit Info Form -->
+    <div class="max-w-4xl mx-auto px-4 py-8">
+      <form id="edit-info-form" class="space-y-6 bg-gray-800 rounded-lg p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Personal Info -->
+          <div class="space-y-4">
+            <h3 class="text-xl font-semibold text-amber-300 border-b border-gray-700 pb-2">Personal Details</h3>
+            
+            <div>
+              <label class="block text-gray-300 mb-1">Full Name</label>
+              <input type="text" id="full-name" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white">
+            </div>
+            
+            <div>
+              <label class="block text-gray-300 mb-1">Date of Birth</label>
+              <input type="date" id="dob" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white">
+            </div>
+            
+            <div>
+              <label class="block text-gray-300 mb-1">Gender</label>
+              <select id="gender" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white">
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+                <option value="prefer-not-to-say">Prefer not to say</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Contact Info -->
+          <div class="space-y-4">
+            <h3 class="text-xl font-semibold text-amber-300 border-b border-gray-700 pb-2">Contact Information</h3>
+            
+            <div>
+              <label class="block text-gray-300 mb-1">Email</label>
+              <input type="email" id="email" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white">
+            </div>
+            
+            <div>
+              <label class="block text-gray-300 mb-1">Mobile Number</label>
+              <input type="tel" id="mobile" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white">
+            </div>
+            
+            <div>
+              <label class="block text-gray-300 mb-1">Address</label>
+              <textarea id="address" rows="3" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4">
+          <button type="button" id="cancel-btn" class="bg-gray-700 px-4 py-2 text-white rounded hover:bg-gray-600">Cancel</button>
+          <button type="submit" class="bg-emerald-600 px-4 py-2 text-white rounded hover:bg-emerald-700">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="JS/edit-info.js"></script>
+</body>
+</html>

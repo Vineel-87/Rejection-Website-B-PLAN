@@ -1,82 +1,226 @@
+<!-- dashboard.html with Emerald Green + Gold Theme -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard | Rejection</title>
-  <link rel="stylesheet" href="CSS/dashboard.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
   <link rel="icon" href="Images/reorganization.png" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Add CryptoJS for Gravatar support -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
 
-<body class="bg-gray-950 text-white min-h-screen flex font-[Poppins]">
+<body class="bg-[#0f0f0f] text-white min-h-screen flex font-[Poppins]">
 
- <!-- Top Row: Rejection + Profile -->
+  <!-- Background header bar -->
+  <div class="fixed top-0 left-0 w-full h-16 bg-[#1a1a1a]/90 backdrop-blur-sm z-30 border-b border-[#50c878]/30"></div>
+
+  <!-- Second horizontal container bar -->
+  <div class="fixed top-16 left-0 w-full h-12 bg-[#1a1a1a]/80 z-30 border-b border-[#50c878]/20"></div>
+
+  <!-- Vertical container on left side below second horizontal bar -->
+  <div class="fixed top-28 left-0 w-64 h-[calc(100vh-7rem)] bg-[#1a1a1a]/70 z-30 border-r border-[#50c878]/20 overflow-y-auto">
+    <!-- Profile Section -->
+    <div class="p-4 border-b border-[#50c878]/20">
+      <a href="profile.html" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition duration-200 group">
+        <div class="relative w-10 h-10">
+          <img id="vertical-profile-pic" src="Images/default-avatar.png" alt="Profile" class="w-full h-full rounded-full border-2 border-[#50c878] object-cover">
+          <div class="absolute inset-0 rounded-full border-2 border-transparent group-hover:border-[#d4af37] transition duration-200"></div>
+        </div>
+        <div class="flex flex-col">
+          <span id="vertical-username" class="font-semibold text-white group-hover:text-[#d4af37] transition duration-200">Guest</span>
+          <span class="text-xs text-gray-400">View Profile</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Menu Items -->
+    <div class="p-4 space-y-1">
+      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition duration-200 group">
+        <div class="w-8 h-8 flex items-center justify-center bg-[#50c878]/20 rounded-full text-[#50c878]">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+        </div>
+        <span class="text-white group-hover:text-[#d4af37] transition duration-200">Friends</span>
+      </a>
+
+      <!-- Add this to your vertical menu in dashboard.html -->
+      <a href="notifications.html" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition duration-200 group">
+        <div class="w-8 h-8 flex items-center justify-center bg-[#50c878]/20 rounded-full text-[#50c878]">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
+        </div>
+        <span class="text-white group-hover:text-[#d4af37] transition duration-200">Notifications</span>
+        <!-- Notification badge will be added dynamically -->
+      </a>
+      
+      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition duration-200 group">
+        <div class="w-8 h-8 flex items-center justify-center bg-[#50c878]/20 rounded-full text-[#50c878]">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <span class="text-white group-hover:text-[#d4af37] transition duration-200">Memories</span>
+      </a>
+
+      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition duration-200 group">
+        <div class="w-8 h-8 flex items-center justify-center bg-[#50c878]/20 rounded-full text-[#50c878]">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+          </svg>
+        </div>
+        <span class="text-white group-hover:text-[#d4af37] transition duration-200">Saved Posts</span>
+      </a>
+
+      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition duration-200 group">
+        <div class="w-8 h-8 flex items-center justify-center bg-[#50c878]/20 rounded-full text-[#50c878]">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        </div>
+        <span class="text-white group-hover:text-[#d4af37] transition duration-200">Groups</span>
+      </a>
+      
+      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition duration-200 group">
+        <div class="w-8 h-8 flex items-center justify-center bg-[#50c878]/20 rounded-full text-[#50c878]">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <span class="text-white group-hover:text-[#d4af37] transition duration-200">Reels</span>
+      </a>
+
+      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition duration-200 group">
+        <div class="w-8 h-8 flex items-center justify-center bg-[#50c878]/20 rounded-full text-[#50c878]">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          </svg>
+        </div>
+        <span class="text-white group-hover:text-[#d4af37] transition duration-200">Ads Request</span>
+      </a>
+        
+      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition duration-200 group">
+        <div class="w-8 h-8 flex items-center justify-center bg-[#50c878]/20 rounded-full text-[#50c878]">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.701 2.701 0 00-1.5-.454M9 6v2m3-2v2m3-2v2M9 3h.01M12 3h.01M15 3h.01M21 21v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7h18zm-3-9v-2a2 2 0 00-2-2H8a2 2 0 00-2 2v2h12z" />
+          </svg>
+        </div>
+        <span class="text-white group-hover:text-[#d4af37] transition duration-200">Birthday Reminder</span>
+      </a>
+            
+      
+      <!-- Add this to your vertical menu in dashboard.html -->
+      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition duration-200 group">
+        <div class="w-8 h-8 flex items-center justify-center bg-[#50c878]/20 rounded-full text-[#50c878]">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+        </div>
+        <span class="text-white group-hover:text-[#d4af37] transition duration-200">Users Activity</span>
+        <!-- Live activity indicator -->
+        <span class="ml-auto flex items-center">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#50c878] opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-[#50c878]"></span>
+          </span>
+        </span>
+      </a>
+
+      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition duration-200 group">
+        <div class="w-8 h-8 flex items-center justify-center bg-[#50c878]/20 rounded-full text-[#50c878]">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <span class="text-white group-hover:text-[#d4af37] transition duration-200">Queries</span>
+      </a>
+      
+    </div>
+  </div>
+
   <div class="fixed top-4 left-7 w-full px-6 z-40 flex items-center justify-between pointer-events-none">
-    <!-- Violet Rejection Brand -->
-    <h1 class="text-3xl font-extrabold text-purple-400 drop-shadow-md pointer-events-auto" style="font-family: 'Great Vibes', cursive;">
-      Rejection
-    </h1>
-
-    <!-- Profile Area -->
+    <div class="flex items-center gap-6">
+      <h1 class="text-3xl font-extrabold text-[#d4af37] drop-shadow-md pointer-events-auto" style="font-family: 'Great Vibes', cursive;">
+        Rejection
+      </h1>
+      
+      <!-- Search Friends Section -->
+      <div class="relative pointer-events-auto">
+        <input 
+          type="text" 
+          id="search-friends" 
+          placeholder="Search Friends..." 
+          class="bg-[#1a1a1a] border border-[#50c878] rounded-full py-2 pl-10 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent w-64 transition-all duration-300"
+        >
+        <svg class="absolute left-3 top-2.5 h-5 w-5 text-[#50c878]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        
+        <!-- Search Results Dropdown -->
+        <div id="search-results" class="absolute top-12 left-0 w-full bg-[#1a1a1a] border border-[#50c878]/50 rounded-lg shadow-lg z-50 hidden max-h-96 overflow-y-auto">
+          <div id="search-loading" class="hidden p-4 text-center text-gray-400">
+            <svg class="animate-spin h-5 w-5 mx-auto text-[#50c878]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </div>
+          <div id="search-results-list"></div>
+        </div>
+      </div>
+    </div>
+    
     <div class="flex items-center gap-2 pointer-events-auto min-w-[250px] justify-end pr-4">
-      <!-- Profile Image Upload -->
       <div class="relative group w-10 h-10">
-        <img id="profile-pic" src="Images/default-avatar.png" alt="Profile" class="w-full h-full rounded-full border-2 border-purple-500 object-cover">
-        <label for="profile-upload" class="absolute bottom-0 right-0 bg-pink-500 text-white rounded-full text-xs w-4 h-3 flex items-center justify-center cursor-pointer hover:bg-pink-600 transition">+</label>
+        <img id="profile-pic" src="Images/default-avatar.png" alt="Profile" class="w-full h-full rounded-full border-2 border-[#50c878] object-cover">
+        <label for="profile-upload" class="absolute bottom-0 right-0 bg-[#50c878] text-white rounded-full text-xs w-4 h-3 flex items-center justify-center cursor-pointer hover:bg-[#3da865] transition">+</label>
         <input type="file" id="profile-upload" accept="image/*" class="hidden" />
       </div>
-
-      <!-- Welcome Text -->
       <a href="profile.html"
-        class="text-white font-semibold text-lg hover:underline hover:underline-offset-4 hover:decoration-pink-400 transition duration-200 whitespace-nowrap pl-2">
+        class="text-white font-semibold text-lg hover:underline hover:underline-offset-4 hover:decoration-[#d4af37] transition duration-200 whitespace-nowrap pl-2">
         Welcome, <span id="user-name">Guest</span>
       </a>
     </div>
   </div>
 
-
-  <!-- Hamburger -->
   <button id="menu-toggle" class="fixed top-4 left-4 z-50 text-white focus:outline-none">
     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
     </svg>
   </button>
 
-  <!-- Sidebar -->
-  <aside id="sidebar" class="sidebar bg-gray-900 w-64 h-full fixed top-0 left-0 z-40 transform -translate-x-full flex flex-col">
+  <aside id="sidebar" class="sidebar bg-[#1a1a1a] w-64 h-full fixed top-0 left-0 z-40 transform -translate-x-full flex flex-col">
     <button id="close-sidebar" class="absolute top-4 right-4 text-white focus:outline-none">
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
       </svg>
     </button>
-
-    <!-- Inside Rejection -->
     <div class="px-6 pt-6 pb-4">
-      <h1 class="text-5xl font-extrabold text-pink-400 drop-shadow-md" style="font-family: 'Great Vibes', cursive;">
+      <h1 class="text-5xl font-extrabold text-[#50c878] drop-shadow-md" style="font-family: 'Great Vibes', cursive;">
         Rejection
       </h1>
     </div>
-
     <div class="flex-1 overflow-y-auto px-6 pb-6">
-      <h2 class="text-2xl font-bold text-purple-300 tracking-wider mb-6">☰ Menu</h2>
+      <h2 class="text-2xl font-bold text-[#d4af37] tracking-wider mb-6">☰ Menu</h2>
       <nav class="flex flex-col gap-6 text-lg font-semibold tracking-wide">
-        <a href="index.html" class="hover:text-purple-300 transition">🏠 Home</a>
-        <a href="#" class="hover:text-purple-300 transition">🔍 Search</a>
-        <a href="#" class="hover:text-purple-300 transition">👥 Friends</a>
-        <a href="#" class="hover:text-purple-300 transition">💬 Chat</a>
-        <a href="#" class="hover:text-purple-300 transition">❓ Queries</a>
-        <a href="#" class="hover:text-purple-300 transition">📧 Mail</a>
-        <a href="#" class="hover:text-purple-300 transition">🔗 Job Links</a>
-        <a href="#" class="hover:text-purple-300 transition">📁 Stories (Projects)</a>
-        <a href="#" class="hover:text-purple-300 transition">📝 Posts</a>
+        <a href="index.html" class="hover:text-[#d4af37] transition">🏠 Home</a>
+        <a href="#" class="hover:text-[#d4af37] transition">🔍 Search</a>
+        <a href="#" class="hover:text-[#d4af37] transition">👥 Friends</a>
+        <a href="#" class="hover:text-[#d4af37] transition">💬 Chat</a>
+        <a href="#" class="hover:text-[#d4af37] transition">❓ Queries</a>
+        <a href="#" class="hover:text-[#d4af37] transition">📧 Mail</a>
+        <a href="#" class="hover:text-[#d4af37] transition">🔗 Job Links</a>
+        <a href="#" class="hover:text-[#d4af37] transition">📁 Stories (Projects)</a>
+        <a href="#" class="hover:text-[#d4af37] transition">📝 Posts</a>
         <div class="h-6"></div>
-        <a href="#" class="hover:text-purple-300 transition">⚙️ Settings</a>
-        <a href="#" class="hover:text-purple-300 transition">🐞 Report a Bug</a>
+        <a href="#" class="hover:text-[#d4af37] transition">⚙️ Settings</a>
+        <a href="#" class="hover:text-[#d4af37] transition">🐞 Report a Bug</a>
       </nav>
-
-      <!-- Logout -->
       <div class="mt-12">
         <a href="signin.html" onclick="logout()" class="block font-bold text-red-500 glow-text hover:text-red-400 transition duration-300">
            🚪 Log Out
@@ -85,19 +229,42 @@
     </div>
   </aside>
 
-  <!-- Main Content -->
-  <main class="flex-grow flex items-center justify-center px-6 py-20 text-center">
-    <div class="bg-gray-900 border border-purple-700 rounded-xl p-10 shadow-lg w-full max-w-xl space-y-6">
-      <h1 class="text-4xl font-bold text-purple-400">🎉 Welcome Back!</h1>
-      <p class="text-lg text-gray-300">You’ve successfully signed in to <strong>Rejection</strong>.</p>
-      <a href="index.html" class="inline-block bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-full transition">Go to Home</a>
+  <main class="flex-grow flex items-center justify-center px-6 py-20 text-center ml-64">
+    <div class="bg-[#1a1a1a] border border-[#50c878] rounded-xl p-10 shadow-lg w-full max-w-xl space-y-6">
+      <h1 class="text-4xl font-bold text-[#d4af37]">🎉 Welcome Back!</h1>
+      <p class="text-lg text-gray-300">You've successfully signed in to <strong>Rejection</strong>.</p>
+      <a href="index.html" class="inline-block bg-[#50c878] hover:bg-[#3da865] text-white font-semibold px-6 py-3 rounded-full transition">Go to Home</a>
     </div>
   </main>
 
-  <!-- Loader -->
-  <div id="page-loader" class="fixed inset-0 bg-gradient-to-r from-pink-500 via-purple-600 to-pink-500 z-[9999] hidden flex items-center justify-center">
+  <div id="page-loader" class="fixed inset-0 bg-gradient-to-r from-[#50c878] via-[#d4af37] to-[#50c878] z-[9999] hidden flex items-center justify-center">
     <div class="w-16 h-16 border-4 border-white border-dashed rounded-full animate-spin"></div>
   </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Load profile data for vertical container
+      const currentUser = localStorage.getItem("currentUser") || "Guest";
+      const verticalProfilePic = document.getElementById("vertical-profile-pic");
+      const verticalUsername = document.getElementById("vertical-username");
+      
+      // Load profile picture
+      if (currentUser && currentUser !== "Guest") {
+        const savedProfilePic = localStorage.getItem(`profilePic_${currentUser}`);
+        if (savedProfilePic) {
+          verticalProfilePic.src = savedProfilePic;
+        } else {
+          // Use Gravatar as fallback
+          verticalProfilePic.src = `https://www.gravatar.com/avatar/${CryptoJS.MD5(currentUser.trim().toLowerCase())}?d=identicon&s=200`;
+        }
+        
+        // Load username (from profile.html data)
+        const savedUsername = localStorage.getItem(`username_${currentUser}`) || 
+                             (currentUser.includes("@") ? currentUser.split("@")[0] : currentUser);
+        verticalUsername.textContent = savedUsername;
+      }
+    });
+  </script>
 
   <script src="JS/logout.js"></script>
   <script src="JS/dashboard.js"></script>
