@@ -1,389 +1,479 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const profileEmail = urlParams.get('email');
-  const currentUser = profileEmail || localStorage.getItem("currentUser") || "Guest";
-  const isViewingOtherProfile = profileEmail && profileEmail !== localStorage.getItem("currentUser");
+// Robust profile.js with complete error handling and API integration
+const API_BASE_URL = 'http://localhost:5000';
 
-  // DOM Elements
-  const fileInput = document.getElementById("edit-upload");
-  const bgInput = document.getElementById("bg-upload");
-  const profileImage = document.getElementById("profile-preview");
-  const header = document.getElementById("profile-header");
-  const usernameEl = document.getElementById("profile-username");
-  const bioEl = document.getElementById("profile-bio");
-  
-  // Friend request buttons
-  const addFriendBtn = document.getElementById("add-friend-btn");
-  const requestSentBtn = document.getElementById("request-sent-btn");
-  const acceptRequestBtn = document.getElementById("accept-request-btn");
-  const declineRequestBtn = document.getElementById("decline-request-btn");
-  const connectedBtn = document.getElementById("connected-btn");
+document.addEventListener("DOMContentLoaded", async () => {
+  // Authentication and Initialization
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const profileEmail = urlParams.get('email');
+    const currentUserEmail = localStorage.getItem("currentUserEmail");
+    const isViewingOtherProfile = profileEmail && profileEmail !== currentUserEmail;
+    const token = localStorage.getItem("token");
 
-  const displayElements = {
-    fullname: document.getElementById("display-fullname"),
-    dob: document.getElementById("display-dob"),
-    gender: document.getElementById("display-gender"),
-    email: document.getElementById("display-email"),
-    mobile: document.getElementById("display-mobile"),
-    address: document.getElementById("display-address"),
-    facebook: document.getElementById("display-facebook"),
-    instagram: document.getElementById("display-instagram"),
-    linkedin: document.getElementById("display-linkedin"),
-    telegram: document.getElementById("display-telegram"),
-    snapchat: document.getElementById("display-snapchat"),
-    github: document.getElementById("display-github"),
-    portfolio: document.getElementById("display-portfolio")
-  };
+    // Validate authentication
+    if (!token && !isViewingOtherProfile) {
+      console.error("No authentication token found");
+      redirectToLogin();
+      return;
+    }
 
-  // Initialize
-  loadInitialProfile();
-  loadProfileInfo();
-  setupFriendRequestButton();
+    // DOM Elements
+    const elements = {
+      fileInput: document.getElementById("edit-upload"),
+      bgInput: document.getElementById("bg-upload"),
+      profileImage: document.getElementById("profile-preview"),
+      header: document.getElementById("profile-header"),
+      usernameEl: document.getElementById("profile-username"),
+      bioEl: document.getElementById("profile-bio"),
+      editorModal: document.getElementById("editor-modal"),
+      editorImage: document.getElementById("editor-image"),
+      brightnessSlider: document.getElementById("brightness-range"),
+      zoomInBtn: document.getElementById("zoom-in"),
+      zoomOutBtn: document.getElementById("zoom-out"),
+      cancelEditBtn: document.getElementById("cancel-edit"),
+      applyEditBtn: document.getElementById("apply-edit"),
+      displayElements: {
+        fullname: document.getElementById("display-fullname"),
+        dob: document.getElementById("display-dob"),
+        gender: document.getElementById("display-gender"),
+        email: document.getElementById("display-email"),
+        mobile: document.getElementById("display-mobile"),
+        address: document.getElementById("display-address"),
+        facebook: document.getElementById("display-facebook"),
+        instagram: document.getElementById("display-instagram"),
+        linkedin: document.getElementById("display-linkedin"),
+        telegram: document.getElementById("display-telegram"),
+        snapchat: document.getElementById("display-snapchat"),
+        github: document.getElementById("display-github"),
+        portfolio: document.getElementById("display-portfolio")
+      },
+      friendButtons: {
+        addFriend: document.getElementById("add-friend-btn"),
+        requestSent: document.getElementById("request-sent-btn"),
+        acceptRequest: document.getElementById("accept-request-btn"),
+        declineRequest: document.getElementById("decline-request-btn"),
+        connected: document.getElementById("connected-btn"),
+        removeConnection: document.getElementById("remove-connection-btn")
+      }
+    };
 
-  function loadInitialProfile() {
-    if (isViewingOtherProfile) {
-      fileInput.style.display = 'none';
-      bgInput.style.display = 'none';
-      usernameEl.style.pointerEvents = 'none';
-      bioEl.style.pointerEvents = 'none';
+    // State management
+    let cropper = null;
+    let currentEditType = "";
+
+    // Initialize
+    await initializeProfile();
+
+    // Core Functions
+    async function initializeProfile() {
+      try {
+        if (isViewingOtherProfile) {
+          disableEditingFeatures();
+          await loadOtherProfileInfo(profileEmail);
+        } else {
+          hideAllFriendButtons();
+          await loadProfileInfo();
+          setupEditListeners();
+        }
+      } catch (error) {
+        console.error("Initialization error:", error);
+        showError("Failed to initialize profile");
+      }
+    }
+
+    function disableEditingFeatures() {
+      if (elements.fileInput) elements.fileInput.style.display = 'none';
+      if (elements.bgInput) elements.bgInput.style.display = 'none';
+      if (elements.usernameEl) elements.usernameEl.style.pointerEvents = 'none';
+      if (elements.bioEl) elements.bioEl.style.pointerEvents = 'none';
+      
       const editCoverBtn = document.querySelector('label[for="bg-upload"]');
       if (editCoverBtn) editCoverBtn.style.display = 'none';
-    } else {
-      hideAllFriendButtons();
     }
 
-    const savedProfilePic = localStorage.getItem(`profilePic_${currentUser}`);
-    if (savedProfilePic) {
-      profileImage.src = savedProfilePic;
-    } else if (profileEmail) {
-      profileImage.src = `https://www.gravatar.com/avatar/${md5(profileEmail)}?d=identicon&s=200`;
-    }
-
-    const savedBgImage = localStorage.getItem(`bgImage_${currentUser}`);
-    if (savedBgImage) applyBackgroundImage(savedBgImage);
-
-    const savedUsername = localStorage.getItem(`username_${currentUser}`);
-    usernameEl.textContent = savedUsername || (profileEmail ? profileEmail.split('@')[0] : 'Unknown');
-
-    const savedBio = localStorage.getItem(`bio_${currentUser}`);
-    if (savedBio) bioEl.textContent = savedBio;
-  }
-
-  function setupFriendRequestButton() {
-    if (!isViewingOtherProfile) return;
-
-    const loggedInUser = localStorage.getItem("currentUser");
-    if (!loggedInUser || loggedInUser === "Guest") {
-      hideAllFriendButtons();
-      return;
-    }
-
-    // Check if already friends
-    const friends = JSON.parse(localStorage.getItem(`friends_${loggedInUser}`) || '[]');
-    if (friends.includes(profileEmail)) {
-      showButton(connectedBtn);
-      return;
-    }
-
-    // Check requests from both perspectives
-    const myRequests = JSON.parse(localStorage.getItem(`friendRequests_${loggedInUser}`) || '[]');
-    const theirRequests = JSON.parse(localStorage.getItem(`friendRequests_${profileEmail}`) || '[]');
-    
-    // Check if I sent a request to them
-    const sentRequest = myRequests.find(req => 
-      req.from === loggedInUser && req.to === profileEmail && req.status === 'pending'
-    );
-    
-    // Check if they sent a request to me
-    const receivedRequest = theirRequests.find(req => 
-      req.from === profileEmail && req.to === loggedInUser && req.status === 'pending'
-    );
-
-    if (sentRequest) {
-      showButton(requestSentBtn);
-      requestSentBtn.onclick = () => {
-        if (confirm("Are you sure you want to cancel the friend request?")) {
-          cancelFriendRequest(sentRequest.id);
+    async function loadProfileInfo() {
+      try {
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/user/profile`);
+        const profile = response; // No need to access .data or other properties
+        
+        // Update profile image
+        if (elements.profileImage) {
+          elements.profileImage.src = getProfileImageUrl(profile);
         }
-      };
-    } 
-    else if (receivedRequest) {
-      showButton(acceptRequestBtn);
-      showButton(declineRequestBtn);
+        
+        // Update username and bio
+        if (elements.usernameEl) {
+          elements.usernameEl.textContent = getDisplayName(profile);
+        }
+        if (elements.bioEl) {
+          elements.bioEl.textContent = profile.bio || 'No bio yet';
+        }
+        
+        // Update background if available
+        if (profile.background_image && elements.header) {
+          applyBackgroundImage(profile.background_image);
+        }
+
+        // Update display elements
+        updateDisplayElements(profile);
+      } catch (error) {
+        console.error("Failed to load profile info:", error);
+        handleAuthError(error);
+      }
+    }
+
+    async function loadOtherProfileInfo(email) {
+      try {
+        const profile = await fetchWithAuth(`${API_BASE_URL}/api/user/by-email/${encodeURIComponent(email)}`);
+        
+        // Update profile image
+        if (elements.profileImage) {
+          elements.profileImage.src = getProfileImageUrl(profile);
+        }
+        
+        // Update username and bio
+        if (elements.usernameEl) {
+          elements.usernameEl.textContent = getDisplayName(profile);
+        }
+        if (elements.bioEl) {
+          elements.bioEl.textContent = profile.bio || '';
+        }
+        
+        // Update background if available
+        if (profile.background_image && elements.header) {
+          applyBackgroundImage(profile.background_image);
+        }
+
+        // Update display elements (only public info)
+        updateDisplayElements(profile, true);
+      } catch (error) {
+        console.error("Failed to load other profile info:", error);
+        showError("Failed to load profile information");
+      }
+    }
+
+    function updateDisplayElements(profile, isPublicView = false) {
+      const { displayElements } = elements;
       
-      acceptRequestBtn.onclick = () => acceptFriendRequest(receivedRequest.id);
-      declineRequestBtn.onclick = () => declineFriendRequest(receivedRequest.id);
-    } 
-    else {
-      showButton(addFriendBtn);
-      addFriendBtn.onclick = sendFriendRequest;
-    }
-  }
-
-  function sendFriendRequest() {
-    const loggedInUser = localStorage.getItem("currentUser");
-    if (!loggedInUser || loggedInUser === "Guest") return;
-
-    const requestId = Date.now().toString();
-    const request = {
-      id: requestId,
-      from: loggedInUser,
-      to: profileEmail,
-      timestamp: new Date().toISOString(),
-      status: 'pending'
-    };
-
-    // Save to both users' friend requests
-    const recipientRequests = JSON.parse(localStorage.getItem(`friendRequests_${profileEmail}`) || '[]');
-    recipientRequests.push(request);
-    localStorage.setItem(`friendRequests_${profileEmail}`, JSON.stringify(recipientRequests));
-
-    const senderRequests = JSON.parse(localStorage.getItem(`friendRequests_${loggedInUser}`) || '[]');
-    senderRequests.push(request);
-    localStorage.setItem(`friendRequests_${loggedInUser}`, JSON.stringify(senderRequests));
-
-    // Update UI
-    setupFriendRequestButton();
-    localStorage.setItem('friendStatusUpdate', Date.now().toString());
-    
-    alert(`Friend request sent to ${profileEmail.split('@')[0]}`);
-  }
-
-  function acceptFriendRequest(requestId) {
-    const loggedInUser = localStorage.getItem("currentUser");
-    if (!loggedInUser || !profileEmail) return;
-
-    // Update request status to 'accepted'
-    updateRequestStatus(loggedInUser, profileEmail, requestId, 'accepted');
-    updateRequestStatus(profileEmail, loggedInUser, requestId, 'accepted');
-
-    // Add to each other's friends list
-    addToFriendsList(loggedInUser, profileEmail);
-    addToFriendsList(profileEmail, loggedInUser);
-
-    // Update UI
-    setupFriendRequestButton();
-    localStorage.setItem('friendStatusUpdate', Date.now().toString());
-    
-    alert(`You are now connected with ${profileEmail.split('@')[0]}`);
-  }
-
-  function declineFriendRequest(requestId) {
-    const loggedInUser = localStorage.getItem("currentUser");
-    if (!loggedInUser || !profileEmail) return;
-
-    // Remove the request from both users
-    removeFriendRequest(loggedInUser, requestId);
-    removeFriendRequest(profileEmail, requestId);
-
-    // Update UI
-    setupFriendRequestButton();
-    localStorage.setItem('friendStatusUpdate', Date.now().toString());
-  }
-
-  function cancelFriendRequest(requestId) {
-    const loggedInUser = localStorage.getItem("currentUser");
-    if (!loggedInUser || !profileEmail) return;
-
-    // Remove from both users' requests
-    removeFriendRequest(profileEmail, requestId);
-    removeFriendRequest(loggedInUser, requestId);
-
-    // Update UI
-    setupFriendRequestButton();
-    localStorage.setItem('friendStatusUpdate', Date.now().toString());
-  }
-
-  // Helper functions
-  function updateRequestStatus(userEmail, friendEmail, requestId, status) {
-    const requests = JSON.parse(localStorage.getItem(`friendRequests_${userEmail}`) || '[]');
-    const updatedRequests = requests.map(req => {
-      if (req.id === requestId && req.from === friendEmail && req.to === userEmail) {
-        return {...req, status};
+      if (displayElements.fullname) {
+        displayElements.fullname.textContent = profile.name || "Not specified";
       }
-      return req;
-    });
-    localStorage.setItem(`friendRequests_${userEmail}`, JSON.stringify(updatedRequests));
-  }
+      
+      if (!isPublicView) {
+        if (displayElements.email) {
+          displayElements.email.textContent = profile.email || "Not specified";
+        }
+        if (displayElements.mobile) {
+          displayElements.mobile.textContent = profile.phone || "Not specified";
+        }
+      }
+      
+      if (displayElements.dob) {
+        displayElements.dob.textContent = profile.dob ? formatDate(profile.dob) : "Not specified";
+      }
+      
+      if (displayElements.gender) {
+        displayElements.gender.textContent = profile.gender ? 
+          capitalizeFirstLetter(profile.gender.replace(/-/g, " ")) : "Not specified";
+      }
+      
+      if (!isPublicView && displayElements.address) {
+        displayElements.address.textContent = profile.address || "Not specified";
+      }
 
-  function removeFriendRequest(userEmail, requestId) {
-    const requests = JSON.parse(localStorage.getItem(`friendRequests_${userEmail}`) || '[]')
-      .filter(req => req.id !== requestId);
-    localStorage.setItem(`friendRequests_${userEmail}`, JSON.stringify(requests));
-  }
-
-  function addToFriendsList(userEmail, friendEmail) {
-    const friends = JSON.parse(localStorage.getItem(`friends_${userEmail}`) || '[]');
-    if (!friends.includes(friendEmail)) {
-      friends.push(friendEmail);
-      localStorage.setItem(`friends_${userEmail}`, JSON.stringify(friends));
+      // Update bio display if available
+      if (elements.bioEl && !isPublicView) {
+        elements.bioEl.textContent = profile.bio || 'No bio yet';
+      }
+      
+      updateLinkedAccountDisplay(displayElements.facebook, profile.facebook);
+      updateLinkedAccountDisplay(displayElements.instagram, profile.instagram);
+      updateLinkedAccountDisplay(displayElements.linkedin, profile.linkedin);
+      updateLinkedAccountDisplay(displayElements.telegram, profile.telegram);
+      updateLinkedAccountDisplay(displayElements.snapchat, profile.snapchat);
+      updateLinkedAccountDisplay(displayElements.github, profile.github);
+      updateLinkedAccountDisplay(displayElements.portfolio, profile.portfolio);
     }
-  }
 
-  function hideAllFriendButtons() {
-    [addFriendBtn, requestSentBtn, acceptRequestBtn, declineRequestBtn, connectedBtn].forEach(btn => {
-      if (btn) btn.style.display = 'none';
-    });
-  }
-
-  function showButton(btn) {
-    hideAllFriendButtons();
-    if (btn) btn.style.display = 'block';
-  }
-
-  function applyBackgroundImage(imageData) {
-    header.style.background = `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${imageData})`;
-    header.style.backgroundSize = 'cover';
-    header.style.backgroundPosition = 'center';
-    header.style.backgroundRepeat = 'no-repeat';
-  }
-
-  function loadProfileInfo() {
-    displayElements.fullname.textContent = localStorage.getItem(`fullName_${currentUser}`) || "Not specified";
-
-    const dob = localStorage.getItem(`dob_${currentUser}`);
-    displayElements.dob.textContent = dob ? new Date(dob).toLocaleDateString() : "Not specified";
-
-    const gender = localStorage.getItem(`gender_${currentUser}`);
-    displayElements.gender.textContent = gender ? gender.charAt(0).toUpperCase() + gender.slice(1).replace(/-/g, " ") : "Not specified";
-
-    displayElements.email.textContent = currentUser.includes("@") ? currentUser : "Not specified";
-    displayElements.mobile.textContent = localStorage.getItem(`mobile_${currentUser}`) || "Not specified";
-    displayElements.address.textContent = localStorage.getItem(`address_${currentUser}`) || "Not specified";
-
-    updateLinkedAccountDisplay(displayElements.facebook, localStorage.getItem(`facebook_${currentUser}`));
-    updateLinkedAccountDisplay(displayElements.instagram, localStorage.getItem(`instagram_${currentUser}`));
-    updateLinkedAccountDisplay(displayElements.linkedin, localStorage.getItem(`linkedin_${currentUser}`));
-    updateLinkedAccountDisplay(displayElements.telegram, localStorage.getItem(`telegram_${currentUser}`));
-    updateLinkedAccountDisplay(displayElements.snapchat, localStorage.getItem(`snapchat_${currentUser}`));
-    updateLinkedAccountDisplay(displayElements.github, localStorage.getItem(`github_${currentUser}`));
-    updateLinkedAccountDisplay(displayElements.portfolio, localStorage.getItem(`portfolio_${currentUser}`));
-  }
-
-  function updateLinkedAccountDisplay(element, url) {
-    if (url && url.trim()) {
-      element.textContent = url;
-      element.href = url.startsWith('http') ? url : 'https://' + url;
-      element.target = '_blank';
-    } else {
-      element.textContent = "Not connected";
-      element.href = "#";
-      element.removeAttribute('target');
+    function updateLinkedAccountDisplay(element, url) {
+      if (!element) return;
+      
+      if (url && url.trim()) {
+        element.textContent = url;
+        element.href = url.startsWith('http') ? url : 'https://' + url;
+        element.target = '_blank';
+        element.classList.remove('text-gray-400');
+        element.classList.add('text-blue-400', 'hover:underline');
+      } else {
+        element.textContent = "Not connected";
+        element.href = "#";
+        element.removeAttribute('target');
+        element.classList.add('text-gray-400');
+        element.classList.remove('text-blue-400', 'hover:underline');
+      }
     }
-  }
 
-  // Image editor functionality
-  let cropper = null;
-  let currentEditType = "";
-  const editorModal = document.getElementById("editor-modal");
-  const editorImage = document.getElementById("editor-image");
-  const brightnessSlider = document.getElementById("brightness-range");
+    function setupEditListeners() {
+      // Username edit
+      if (elements.usernameEl) {
+        elements.usernameEl.addEventListener("click", () => handleNameEdit());
+      }
 
-  function openEditor(file, type) {
-    if (isViewingOtherProfile) return;
+      // Bio edit
+      if (elements.bioEl) {
+        elements.bioEl.addEventListener("click", () => handleBioEdit());
+      }
 
-    currentEditType = type;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      editorImage.src = e.target.result;
-      editorModal.classList.remove("hidden");
-      brightnessSlider.value = 1;
-      editorImage.style.filter = "brightness(1)";
+      // Profile picture upload
+      if (elements.fileInput) {
+        elements.fileInput.addEventListener("change", (e) => handleImageUpload(e, "profile"));
+      }
 
-      if (cropper) cropper.destroy();
+      // Background image upload
+      if (elements.bgInput) {
+        elements.bgInput.addEventListener("change", (e) => handleImageUpload(e, "background"));
+      }
 
-      cropper = new Cropper(editorImage, {
-        viewMode: 1,
-        aspectRatio: type === "profile" ? 1 : 16 / 9,
-        autoCropArea: 1,
-        responsive: true
+      // Image editor controls
+      if (elements.brightnessSlider) {
+        elements.brightnessSlider.addEventListener("input", handleBrightnessChange);
+      }
+
+      if (elements.zoomInBtn) elements.zoomInBtn.onclick = () => cropper?.zoom(0.1);
+      if (elements.zoomOutBtn) elements.zoomOutBtn.onclick = () => cropper?.zoom(-0.1);
+      
+      if (elements.cancelEditBtn) {
+        elements.cancelEditBtn.onclick = closeEditor;
+      }
+
+      if (elements.applyEditBtn) {
+        elements.applyEditBtn.onclick = applyImageEdit;
+      }
+    }
+
+    async function handleNameEdit() {
+      const currentName = elements.usernameEl?.textContent.trim() || '';
+      const newName = prompt("Enter your name:", currentName);
+      
+      if (newName?.trim() && newName !== currentName) {
+        try {
+          await fetchWithAuth(`${API_BASE_URL}/api/user`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: newName.trim() })
+          });
+          
+          if (elements.usernameEl) {
+            elements.usernameEl.textContent = newName.trim();
+          }
+        } catch (error) {
+          console.error("Error updating name:", error);
+          handleAuthError(error);
+        }
+      }
+    }
+
+    async function handleBioEdit() {
+      const currentBio = elements.bioEl?.textContent.trim() || '';
+      const newBio = prompt("Edit your bio:", currentBio);
+      
+      if (newBio !== null && newBio !== currentBio) {
+        try {
+          await fetchWithAuth(`${API_BASE_URL}/api/user/bio`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ bio: newBio.trim() })
+          });
+          
+          if (elements.bioEl) {
+            elements.bioEl.textContent = newBio.trim();
+          }
+        } catch (error) {
+          console.error("Error updating bio:", error);
+          handleAuthError(error);
+        }
+      }
+    }
+
+    function handleImageUpload(event, type) {
+      const file = event.target.files[0];
+      if (file && file.type.startsWith("image/")) {
+        openEditor(file, type);
+      }
+      event.target.value = "";
+    }
+
+    function openEditor(file, type) {
+      if (!elements.editorModal || !elements.editorImage) return;
+
+      currentEditType = type;
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+        elements.editorImage.src = e.target.result;
+        elements.editorModal.classList.remove("hidden");
+        
+        if (elements.brightnessSlider) {
+          elements.brightnessSlider.value = 1;
+        }
+        
+        elements.editorImage.style.filter = "brightness(1)";
+
+        if (cropper) cropper.destroy();
+
+        cropper = new Cropper(elements.editorImage, {
+          viewMode: 1,
+          aspectRatio: type === "profile" ? 1 : 16 / 9,
+          autoCropArea: 1,
+          responsive: true
+        });
+      };
+      
+      reader.readAsDataURL(file);
+    }
+
+    function handleBrightnessChange(e) {
+      if (elements.editorImage) {
+        elements.editorImage.style.filter = `brightness(${e.target.value})`;
+      }
+    }
+
+    async function applyImageEdit() {
+      if (!cropper || !elements.header) return;
+
+      try {
+        const canvas = cropper.getCroppedCanvas({
+          width: currentEditType === "profile" ? 500 : elements.header.offsetWidth * 2,
+          height: currentEditType === "profile" ? 500 : elements.header.offsetHeight * 2,
+          fillColor: '#000'
+        });
+
+        const brightness = parseFloat(elements.brightnessSlider?.value || 1);
+        const filteredCanvas = applyBrightnessFilter(canvas, brightness);
+
+        const blob = await new Promise(resolve => {
+          filteredCanvas.toBlob(resolve, 'image/jpeg', 0.9);
+        });
+
+        const formData = new FormData();
+        const file = new File([blob], `${currentEditType}-${Date.now()}.jpg`, { type: 'image/jpeg' });
+        const fieldName = currentEditType === "profile" ? "avatar" : "background";
+        formData.append(fieldName, file);
+
+        const endpoint = currentEditType === "profile" 
+          ? `${API_BASE_URL}/api/user/avatar` 
+          : `${API_BASE_URL}/api/user/background`;
+        
+        const result = await fetchWithAuth(endpoint, {
+          method: 'POST',
+          body: formData
+        });
+
+        if (currentEditType === "profile" && elements.profileImage) {
+          elements.profileImage.src = result.avatar;
+        } else if (currentEditType === "background") {
+          applyBackgroundImage(result.background);
+        }
+
+        closeEditor();
+      } catch (error) {
+        console.error("Error updating image:", error);
+        handleAuthError(error);
+      }
+    }
+
+    function applyBrightnessFilter(canvas, brightness) {
+      const filteredCanvas = document.createElement("canvas");
+      filteredCanvas.width = canvas.width;
+      filteredCanvas.height = canvas.height;
+      const ctx = filteredCanvas.getContext("2d");
+      ctx.filter = `brightness(${brightness})`;
+      ctx.drawImage(canvas, 0, 0);
+      return filteredCanvas;
+    }
+
+    function closeEditor() {
+      cropper?.destroy();
+      cropper = null;
+      if (elements.editorModal) elements.editorModal.classList.add("hidden");
+    }
+
+    function applyBackgroundImage(imagePath) {
+      if (!elements.header) return;
+      elements.header.style.background = `
+        linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+        url(${API_BASE_URL}${imagePath}?t=${Date.now()})
+      `;
+      elements.header.style.backgroundSize = 'cover';
+      elements.header.style.backgroundPosition = 'center';
+      elements.header.style.backgroundRepeat = 'no-repeat';
+    }
+
+    function hideAllFriendButtons() {
+      Object.values(elements.friendButtons).forEach(btn => {
+        if (btn) btn.style.display = 'none';
       });
-    };
-    reader.readAsDataURL(file);
-  }
-
-  if (!isViewingOtherProfile) {
-    usernameEl.addEventListener("click", () => {
-      const newName = prompt("Enter your name:", usernameEl.textContent.trim());
-      if (newName?.trim()) {
-        usernameEl.textContent = newName.trim();
-        localStorage.setItem(`username_${currentUser}`, newName.trim());
-      }
-    });
-
-    bioEl.addEventListener("click", () => {
-      const newBio = prompt("Edit your bio:", bioEl.textContent.trim());
-      if (newBio !== null) {
-        bioEl.textContent = newBio.trim();
-        localStorage.setItem(`bio_${currentUser}`, newBio.trim());
-      }
-    });
-
-    fileInput.addEventListener("change", (e) => {
-      const file = e.target.files[0];
-      if (file && file.type.startsWith("image/")) openEditor(file, "profile");
-      fileInput.value = "";
-    });
-
-    bgInput.addEventListener("change", (e) => {
-      const file = e.target.files[0];
-      if (file && file.type.startsWith("image/")) openEditor(file, "background");
-      bgInput.value = "";
-    });
-  }
-
-  brightnessSlider.addEventListener("input", (e) => {
-    editorImage.style.filter = `brightness(${e.target.value})`;
-  });
-
-  document.getElementById("zoom-in").onclick = () => cropper?.zoom(0.1);
-  document.getElementById("zoom-out").onclick = () => cropper?.zoom(-0.1);
-  document.getElementById("cancel-edit").onclick = () => {
-    cropper?.destroy();
-    cropper = null;
-    editorModal.classList.add("hidden");
-  };
-
-  document.getElementById("apply-edit").onclick = () => {
-    if (!cropper || isViewingOtherProfile) return;
-
-    const canvas = cropper.getCroppedCanvas({
-      width: currentEditType === "profile" ? 500 : header.offsetWidth * 2,
-      height: currentEditType === "profile" ? 500 : header.offsetHeight * 2,
-      fillColor: '#000'
-    });
-
-    const brightness = parseFloat(brightnessSlider.value);
-    const filteredCanvas = document.createElement("canvas");
-    filteredCanvas.width = canvas.width;
-    filteredCanvas.height = canvas.height;
-    const ctx = filteredCanvas.getContext("2d");
-    ctx.filter = `brightness(${brightness})`;
-    ctx.drawImage(canvas, 0, 0);
-
-    const dataUrl = filteredCanvas.toDataURL("image/png");
-
-    if (currentEditType === "profile") {
-      profileImage.src = dataUrl;
-      localStorage.setItem(`profilePic_${currentUser}`, dataUrl);
-    } else {
-      applyBackgroundImage(dataUrl);
-      localStorage.setItem(`bgImage_${currentUser}`, dataUrl);
     }
 
-    cropper?.destroy();
-    cropper = null;
-    editorModal.classList.add("hidden");
-  };
+    // Utility Functions
+    async function fetchWithAuth(url, options = {}) {
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+        ...(options.headers || {})
+      };
 
-  function md5(string) {
-    return string ? CryptoJS.MD5(string.trim().toLowerCase()).toString() : '';
-  }
+      const response = await fetch(url, { ...options, headers });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const error = new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        error.status = response.status;
+        throw error;
+      }
 
-  // Listen for updates from other tabs
-  window.addEventListener('storage', (e) => {
-    if (e.key === 'friendStatusUpdate') {
-      setupFriendRequestButton();
+      return response.json();
     }
-  });
+
+    function handleAuthError(error) {
+      if (error.status === 401 || error.status === 403 || 
+          error.message.includes("token") || error.message.includes("authentication")) {
+        redirectToLogin();
+      } else {
+        showError(error.message || "An error occurred");
+      }
+    }
+
+    function redirectToLogin() {
+      localStorage.removeItem("token");
+      window.location.href = "/SignIn.html";
+    }
+
+    function showError(message) {
+      alert(message); // Replace with your preferred error display method
+    }
+
+    function getProfileImageUrl(profile) {
+      return profile.avatar 
+        ? `${API_BASE_URL}${profile.avatar}?t=${Date.now()}`
+        : `https://ui-avatars.com/api/?name=${encodeURIComponent(getDisplayName(profile))}&background=random`;
+    }
+
+    function getDisplayName(profile) {
+      return profile.name || (profile.email ? profile.email.split('@')[0] : 'User');
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return "";
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return new Date(dateString).toLocaleDateString(undefined, options);
+    }
+
+    function capitalizeFirstLetter(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+  } catch (error) {
+    console.error("Global error handler:", error);
+    redirectToLogin();
+  }
 });

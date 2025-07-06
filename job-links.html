@@ -1,0 +1,220 @@
+<!-- job-links.html with Emerald Green + Gold Theme -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Links | Rejection</title>
+  <link rel="icon" href="Images/reorganization.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/job-links.css">
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+  <!-- First horizontal container -->
+  <div class="fixed top-0 left-0 w-full h-16 bg-[#1a1a1a]/90 backdrop-blur-sm z-30 border-b border-[#50c878]/30 flex items-center px-6">
+    <!-- Back button -->
+    <a href="dashboard.html" class="flex items-center text-[#d4af37] hover:text-white transition mr-6">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+      </svg>
+    </a>
+    
+    <!-- Logo -->
+    <h1 class="text-3xl font-extrabold text-[#d4af37] drop-shadow-md" style="font-family: 'Great Vibes', cursive;">
+      Rejection
+    </h1>
+  </div>
+
+  <!-- Second horizontal container with search -->
+  <div class="fixed top-16 left-0 w-full h-12 bg-[#1a1a1a]/80 z-30 border-b border-[#50c878]/20 flex items-center px-6">
+    <!-- Search bar at right corner -->
+    <div class="ml-auto w-64">
+      <div class="relative">
+        <input 
+          type="text" 
+          placeholder="Enter any keyword, skill..." 
+          class="w-full bg-[#1a1a1a] border border-[#50c878]/50 rounded-full py-2 pl-4 pr-10 text-white focus:outline-none focus:ring-1 focus:ring-[#50c878] focus:border-[#50c878] text-sm"
+        >
+        <svg class="absolute right-3 top-2.5 h-4 w-4 text-[#50c878]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Third horizontal container (new) -->
+  <div class="fixed top-28 left-72 right-72 h-12 bg-[#1a1a1a]/70 z-30 border-b border-[#50c878]/15 flex items-center px-6">
+    <!-- Empty container for future content -->
+  </div>
+
+  <!-- Main content area -->
+  <div class="flex flex-1 pt-40"> <!-- Increased pt to account for third container -->
+    <!-- Left vertical container with filters -->
+    <div class="w-72 h-[calc(100vh-8rem)] bg-[#1a1a1a]/70 border-r border-[#50c878]/20 sticky top-40 p-4 overflow-y-auto"> <!-- Adjusted height and top position -->
+      <!-- Date posted filter dropdown -->
+      <div class="mb-6">
+        <button id="dateFilterToggle" class="flex items-center justify-between w-full text-left text-[#d4af37] hover:text-white transition pb-2">
+          <span class="font-medium">Date Posted   +</span>
+        </button>
+        <hr class="border-[#50c878]/30 my-2">
+        <div id="dateFilterOptions" class="mt-2 pl-2 space-y-2 hidden">
+          <div class="flex items-center">
+            <input type="checkbox" id="hour" name="dateFilter" value="hour" class="mr-2">
+            <label for="hour" class="text-sm cursor-pointer">Past hour</label>
+          </div>
+          <div class="flex items-center">
+            <input type="checkbox" id="day" name="dateFilter" value="day" class="mr-2">
+            <label for="day" class="text-sm cursor-pointer">Past 24 hours</label>
+          </div>
+          <div class="flex items-center">
+            <input type="checkbox" id="week" name="dateFilter" value="week" class="mr-2">
+            <label for="week" class="text-sm cursor-pointer">Past week</label>
+          </div>
+          <div class="flex items-center">
+            <input type="checkbox" id="month" name="dateFilter" value="month" class="mr-2">
+            <label for="month" class="text-sm cursor-pointer">Past month</label>
+          </div>
+          <div class="flex items-center">
+            <input type="checkbox" id="year" name="dateFilter" value="year" class="mr-2">
+            <label for="year" class="text-sm cursor-pointer">Past year</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Company filter dropdown -->
+      <div class="mb-6">
+        <button id="companyFilterToggle" class="flex items-center justify-between w-full text-left text-[#d4af37] hover:text-white transition pb-2">
+          <span class="font-medium">Company   +</span>
+        </button>
+        <hr class="border-[#50c878]/30 my-2">
+        <div id="companyFilterOptions" class="mt-2 pl-2 hidden">
+          <div class="relative">
+            <input 
+              type="text" 
+              placeholder="Enter Any Company" 
+              class="w-full bg-[#1a1a1a] border border-[#50c878]/50 rounded-full py-1.5 pl-3 pr-8 text-white focus:outline-none focus:ring-1 focus:ring-[#50c878] focus:border-[#50c878] text-sm"
+            >
+            <svg class="absolute right-2.5 top-2 h-4 w-4 text-[#50c878]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Experience filter dropdown -->
+    <div class="mb-6">
+      <button id="experienceFilterToggle" class="flex items-center justify-between w-full text-left text-[#d4af37] hover:text-white transition pb-2">
+        <span class="font-medium">Experience +</span>
+      </button>
+      <hr class="border-[#50c878]/30 my-2">
+      <div id="experienceFilterOptions" class="mt-2 pl-2 space-y-2 hidden">
+        <div class="flex items-center">
+          <input type="checkbox" id="exp1" name="experienceFilter" value="0-2" class="mr-2">
+          <label for="exp1" class="text-sm cursor-pointer">0-2 years</label>
+        </div>
+        <div class="flex items-center">
+          <input type="checkbox" id="exp2" name="experienceFilter" value="2-5" class="mr-2">
+          <label for="exp2" class="text-sm cursor-pointer">2-5 years</label>
+        </div>
+        <div class="flex items-center">
+          <input type="checkbox" id="exp3" name="experienceFilter" value="5-10" class="mr-2">
+          <label for="exp3" class="text-sm cursor-pointer">5-10 years</label>
+        </div>
+        <div class="flex items-center">
+          <input type="checkbox" id="exp4" name="experienceFilter" value="10+" class="mr-2">
+          <label for="exp4" class="text-sm cursor-pointer">10+ years</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <button id="locationFilterToggle" class="flex items-center justify-between w-full text-left text-[#d4af37] hover:text-white transition pb-2">
+        <span class="font-medium">Location +</span>
+      </button>
+      <hr class="border-[#50c878]/30 my-2">
+      <div id="locationFilterOptions" class="mt-2 pl-2 hidden">
+        <div class="relative mb-3">
+          <input 
+            type="text" 
+            placeholder="Enter any Location" 
+            class="w-full bg-[#1a1a1a] border border-[#50c878]/50 rounded-full py-1.5 pl-3 pr-8 text-white focus:outline-none focus:ring-1 focus:ring-[#50c878] focus:border-[#50c878] text-sm"
+          >
+          <svg class="absolute right-2.5 top-2 h-4 w-4 text-[#50c878]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <button id="skillFilterToggle" class="flex items-center justify-between w-full text-left text-[#d4af37] hover:text-white transition pb-2">
+        <span class="font-medium"> Skills +</span>
+      </button>
+      <hr class="border-[#50c878]/30 my-2">
+      <div id="skillFilterOptions" class="mt-2 pl-2 hidden">
+        <div class="relative mb-3">
+          <input 
+            type="text" 
+            placeholder="Enter Your Skill..." 
+            class="w-full bg-[#1a1a1a] border border-[#50c878]/50 rounded-full py-1.5 pl-3 pr-8 text-white focus:outline-none focus:ring-1 focus:ring-[#50c878] focus:border-[#50c878] text-sm"
+          >
+          <svg class="absolute right-2.5 top-2 h-4 w-4 text-[#50c878]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <button id="workModeFilterToggle" class="flex items-center justify-between w-full text-left text-[#d4af37] hover:text-white transition pb-2">
+        <span class="font-medium">Work Mode +</span>
+      </button>
+      <hr class="border-[#50c878]/30 my-2">
+      <div id="workModeFilterOptions" class="mt-2 pl-2 space-y-2 hidden">
+        <div class="flex items-center">
+          <input type="checkbox" id="remote" name="workModeFilter" value="remote" class="mr-2">
+          <label for="remote" class="text-sm cursor-pointer">Remote</label>
+        </div>
+        <div class="flex items-center">
+          <input type="checkbox" id="onsite" name="workModeFilter" value="onsite" class="mr-2">
+          <label for="onsite" class="text-sm cursor-pointer">Onsite/Office</label>
+        </div>
+        <div class="flex items-center">
+          <input type="checkbox" id="hybrid" name="workModeFilter" value="hybrid" class="mr-2">
+          <label for="hybrid" class="text-sm cursor-pointer">Hybrid</label>
+        </div>
+      </div>
+    </div>
+      <!-- Apply Filters Button - ADD RIGHT HERE -->
+    <div class="mt-auto pt-4">
+      <button id="applyFiltersBtn" class="w-full bg-[#50c878] hover:bg-[#3da865] text-black font-medium py-2 px-4 rounded-lg transition duration-200">
+        Apply Filters
+      </button>
+    </div>
+  </div> <!-- This closes the left filters container -->
+  
+  
+    <!-- Center content area -->
+    <div class="flex-1 overflow-y-auto h-[calc(100vh-8rem)] p-6"> <!-- Adjusted height -->
+      <!-- Job content will go here -->
+    </div>
+
+    <!-- Right vertical container -->
+    <div class="w-72 h-[calc(100vh-8rem)] bg-[#1a1a1a]/70 border-l border-[#50c878]/20 sticky top-40 p-4 overflow-y-auto"> <!-- Adjusted height and top position -->
+      <!-- Add a post button wrapped with anchor -->
+      <a href="post-form.html" class="block">
+        <button id="addPostBtn" class="w-full bg-[#50c878] hover:bg-[#3da865] text-black font-medium py-2 px-4 rounded-lg mb-4 transition duration-200 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Add a Post
+        </button>
+      </a>
+    </div>
+
+  <script src="JS/job-links.js"></script>
+</body>
+</html>

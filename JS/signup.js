@@ -1,55 +1,58 @@
-let generatedOTP = "";
-
 document.getElementById("signup-form").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
   const phone = document.getElementById("phone").value.trim();
-
-  if (!email || !password || !phone) {
-    alert("Please fill all fields correctly.");
-    return;
-  }
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const originalBtnText = submitBtn.innerHTML;
 
   try {
-    const response = await fetch("http://localhost:5000/send-otp", {
+    // Show loading state
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="inline-block animate-spin">↻</span> Sending OTP...';
+
+    const response = await fetch("http://localhost:5000/api/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ 
+        email, 
+        password,
+        name: email.split('@')[0],
+        phone
+      }),
     });
 
-    const result = await response.json();
-
-    if (response.ok) {
-      generatedOTP = result.otp || "";
-      document.getElementById("otp-section").classList.remove("hidden");
-      alert("📧 OTP has been sent to your email.");
-    } else {
-      alert("❌ " + (result.message || "Failed to send OTP."));
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Registration failed");
     }
+
+    document.getElementById("otp-section").classList.remove("hidden");
+    showAlert("OTP sent to your email!", "success");
   } catch (err) {
-    alert("⚠️ Server error: " + err.message);
+    showAlert(`Error: ${err.message}`, "error");
+    console.error("Registration error:", err);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalBtnText;
   }
 });
 
 async function verifyOTP() {
   const email = document.getElementById("email").value.trim();
   const otp = document.getElementById("otp").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const phone = document.getElementById("phone").value.trim();
   const resultText = document.getElementById("otp-result");
-
-  if (!otp || otp.length !== 6) {
-    resultText.textContent = "❌ Enter a valid 6-digit OTP.";
-    resultText.className = "text-red-400 mt-2";
-    return;
-  }
+  const verifyBtn = document.querySelector("#otp-section button");
+  const originalBtnText = verifyBtn.innerHTML;
 
   try {
-    const response = await fetch("http://localhost:5000/verify-otp", {
+    verifyBtn.disabled = true;
+    verifyBtn.innerHTML = '<span class="inline-block animate-spin">↻</span> Verifying...';
+
+    const response = await fetch("http://localhost:5000/api/verify-otp", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -57,40 +60,41 @@ async function verifyOTP() {
       body: JSON.stringify({ email, otp }),
     });
 
-    const result = await response.json();
-
-    if (response.ok) {
-      resultText.textContent = "✅ OTP Verified!";
-      resultText.className = "text-green-400 mt-2";
-
-      // ✅ Save user to backend
-      const saveResponse = await fetch("http://localhost:5000/save-user", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password, phone }),
-      });
-
-      const saveResult = await saveResponse.json();
-
-      if (saveResponse.ok) {
-        // Optional UI feedback
-        resultText.textContent = "🎉 Account created successfully! Redirecting to Sign In...";
-        document.getElementById("signin-button").disabled = true;
-
-        // Delay + redirect
-        setTimeout(() => {
-          window.location.href = "signin.html";
-        }, 2000);
-      } else {
-        alert("⚠️ " + (saveResult.message || "Could not save user."));
-      }
-    } else {
-      resultText.textContent = "❌ " + (result.message || "OTP Incorrect");
-      resultText.className = "text-red-400 mt-2";
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "OTP verification failed");
     }
+
+    const result = await response.json();
+    resultText.textContent = "Account verified successfully!";
+    resultText.className = "text-green-400 text-center";
+    
+    // Enable sign in button
+    document.getElementById("signin-button").disabled = false;
+    document.getElementById("signin-button").onclick = () => {
+      window.location.href = "signin.html";
+    };
   } catch (err) {
-    alert("⚠️ Verification failed: " + err.message);
+    resultText.textContent = err.message;
+    resultText.className = "text-red-400 text-center";
+  } finally {
+    verifyBtn.disabled = false;
+    verifyBtn.innerHTML = originalBtnText;
   }
+}
+
+function showAlert(message, type = "info") {
+  const alertDiv = document.createElement("div");
+  alertDiv.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg z-50 ${
+    type === "error" ? "bg-red-600" : 
+    type === "success" ? "bg-green-600" : "bg-blue-600"
+  } text-white`;
+  alertDiv.textContent = message;
+  
+  document.body.appendChild(alertDiv);
+  
+  setTimeout(() => {
+    alertDiv.classList.add("opacity-0", "transition-opacity", "duration-500");
+    setTimeout(() => alertDiv.remove(), 500);
+  }, 3000);
 }

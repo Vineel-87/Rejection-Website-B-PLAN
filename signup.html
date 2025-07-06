@@ -5,51 +5,87 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Create Account | Rejection</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="icon" type="image/png" sizes="192x192" href="Images/reorganization.png" /> <!-- ✅ Favicon -->
-  <script src="JS/signup.js" defer></script> <!-- We'll create this -->
+  <link rel="icon" type="image/png" sizes="192x192" href="Images/reorganization.png" />
+  <style>
+    .gradient-text {
+      background: linear-gradient(90deg, #50c878, #d4af37);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .gradient-border {
+      position: relative;
+      background: #1a1a1a;
+      border-radius: 0.75rem;
+    }
+    .gradient-border::before {
+      content: "";
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      right: -1px;
+      bottom: -1px;
+      border-radius: 0.75rem;
+      background: linear-gradient(90deg, #50c878, #d4af37);
+      z-index: -1;
+    }
+  </style>
+  <script src="JS/signup.js" defer></script>
 </head>
-<body class="bg-gray-950 text-white min-h-screen flex flex-col items-center justify-center px-4">
+<body class="bg-[#0f0f0f] text-white min-h-screen flex flex-col items-center justify-center px-4">
 
-  <div class="bg-gray-900 rounded-xl p-8 shadow-lg max-w-md w-full space-y-6">
-    <h1 class="text-2xl font-bold text-purple-400 text-center">Create New Account</h1>
+  <div class="gradient-border p-8 shadow-lg max-w-md w-full space-y-6">
+    <h1 class="text-2xl font-bold gradient-text text-center">Create New Account</h1>
 
     <form id="signup-form" class="space-y-4">
       <div>
-        <label for="email" class="block mb-1 text-sm font-semibold">Email</label>
-        <input type="email" id="email" required class="w-full px-4 py-2 bg-gray-800 text-white rounded border border-gray-600 focus:outline-none focus:border-purple-500" />
+        <label for="email" class="block mb-1 text-sm font-semibold text-gray-300">Email</label>
+        <input type="email" id="email" required 
+          class="w-full px-4 py-2 bg-[#252525] text-white rounded border border-[#50c878]/30 focus:outline-none focus:ring-2 focus:ring-[#d4af37] transition" />
       </div>
 
       <div>
-        <label for="password" class="block mb-1 text-sm font-semibold">Password</label>
-        <input type="password" id="password" required class="w-full px-4 py-2 bg-gray-800 text-white rounded border border-gray-600 focus:outline-none focus:border-purple-500" />
+        <label for="password" class="block mb-1 text-sm font-semibold text-gray-300">Password</label>
+        <input type="password" id="password" required 
+          class="w-full px-4 py-2 bg-[#252525] text-white rounded border border-[#50c878]/30 focus:outline-none focus:ring-2 focus:ring-[#d4af37] transition" />
       </div>
 
       <div>
-        <label for="phone" class="block mb-1 text-sm font-semibold">Phone Number</label>
-        <input type="tel" id="phone" required class="w-full px-4 py-2 bg-gray-800 text-white rounded border border-gray-600 focus:outline-none focus:border-purple-500" />
+        <label for="phone" class="block mb-1 text-sm font-semibold text-gray-300">Phone Number</label>
+        <input type="tel" id="phone" required 
+          class="w-full px-4 py-2 bg-[#252525] text-white rounded border border-[#50c878]/30 focus:outline-none focus:ring-2 focus:ring-[#d4af37] transition" />
       </div>
 
-      <button type="submit" class="w-full py-2 bg-purple-600 hover:bg-purple-700 rounded text-white font-semibold">Send OTP</button>
+      <button type="submit" 
+        class="w-full py-2.5 bg-gradient-to-r from-[#50c878] to-[#d4af37] hover:from-[#3da865] hover:to-[#c9a227] rounded text-white font-semibold transition-all hover:shadow-lg hover:shadow-[#50c878]/30">
+        Send OTP
+      </button>
     </form>
 
     <!-- OTP Section -->
     <div id="otp-section" class="hidden space-y-4">
-      <label for="otp" class="block text-sm font-semibold">Enter OTP</label>
-      <input type="text" id="otp" maxlength="6" class="w-full px-4 py-2 bg-gray-800 text-white rounded border border-gray-600 focus:outline-none focus:border-purple-500" />
-      <button onclick="verifyOTP()" class="w-full py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold">Verify OTP</button>
-      <p id="otp-result" class="text-center"></p>
+      <label for="otp" class="block text-sm font-semibold text-gray-300">Enter OTP</label>
+      <input type="text" id="otp" maxlength="6" 
+        class="w-full px-4 py-2 bg-[#252525] text-white rounded border border-[#50c878]/30 focus:outline-none focus:ring-2 focus:ring-[#d4af37] transition" />
+      <button onclick="verifyOTP()" 
+        class="w-full py-2.5 bg-gradient-to-r from-[#50c878] to-[#d4af37] hover:from-[#3da865] hover:to-[#c9a227] rounded text-white font-semibold transition-all hover:shadow-lg hover:shadow-[#50c878]/30">
+        Verify OTP
+      </button>
+      <p id="otp-result" class="text-center text-[#d4af37]"></p>
     </div>
 
     <!-- Final Sign-In Button -->
     <div class="pt-4 text-center">
-      <button id="signin-button" class="py-2 px-6 bg-green-600 hover:bg-green-700 rounded-full text-white font-semibold disabled:opacity-40" disabled>
+      <button id="signin-button" 
+        class="py-2 px-6 bg-gradient-to-r from-[#50c878] to-[#d4af37] hover:from-[#3da865] hover:to-[#c9a227] rounded-full text-white font-semibold disabled:opacity-40 transition-all hover:shadow-lg hover:shadow-[#50c878]/30" 
+        disabled>
         Sign In
       </button>
     </div>
+  </div>
 
-
-  <footer class="mt-8 text-center text-sm text-gray-500">
-    <a href="index.html" class="text-purple-400 hover:text-purple-300">🔙 Back to Home</a>
+  <footer class="mt-8 text-center text-sm text-gray-400">
+    <a href="index.html" class="text-[#d4af37] hover:text-[#50c878] transition">🔙 Back to Home</a>
   </footer>
 
 </body>

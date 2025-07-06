@@ -4,7 +4,7 @@ document.getElementById("signin-form").addEventListener("submit", async (e) => {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
   const submitBtn = document.querySelector("#signin-form button[type='submit']");
-  const originalBtnText = submitBtn.textContent;
+  const originalBtnText = submitBtn.innerHTML;
 
   if (!email || !password) {
     showAlert("Please enter both email and password.", "error");
@@ -20,9 +20,9 @@ document.getElementById("signin-form").addEventListener("submit", async (e) => {
   try {
     // Show loading state
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span class="inline-block animate-spin">⏳</span> Signing in...';
+    submitBtn.innerHTML = '<span class="inline-block animate-spin">↻</span> Signing in...';
 
-    const response = await fetch("http://localhost:5000/login", {
+    const response = await fetch("http://localhost:5000/api/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -30,23 +30,16 @@ document.getElementById("signin-form").addEventListener("submit", async (e) => {
       body: JSON.stringify({ email, password }),
     });
 
-    // Handle non-JSON responses
-    const contentType = response.headers.get("content-type");
-    if (!contentType || !contentType.includes("application/json")) {
-      throw new Error("Invalid response from server");
-    }
-
     const result = await response.json();
 
     if (response.ok) {
-      // Store user email in localStorage before redirecting
-      localStorage.setItem('currentUser', email);
-      // Clear any temporary profile picture storage
-      localStorage.removeItem('tempProfilePic');
+      // Store token and user data
+      localStorage.setItem('token', result.token);
+      localStorage.setItem('user', JSON.stringify(result.user));
       
-      showAlert("✅ Login successful! Redirecting...", "success");
+      showAlert("✔️ Login successful! Redirecting...", "success");
       setTimeout(() => {
-        window.location.href = "dashboard.html";
+        window.location.href = "job-links.html";
       }, 1500);
     } else {
       showAlert(`❌ ${result.message || "Login failed. Please check your credentials"}`, "error");
@@ -57,11 +50,10 @@ document.getElementById("signin-form").addEventListener("submit", async (e) => {
   } finally {
     // Reset button state
     submitBtn.disabled = false;
-    submitBtn.textContent = originalBtnText;
+    submitBtn.innerHTML = originalBtnText;
   }
 });
 
-// Custom alert function
 function showAlert(message, type = "info") {
   const alertDiv = document.createElement("div");
   alertDiv.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg z-50 ${

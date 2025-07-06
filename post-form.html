@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post Job Link | Rejection</title>
+  <link rel="icon" href="Images/reorganization.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/post-form.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Add CryptoJS for Gravatar support -->
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <style>
+    .gradient-bg {
+      background: linear-gradient(135deg, rgba(80,200,120,0.1) 0%, rgba(212,175,55,0.1) 100%);
+    }
+    .gradient-border {
+      border: 1px solid transparent;
+      background-clip: padding-box, border-box;
+      background-origin: padding-box, border-box;
+      background-image: linear-gradient(to right, #1a1a1a, #1a1a1a), 
+                        linear-gradient(135deg, #50c878, #d4af37);
+    }
+    .gradient-text {
+      background: linear-gradient(to right, #50c878, #d4af37);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+  </style>
+</head>
+<body class="bg-[#0f0f0f] text-white min-h-screen font-[Poppins]">
+
+  <!-- Header -->
+  <div class="fixed top-0 left-0 w-full h-16 bg-[#1a1a1a]/90 backdrop-blur-sm z-30 border-b border-[#50c878]/30 flex items-center px-6">
+    <!-- Back button -->
+    <a href="job-links.html" class="flex items-center text-[#d4af37] hover:text-white transition mr-6">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+      </svg>
+    </a>
+    
+    <!-- Logo -->
+    <h1 class="text-3xl font-extrabold text-[#d4af37] drop-shadow-md" style="font-family: 'Great Vibes', cursive;">
+      Rejection
+    </h1>
+  </div>
+
+  <!-- Main Content -->
+  <div class="pt-16 pb-8 px-4 max-w-4xl mx-auto">
+    <!-- User Info Header -->
+    <div class="flex items-center gap-4 mb-6 p-4 gradient-bg rounded-lg border border-[#50c878]/30">
+      <img id="post-user-avatar" src="Images/default-avatar.png" class="w-12 h-12 rounded-full border-2 border-[#50c878] object-cover">
+      <div>
+        <h3 id="post-username" class="font-bold text-lg">Username</h3>
+        <p class="text-sm text-gray-400">Posting now...</p>
+      </div>
+    </div>
+
+    <!-- Post Form -->
+    <form id="job-post-form" class="space-y-6">
+      <!-- Job Link -->
+      <div class="gradient-border rounded-lg p-1">
+        <div class="bg-[#1a1a1a] p-4 rounded-lg">
+          <label for="job-link" class="block text-sm font-medium text-[#d4af37] mb-2">Job Link</label>
+          <input 
+            type="url" 
+            id="job-link" 
+            placeholder="Paste job link here" 
+            required
+            class="w-full bg-[#1a1a1a] border border-[#50c878]/30 rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-1 focus:ring-[#50c878] focus:border-[#50c878]">
+        </div>
+      </div>
+
+      <!-- Date Posted -->
+      <div class="gradient-border rounded-lg p-1">
+        <div class="bg-[#1a1a1a] p-4 rounded-lg">
+          <label for="date-posted" class="block text-sm font-medium text-[#d4af37] mb-2">Date Posted</label>
+          <input 
+            type="date" 
+            id="date-posted" 
+            required
+            class="w-full bg-[#1a1a1a] border border-[#50c878]/30 rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-1 focus:ring-[#50c878] focus:border-[#50c878]">
+        </div>
+      </div>
+
+      <!-- Company Name -->
+      <div class="gradient-border rounded-lg p-1">
+        <div class="bg-[#1a1a1a] p-4 rounded-lg">
+          <label for="company" class="block text-sm font-medium text-[#d4af37] mb-2">Company</label>
+          <input 
+            type="text" 
+            id="company" 
+            placeholder="Enter company name" 
+            required
+            class="w-full bg-[#1a1a1a] border border-[#50c878]/30 rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-1 focus:ring-[#50c878] focus:border-[#50c878]">
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="gradient-border rounded-lg p-1">
+        <div class="bg-[#1a1a1a] p-4 rounded-lg">
+          <label for="description" class="block text-sm font-medium text-[#d4af37] mb-2">Description</label>
+          <textarea 
+            id="description" 
+            rows="5" 
+            placeholder="Enter job description" 
+            required
+            class="w-full bg-[#1a1a1a] border border-[#50c878]/30 rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-1 focus:ring-[#50c878] focus:border-[#50c878]"></textarea>
+        </div>
+      </div>
+
+      <!-- Skills Required -->
+      <div class="gradient-border rounded-lg p-1">
+        <div class="bg-[#1a1a1a] p-4 rounded-lg">
+          <label for="skills" class="block text-sm font-medium text-[#d4af37] mb-2">Skills Required</label>
+          <div id="skills-container" class="flex flex-wrap gap-2 mb-2">
+            <!-- Skills tags will be added here -->
+          </div>
+          <div class="flex gap-2">
+            <input 
+              type="text" 
+              id="skill-input" 
+              placeholder="Add skill (press Enter to add)" 
+              class="flex-1 bg-[#1a1a1a] border border-[#50c878]/30 rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-1 focus:ring-[#50c878] focus:border-[#50c878]">
+            <button type="button" id="add-skill-btn" class="bg-[#50c878] hover:bg-[#3da865] text-black px-3 py-1 rounded-lg text-sm">Add</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Location -->
+      <div class="gradient-border rounded-lg p-1">
+        <div class="bg-[#1a1a1a] p-4 rounded-lg">
+          <label for="location" class="block text-sm font-medium text-[#d4af37] mb-2">Location</label>
+          <input 
+            type="text" 
+            id="location" 
+            placeholder="Enter company address" 
+            required
+            class="w-full bg-[#1a1a1a] border border-[#50c878]/30 rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-1 focus:ring-[#50c878] focus:border-[#50c878]">
+        </div>
+      </div>
+
+      <!-- Last Date of Application -->
+      <div class="gradient-border rounded-lg p-1">
+        <div class="bg-[#1a1a1a] p-4 rounded-lg">
+          <label for="last-date" class="block text-sm font-medium text-[#d4af37] mb-2">Last Date of Application</label>
+          <input 
+            type="date" 
+            id="last-date" 
+            required
+            class="w-full bg-[#1a1a1a] border border-[#50c878]/30 rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-1 focus:ring-[#50c878] focus:border-[#50c878]">
+        </div>
+      </div>
+
+      <!-- Experience -->
+      <div class="gradient-border rounded-lg p-1">
+        <div class="bg-[#1a1a1a] p-4 rounded-lg">
+          <label for="experience" class="block text-sm font-medium text-[#d4af37] mb-2">Experience Required</label>
+          <input 
+            type="text" 
+            id="experience" 
+            placeholder="e.g., 0-2, 1-3 years" 
+            required
+            class="w-full bg-[#1a1a1a] border border-[#50c878]/30 rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-1 focus:ring-[#50c878] focus:border-[#50c878]">
+        </div>
+      </div>
+
+      <!-- Work Mode -->
+      <div class="gradient-border rounded-lg p-1">
+        <div class="bg-[#1a1a1a] p-4 rounded-lg">
+          <label class="block text-sm font-medium text-[#d4af37] mb-2">Work Mode</label>
+          <div class="flex flex-wrap gap-4">
+            <label class="flex items-center">
+              <input type="radio" name="work-mode" value="remote" class="form-radio text-[#50c878] border-[#50c878] focus:ring-[#50c878]" checked>
+              <span class="ml-2">Remote</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="work-mode" value="onsite" class="form-radio text-[#50c878] border-[#50c878] focus:ring-[#50c878]">
+              <span class="ml-2">Onsite</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="work-mode" value="hybrid" class="form-radio text-[#50c878] border-[#50c878] focus:ring-[#50c878]">
+              <span class="ml-2">Hybrid</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="flex justify-end gap-4 pt-4">
+        <button type="button" onclick="window.location.href='job-links.html'" class="bg-[#252525] hover:bg-[#333] text-white px-6 py-2 rounded-lg transition border border-[#50c878]/30">
+          Cancel
+        </button>
+        <button type="submit" class="bg-gradient-to-r from-[#50c878] to-[#d4af37] hover:from-[#d4af37] hover:to-[#50c878] text-black font-medium px-6 py-2 rounded-lg transition shadow-lg">
+          Post Job
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Success Modal -->
+  <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex items-center justify-center">
+    <div class="bg-[#1a1a1a] p-8 rounded-xl max-w-md w-full border border-[#50c878]/30 text-center">
+      <div class="w-16 h-16 bg-[#50c878] rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-black" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <h3 class="text-2xl font-bold text-[#d4af37] mb-2">Job Posted Successfully!</h3>
+      <p class="text-gray-300 mb-6">Your job posting has been shared with the community.</p>
+      <button onclick="window.location.href='job-links.html'" class="bg-gradient-to-r from-[#50c878] to-[#d4af37] hover:from-[#d4af37] hover:to-[#50c878] text-black font-medium px-6 py-2 rounded-lg transition shadow-lg w-full">
+        Back to Job Links
+      </button>
+    </div>
+  </div>
+
+  <script src="JS/post-form.js"></script>
+</body>
+</html>

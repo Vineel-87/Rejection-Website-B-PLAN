@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Update username display
       if (userNameElement) {
         const displayName = localStorage.getItem(`username_${currentUser}`) || 
-                          (currentUser.includes("@") ? currentUser.split("@")[0] : currentUser);
+                         (currentUser.includes("@") ? currentUser.split("@")[0] : currentUser);
         userNameElement.textContent = displayName;
         
         if (verticalUsername) {
@@ -188,6 +188,59 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (error) {
       console.error("Error loading friends list:", error);
     }
+  }
+
+  // Theme toggle functionality
+  function setupThemeToggle() {
+    const themeToggle = document.getElementById('theme-toggle');
+    const iconDark = document.getElementById('theme-icon-dark');
+    const iconLight = document.getElementById('theme-icon-light');
+    
+    // Check for saved theme preference or use dark mode as default
+    const currentTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.classList.add(currentTheme + '-mode');
+    
+    // Set initial icon state
+    if (currentTheme === 'light') {
+      iconDark?.classList.add('hidden');
+      iconLight?.classList.remove('hidden');
+    } else {
+      iconDark?.classList.remove('hidden');
+      iconLight?.classList.add('hidden');
+    }
+    
+    themeToggle?.addEventListener('click', () => {
+      // Toggle between dark and light
+      if (document.documentElement.classList.contains('dark-mode')) {
+        document.documentElement.classList.remove('dark-mode');
+        document.documentElement.classList.add('light-mode');
+        localStorage.setItem('theme', 'light');
+        iconDark?.classList.add('hidden');
+        iconLight?.classList.remove('hidden');
+      } else {
+        document.documentElement.classList.remove('light-mode');
+        document.documentElement.classList.add('dark-mode');
+        localStorage.setItem('theme', 'dark');
+        iconDark?.classList.remove('hidden');
+        iconLight?.classList.add('hidden');
+      }
+    });
+    
+    // Apply theme to other tabs if needed
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'theme') {
+        document.documentElement.classList.remove('dark-mode', 'light-mode');
+        document.documentElement.classList.add(event.newValue + '-mode');
+        
+        if (event.newValue === 'light') {
+          iconDark?.classList.add('hidden');
+          iconLight?.classList.remove('hidden');
+        } else {
+          iconDark?.classList.remove('hidden');
+          iconLight?.classList.add('hidden');
+        }
+      }
+    });
   }
 
   function createFriendItem(friendEmail) {
@@ -336,6 +389,63 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Check for today's birthdays
+  function checkBirthdays() {
+    const currentUser = localStorage.getItem("currentUser");
+    if (!currentUser || currentUser === "Guest") return;
+
+    // Get friends list
+    const friends = JSON.parse(localStorage.getItem(`friends_${currentUser}`) || "[]");
+    const todayBirthdays = [];
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    friends.forEach(friendEmail => {
+      const dobString = localStorage.getItem(`dob_${friendEmail}`);
+      if (!dobString) return;
+
+      // Parse date (handles dd/mm/yyyy format)
+      const parts = dobString.split('/');
+      let dob;
+      if (parts.length === 3) {
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const year = parseInt(parts[2], 10);
+        dob = new Date(year, month, day);
+      } else {
+        dob = new Date(dobString);
+      }
+
+      if (isNaN(dob.getTime())) return;
+
+      // Create this year's birthday date
+      const thisYearBirthday = new Date(today.getFullYear(), dob.getMonth(), dob.getDate());
+      thisYearBirthday.setHours(0, 0, 0, 0);
+
+      // Calculate difference in days
+      const diffTime = thisYearBirthday - today;
+      const daysUntil = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+      // If birthday is today (daysUntil === 0)
+      if (daysUntil === 0) {
+        const username = localStorage.getItem(`username_${friendEmail}`) || friendEmail.split('@')[0];
+        todayBirthdays.push(username);
+      }
+    });
+
+    // Update notification badge
+    const badge = document.getElementById('birthday-notification-badge');
+    const countElement = document.getElementById('birthday-count');
+    
+    if (todayBirthdays.length > 0) {
+      badge.classList.remove('hidden');
+      countElement.textContent = todayBirthdays.length;
+    } else {
+      badge.classList.add('hidden');
+    }
+  }
+
   // Simple HTML escape function for security
   function escapeHtml(unsafe) {
     if (!unsafe) return '';
@@ -350,4 +460,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize all functionality
   loadProfileData();
   setupFriendsList();
+  checkBirthdays(); // Add this line to check for birthdays on load
+  setupThemeToggle();
 });

@@ -1,13 +1,26 @@
-.font-[Poppins] {
-      font-family: 'Poppins', sans-serif;
+.gradient-header {
+      background: linear-gradient(135deg, #50c878 0%, #3da865 50%, #d4af37 100%);
     }
-.scroll-container::-webkit-scrollbar {
+    .gradient-text {
+      background: linear-gradient(90deg, #50c878, #d4af37);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .input-focus {
+      transition: all 0.3s ease;
+    }
+    .input-focus:focus {
+      box-shadow: 0 0 0 3px rgba(80, 200, 120, 0.3);
+      border-color: #d4af37;
+    }
+    .scroll-container::-webkit-scrollbar {
       width: 6px;
     }
-.scroll-container::-webkit-scrollbar-track {
+    .scroll-container::-webkit-scrollbar-track {
       background: #1a1a1a;
     }
-.scroll-container::-webkit-scrollbar-thumb {
-      background: #50c878;
+    .scroll-container::-webkit-scrollbar-thumb {
+      background: linear-gradient(#50c878, #d4af37);
       border-radius: 3px;
     }

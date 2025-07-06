@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Birthday Reminders | Rejection</title>
+  <link rel="stylesheet" href="css/birthday-reminders.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Add CryptoJS for Gravatar support -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <style>
+    .marquee {
+      animation: marquee 15s linear infinite;
+      white-space: nowrap;
+      display: inline-block;
+      padding-left: 100%;
+    }
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+    .birthday-confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: #f00;
+      opacity: 0;
+    }
+    .birthday-header {
+      background: linear-gradient(90deg, rgba(80,200,120,0.2) 0%, rgba(212,175,55,0.3) 50%, rgba(80,200,120,0.2) 100%);
+      border-bottom: 1px solid rgba(212,175,55,0.3);
+    }
+  </style>
+</head>
+<body class="bg-dark-base text-ivory min-h-screen flex font-poppins">
+
+  <!-- Navigation/Header -->
+  <div class="header-main fixed top-0 left-0 w-full h-16 bg-[#1a1a1a]/90 backdrop-blur-sm z-30 border-b border-[#50c878]/30 flex items-center justify-between px-4">
+    <button onclick="window.location.href='dashboard.html'" class="flex items-center gap-2 text-[#d4af37] hover:text-white transition">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      <span>Back to Dashboard</span>
+    </button>
+    <h1 class="text-2xl font-bold text-[#d4af37]" style="font-family: 'Great Vibes', cursive;">Birthday Reminders</h1>
+    <div class="w-10"></div> <!-- Spacer for balance -->
+  </div>
+
+  <div id="birthday-marquee" class="header-sub fixed top-16 left-0 w-full h-12 bg-[#1a1a1a]/80 z-30 border-b border-[#50c878]/20 flex items-center overflow-hidden birthday-header">
+    <div id="marquee-content" class="marquee text-[#d4af37] font-semibold text-lg flex items-center">
+      <!-- Marquee content will be populated by JavaScript -->
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar fixed top-28 left-0 w-64 h-[calc(100vh-7rem)] bg-[#1a1a1a]/70 z-30 border-r border-[#50c878]/20 overflow-y-auto">
+    <!-- Profile Section -->
+    <div class="p-4 border-b border-[#50c878]/20">
+      <a href="profile.html" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition duration-200 group">
+        <div class="relative w-10 h-10">
+          <img id="vertical-profile-pic" src="Images/default-avatar.png" alt="Profile" class="w-full h-full rounded-full border-2 border-[#50c878] object-cover">
+          <div class="absolute inset-0 rounded-full border-2 border-transparent group-hover:border-[#d4af37] transition duration-200"></div>
+        </div>
+        <div class="flex flex-col">
+          <span id="vertical-username" class="font-semibold text-white group-hover:text-[#d4af37] transition duration-200">Guest</span>
+          <span class="text-xs text-gray-400">View Profile</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Quick Navigation -->
+    <div class="p-4">
+      <h3 class="text-sm uppercase text-[#50c878] mb-2 tracking-wider">Quick Actions</h3>
+      <div class="space-y-1">
+        <a href="#" class="flex items-center gap-2 p-2 text-sm rounded-lg hover:bg-[#1a1a1a] transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#50c878]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>Set Reminder</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Birthday Notes Section -->
+    <div class="p-4 border-t border-[#50c878]/20">
+      <h3 class="text-sm uppercase text-[#50c878] mb-2 tracking-wider">Birthday Notes</h3>
+      <textarea 
+        id="birthday-notes" 
+        class="w-full bg-[#1a1a1a]/90 text-white p-3 rounded-lg border border-[#50c878]/30 mb-3 h-40 resize-none focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:border-[#d4af37] transition-all" 
+        placeholder="Write your special birthday wishes and notes here..."
+      ></textarea>
+      <button 
+        id="save-notes" 
+        class="w-full bg-[#50c878] hover:bg-[#3da865] text-white font-medium py-2 px-4 rounded-lg transition flex items-center justify-center gap-2"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+        </svg>
+        Save Notes
+      </button>
+    </div>
+
+    <!-- Upcoming Highlights -->
+    <div class="p-4 border-t border-[#50c878]/20">
+      <h3 class="text-sm uppercase text-[#50c878] mb-2 tracking-wider">This Month</h3>
+      <div id="sidebar-upcoming" class="space-y-2">
+        <!-- Will be populated by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content ml-64 mt-28 w-[calc(100%-16rem)] p-6">
+    <div class="content-container">
+      <!-- Today's Birthdays -->
+      <div class="birthday-card bg-[#1a1a1a]/70 backdrop-blur-sm rounded-xl border border-[#50c878]/20 p-6 mb-6 relative overflow-hidden">
+        <div class="absolute inset-0 bg-[#d4af37]/5 opacity-20"></div>
+        <div class="card-header flex items-center justify-between mb-4 relative z-10">
+          <h2 class="card-title text-2xl font-bold text-[#d4af37] flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.701 2.701 0 00-1.5-.454M9 6v2m3-2v2m3-2v2M9 3h.01M12 3h.01M15 3h.01M21 21v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7h18zm-3-9v-2a2 2 0 00-2-2H8a2 2 0 00-2 2v2h12z" />
+            </svg>
+            Today's Birthdays
+          </h2>
+          <span class="badge-today bg-[#d4af37] text-black px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+            Today
+          </span>
+        </div>
+        <div id="today-birthdays" class="birthday-list relative z-10">
+          <p class="no-birthdays text-gray-400 text-center py-8">No birthdays today</p>
+        </div>
+      </div>
+      
+      <!-- Upcoming Birthdays -->
+      <div class="birthday-card bg-[#1a1a1a]/70 backdrop-blur-sm rounded-xl border border-[#50c878]/20 p-6 mb-6">
+        <h2 class="card-title text-2xl font-bold text-[#50c878] mb-4 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          Upcoming Birthdays
+        </h2>
+        <div id="upcoming-birthdays" class="birthday-list">
+          <p class="no-birthdays text-gray-400 text-center py-8">No upcoming birthdays in the next 30 days</p>
+        </div>
+      </div>
+      
+      <!-- All Friends' Birthdays -->
+      <div class="birthday-card bg-[#1a1a1a]/70 backdrop-blur-sm rounded-xl border border-[#50c878]/20 p-6">
+        <h2 class="card-title text-2xl font-bold text-white mb-4 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          All Friends' Birthdays
+        </h2>
+        <div id="all-birthdays" class="all-birthdays-grid grid grid-cols-2 gap-6">
+          <p class="no-birthdays text-gray-400 text-center py-8 col-span-2">No birthdays found</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- External JavaScript -->
+  <script src="JS/birthday-reminders.js"></script>
+</body>
+</html>

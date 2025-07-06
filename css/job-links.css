@@ -1,0 +1,52 @@
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #0f0f0f;
+  color: white;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #50c878;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3da865;
+}
+
+/* Custom checkbox */
+input[type="checkbox"] {
+  accent-color: #50c878;
+}
+
+/* Add post button hover effect */
+#addPostBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Improved filter header styling */
+[id$="FilterToggle"] {
+  text-decoration: none !important;
+  font-weight: 500 !important;
+  color: #d4af37 !important;
+  padding: 0.25rem 0 !important;
+  font-size: 0.9rem !important;
+}
+
+[id$="FilterToggle"]:hover {
+  color: white !important;
+}
+
+/* Optional: Add some spacing between filter sections */
+.mb-6 {
+  margin-bottom: 1.25rem !important;
+}

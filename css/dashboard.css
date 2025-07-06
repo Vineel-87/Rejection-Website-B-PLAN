@@ -16,3 +16,52 @@
 .animate-pulse {
   animation: pulse 0.5s ease-in-out;
 }
+
+/* Light mode styles - Only background colors */
+.light-mode {
+  --bg-primary: #f8f9fa;
+  --bg-secondary: #e9ecef;
+  --bg-tertiary: #dee2e6;
+}
+
+/* Dark mode styles (default) - Only background colors */
+.dark-mode {
+  --bg-primary: #0f0f0f;
+  --bg-secondary: #1a1a1a;
+  --bg-tertiary: #252525;
+}
+
+/* Apply theme variables to background elements */
+body {
+  background-color: var(--bg-primary);
+}
+
+.bg-\[\#0f0f0f\] {
+  background-color: var(--bg-primary);
+}
+.bg-\[\#1a1a1a\] {
+  background-color: var(--bg-secondary);
+}
+.bg-\[\#252525\] {
+  background-color: var(--bg-tertiary);
+}
+.hover\:bg-\[\#1a1a1a\]:hover {
+  background-color: var(--bg-secondary);
+}
+
+/* Specific elements that need background changes */
+.fixed.top-0.left-0.w-full.h-16, /* Header bar */
+.fixed.top-16.left-0.w-full.h-12, /* Second horizontal bar */
+.fixed.top-28.left-0.w-64.h-\[calc\(100vh-7rem\)\] /* Vertical container */ {
+  background-color: var(--bg-secondary);
+}
+
+/* Search results dropdown */
+#search-results {
+  background-color: var(--bg-secondary);
+}
+
+/* Sidebar */
+#sidebar {
+  background-color: var(--bg-secondary);
+}

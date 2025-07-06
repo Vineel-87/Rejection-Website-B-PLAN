@@ -6,20 +6,38 @@
 .animate-marquee {
   display: inline-block;
   animation: marquee 15s linear infinite;
+  padding: 0.5rem 0;
 }
 
-/* Add background image on left & right only */
+/* Marquee Container */
+.marquee-container {
+  background: linear-gradient(90deg, rgba(80, 200, 120, 0.15) 0%, rgba(212, 175, 55, 0.2) 50%, rgba(80, 200, 120, 0.15) 100%);
+  border-top: 1px solid rgba(212, 175, 55, 0.3);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+  overflow: hidden;
+  margin: 0;
+}
+
+/* Marquee Text */
+.marquee-text {
+  color: #f8f8f8; /* Ivory color */
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.3); /* Gold shadow */
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  padding: 0.5rem 0;
+}
+
+/* Background images */
 body::before,
 body::after {
   content: "";
   position: fixed;
   top: 0;
   bottom: 0;
-  width: 150px; /* Adjust width */
-  background: url('../Images/Violet.jpg') no-repeat center center;
-  background-size: cover;
+  width: 150px;
+  background: linear-gradient(rgba(80, 200, 120, 0.1), rgba(80, 200, 120, 0.1));
   z-index: 0;
-  opacity: 0.3; /* Optional transparency */
+  opacity: 0.3;
 }
 
 body::before {
@@ -33,4 +51,14 @@ body::after {
 body > * {
   position: relative;
   z-index: 1;
+}
+
+/* Remove any default margins */
+body {
+  margin: 0;
+}
+
+/* Navbar adjustments */
+nav {
+  margin-bottom: 0 !important;
 }
