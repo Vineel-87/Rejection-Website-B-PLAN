@@ -814,6 +814,38 @@ app.get("/api/user/search/:term", authenticateToken, async (req, res) => {
   }
 });
 
+// Get user's friends list
+app.get("/api/user/friends", authenticateToken, async (req, res) => {
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    
+    // Get accepted friends (both directions)
+    const [friends] = await connection.query(`
+      SELECT 
+        u.id, 
+        u.email, 
+        u.name, 
+        u.avatar,
+        up.dob
+      FROM friends f
+      JOIN users u ON 
+        (f.user_id = ? AND f.friend_id = u.id) OR 
+        (f.friend_id = ? AND f.user_id = u.id)
+      LEFT JOIN user_profiles up ON u.id = up.user_id
+      WHERE f.status = 'accepted'
+      ORDER BY u.name
+    `, [req.user.userId, req.user.userId]);
+
+    res.status(200).json(friends);
+  } catch (error) {
+    console.error("Friends list error:", error);
+    res.status(500).json({ message: "Failed to fetch friends list" });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
+
 // Job Posts Endpoints
 // Get all job posts
 app.get("/api/job-posts", authenticateToken, async (req, res) => {
@@ -964,59 +996,65 @@ app.delete("/api/job-posts/:id", authenticateToken, async (req, res) => {
   }
 });
 
-// Get friend status with another user
+// In server.js - make sure this endpoint is correct
+// Get friendship status between current user and target user
 app.get("/api/user/friend-status/:email", authenticateToken, async (req, res) => {
+  const currentUserId = req.user.userId;
+  const targetEmail = req.params.email;
+
   let connection;
   try {
     connection = await pool.getConnection();
-    
-    // Get target user ID
+
+    // Find target user ID
     const [targetUsers] = await connection.query(
       "SELECT id FROM users WHERE email = ?",
-      [req.params.email]
+      [targetEmail]
     );
-    
     if (targetUsers.length === 0) {
       return res.status(404).json({ message: "User not found" });
     }
-    
+
     const targetUserId = targetUsers[0].id;
-    
-    if (targetUserId === req.user.userId) {
-      return res.status(400).json({ message: "Cannot check friend status with yourself" });
+
+    // If current user is viewing their own profile
+    if (currentUserId === targetUserId) {
+      return res.status(200).json({ status: "self" });
     }
-    
-    // Check friend status
-    const [friendships] = await connection.query(
-      `SELECT status, user_id, friend_id FROM friends 
+
+    // Check if friendship exists
+    const [friendship] = await connection.query(
+      `SELECT * FROM friends 
        WHERE (user_id = ? AND friend_id = ?) 
        OR (user_id = ? AND friend_id = ?)`,
-      [req.user.userId, targetUserId, targetUserId, req.user.userId]
+      [currentUserId, targetUserId, targetUserId, currentUserId]
     );
-    
-    if (friendships.length === 0) {
+
+    if (friendship.length === 0) {
       return res.status(200).json({ status: "none" });
     }
-    
-    const friendship = friendships[0];
-    
-    if (friendship.status === 'accepted') {
+
+    const relation = friendship[0];
+    if (relation.status === 'accepted') {
       return res.status(200).json({ status: "friends" });
-    }
-    
-    if (friendship.user_id === req.user.userId) {
+    } else if (relation.user_id === currentUserId && relation.status === 'pending') {
       return res.status(200).json({ status: "pending_sent" });
-    } else {
+    } else if (relation.friend_id === currentUserId && relation.status === 'pending') {
       return res.status(200).json({ status: "pending_received" });
+    } else {
+      return res.status(200).json({ status: "none" });
     }
+
   } catch (error) {
-    console.error("Friend status error:", error);
+    console.error("Friend status check error:", error);
     res.status(500).json({ message: "Failed to check friend status" });
   } finally {
     if (connection) await connection.release();
   }
 });
 
+
+// Accept friend request
 app.post("/api/user/friends/accept", authenticateToken, async (req, res) => {
   const { friendEmail } = req.body;
   
@@ -1028,6 +1066,7 @@ app.post("/api/user/friends/accept", authenticateToken, async (req, res) => {
   try {
     connection = await pool.getConnection();
     
+    // Get friend user
     const [friendUsers] = await connection.query(
       "SELECT id FROM users WHERE email = ?",
       [friendEmail]
@@ -1039,20 +1078,12 @@ app.post("/api/user/friends/accept", authenticateToken, async (req, res) => {
 
     const friendId = friendUsers[0].id;
     
-    const [existing] = await connection.query(
-      "SELECT id FROM friends WHERE user_id = ? AND friend_id = ? AND status = 'pending'",
-      [friendId, req.user.userId]
-    );
-    
-    if (existing.length === 0) {
-      return res.status(400).json({ message: "No pending friend request from this user" });
-    }
-
+    // Update friend status to accepted
     await connection.query(
       "UPDATE friends SET status = 'accepted' WHERE user_id = ? AND friend_id = ?",
       [friendId, req.user.userId]
     );
-    
+
     res.status(200).json({ message: "Friend request accepted" });
   } catch (error) {
     console.error("Accept friend error:", error);
@@ -1061,7 +1092,6 @@ app.post("/api/user/friends/accept", authenticateToken, async (req, res) => {
     if (connection) await connection.release();
   }
 });
-
 
 // Decline friend request
 app.post("/api/user/friends/decline", authenticateToken, async (req, res) => {
