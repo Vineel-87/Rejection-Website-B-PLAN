@@ -57,12 +57,23 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     };
 
+    // Mobile sidebar toggle functionality
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebar = document.getElementById('sidebar');
+
+    if (sidebarToggle && sidebar) {
+      sidebarToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('hidden');
+      });
+    }
+
     // State management
     let cropper = null;
     let currentEditType = "";
 
     // Initialize
     await initializeProfile();
+     
 
     // Core Functions
     async function initializeProfile() {
@@ -70,6 +81,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (isViewingOtherProfile) {
           disableEditingFeatures();
           await loadOtherProfileInfo(profileEmail);
+          // Add the friend status check right here
+          await checkFriendStatus(profileEmail);
         } else {
           hideAllFriendButtons();
           await loadProfileInfo();
@@ -91,66 +104,40 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (editCoverBtn) editCoverBtn.style.display = 'none';
     }
 
-    async function loadProfileInfo() {
-      try {
-        const response = await fetchWithAuth(`${API_BASE_URL}/api/user/profile`);
-        const profile = response; // No need to access .data or other properties
-        
-        // Update profile image
-        if (elements.profileImage) {
-          elements.profileImage.src = getProfileImageUrl(profile);
-        }
-        
-        // Update username and bio
-        if (elements.usernameEl) {
-          elements.usernameEl.textContent = getDisplayName(profile);
-        }
-        if (elements.bioEl) {
-          elements.bioEl.textContent = profile.bio || 'No bio yet';
-        }
-        
-        // Update background if available
-        if (profile.background_image && elements.header) {
-          applyBackgroundImage(profile.background_image);
-        }
-
-        // Update display elements
-        updateDisplayElements(profile);
-      } catch (error) {
-        console.error("Failed to load profile info:", error);
-        handleAuthError(error);
-      }
-    }
-
+    // Helper function to fetch and update friend count
     async function loadOtherProfileInfo(email) {
-      try {
-        const profile = await fetchWithAuth(`${API_BASE_URL}/api/user/by-email/${encodeURIComponent(email)}`);
-        
-        // Update profile image
-        if (elements.profileImage) {
-          elements.profileImage.src = getProfileImageUrl(profile);
-        }
-        
-        // Update username and bio
-        if (elements.usernameEl) {
-          elements.usernameEl.textContent = getDisplayName(profile);
-        }
-        if (elements.bioEl) {
-          elements.bioEl.textContent = profile.bio || '';
-        }
-        
-        // Update background if available
-        if (profile.background_image && elements.header) {
-          applyBackgroundImage(profile.background_image);
-        }
-
-        // Update display elements (only public info)
-        updateDisplayElements(profile, true);
-      } catch (error) {
-        console.error("Failed to load other profile info:", error);
-        showError("Failed to load profile information");
+    try {
+      const profile = await fetchWithAuth(`${API_BASE_URL}/api/user/by-email/${encodeURIComponent(email)}`);
+      
+      // Update profile image
+      if (elements.profileImage) {
+        elements.profileImage.src = getProfileImageUrl(profile);
       }
+      
+      // Update username and bio
+      if (elements.usernameEl) {
+        elements.usernameEl.textContent = getDisplayName(profile);
+      }
+      if (elements.bioEl) {
+        elements.bioEl.textContent = profile.bio || '';
+      }
+      
+      // Update background if available
+      if (profile.background_image && elements.header) {
+        applyBackgroundImage(profile.background_image);
+      }
+
+      // Update display elements (only public info)
+      updateDisplayElements(profile, true);
+      
+      // Update friend count - use fetchAndUpdateFriendCount instead
+      await fetchAndUpdateFriendCount(profile.id);
+    } catch (error) {
+      console.error("Failed to load other profile info:", error);
+      showError("Failed to load profile information");
     }
+  }
+        
 
     function updateDisplayElements(profile, isPublicView = false) {
       const { displayElements } = elements;
@@ -251,11 +238,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
 
+    // In the handleNameEdit function
     async function handleNameEdit() {
       const currentName = elements.usernameEl?.textContent.trim() || '';
-      const newName = prompt("Enter your name:", currentName);
+      const newName = prompt("Enter your name (max 30 characters):", currentName);
       
       if (newName?.trim() && newName !== currentName) {
+        if (newName.length > 30) {
+          showAlert("Name must be 30 characters or less", "error");
+          return;
+        }
+        
         try {
           await fetchWithAuth(`${API_BASE_URL}/api/user`, {
             method: 'PUT',
@@ -266,6 +259,12 @@ document.addEventListener("DOMContentLoaded", async () => {
           if (elements.usernameEl) {
             elements.usernameEl.textContent = newName.trim();
           }
+          
+          if (elements.displayElements.fullname) {
+            elements.displayElements.fullname.textContent = newName.trim();
+          }
+          
+          showAlert("Name updated successfully", "success");
         } catch (error) {
           console.error("Error updating name:", error);
           handleAuthError(error);
@@ -275,9 +274,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     async function handleBioEdit() {
       const currentBio = elements.bioEl?.textContent.trim() || '';
-      const newBio = prompt("Edit your bio:", currentBio);
+      const newBio = prompt("Edit your bio (max 120 characters):", currentBio);
       
       if (newBio !== null && newBio !== currentBio) {
+        if (newBio.length > 60) {
+          showAlert("Bio must be 120 characters or less", "error");
+          return;
+        }
+        
         try {
           await fetchWithAuth(`${API_BASE_URL}/api/user/bio`, {
             method: 'PUT',
@@ -288,6 +292,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           if (elements.bioEl) {
             elements.bioEl.textContent = newBio.trim();
           }
+          
+          showAlert("Bio updated successfully", "success");
         } catch (error) {
           console.error("Error updating bio:", error);
           handleAuthError(error);
@@ -371,8 +377,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (currentEditType === "profile" && elements.profileImage) {
           elements.profileImage.src = result.avatar;
+          // Show success message
+          showAlert("Profile picture updated successfully", "success");
         } else if (currentEditType === "background") {
           applyBackgroundImage(result.background);
+          // Show success message
+          showAlert("Background image updated successfully", "success");
         }
 
         closeEditor();
@@ -415,6 +425,160 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
     }
 
+    // Add these new functions to profile.js
+    async function checkFriendStatus(targetEmail) {
+      try {
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/user/friend-status/${encodeURIComponent(targetEmail)}`);
+        updateFriendButton(response.status);
+      } catch (error) {
+        console.error("Error checking friend status:", error);
+        // Default to "Add Friend" if there's an error
+        updateFriendButton('none');
+      }
+    }
+
+    function updateFriendButton(status) {
+      hideAllFriendButtons();
+      
+      switch(status) {
+        case 'none':
+          if (elements.friendButtons.addFriend) elements.friendButtons.addFriend.style.display = 'block';
+          break;
+        case 'pending_sent':
+          if (elements.friendButtons.requestSent) elements.friendButtons.requestSent.style.display = 'block';
+          break;
+        case 'pending_received':
+          if (elements.friendButtons.acceptRequest) elements.friendButtons.acceptRequest.style.display = 'block';
+          if (elements.friendButtons.declineRequest) elements.friendButtons.declineRequest.style.display = 'block';
+          break;
+        case 'friends':
+          if (elements.friendButtons.connected) elements.friendButtons.connected.style.display = 'block';
+          if (elements.friendButtons.removeConnection) elements.friendButtons.removeConnection.style.display = 'block';
+          break;
+        default:
+          if (elements.friendButtons.addFriend) elements.friendButtons.addFriend.style.display = 'block';
+      }
+    }
+
+    // Add friend event listener
+    if (elements.friendButtons.addFriend) {
+      elements.friendButtons.addFriend.addEventListener('click', async () => {
+        try {
+          const urlParams = new URLSearchParams(window.location.search);
+          const profileEmail = urlParams.get('email');
+          
+          await fetchWithAuth(`${API_BASE_URL}/api/user/friends`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ friendEmail: profileEmail })
+          });
+          
+          updateFriendButton('pending_sent');
+          showAlert("Friend request sent", "success");
+        } catch (error) {
+          console.error("Error sending friend request:", error);
+          showError(error.message || "Failed to send friend request");
+        }
+      });
+    }
+
+    // Accept friend request
+    // Update the friend-related event listeners to always refresh the count
+    if (elements.friendButtons.acceptRequest) {
+      elements.friendButtons.acceptRequest.addEventListener('click', async () => {
+        try {
+          const urlParams = new URLSearchParams(window.location.search);
+          const profileEmail = urlParams.get('email');
+          
+          await fetchWithAuth(`${API_BASE_URL}/api/user/friends/accept`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ friendEmail: profileEmail })
+          });
+          
+          updateFriendButton('friends');
+          // Always refresh the count from server after operation
+          const profile = await fetchWithAuth(`${API_BASE_URL}/api/user/by-email/${encodeURIComponent(profileEmail)}`);
+          await fetchAndUpdateFriendCount(profile.id);
+          showAlert("Friend request accepted", "success");
+        } catch (error) {
+          console.error("Error accepting friend request:", error);
+          showError(error.message || "Failed to accept friend request");
+        }
+      });
+    }
+
+
+    // Decline friend request
+    if (elements.friendButtons.declineRequest) {
+      elements.friendButtons.declineRequest.addEventListener('click', async () => {
+        try {
+          const urlParams = new URLSearchParams(window.location.search);
+          const profileEmail = urlParams.get('email');
+          
+          await fetchWithAuth(`${API_BASE_URL}/api/user/friends/decline`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ friendEmail: profileEmail })
+          });
+          
+          updateFriendButton('none');
+          showAlert("Friend request declined", "success");
+        } catch (error) {
+          console.error("Error declining friend request:", error);
+          showError(error.message || "Failed to decline friend request");
+        }
+      });
+    }
+
+    // Remove friend connection
+    if (elements.friendButtons.removeConnection) {
+      elements.friendButtons.removeConnection.addEventListener('click', async () => {
+        const confirmed = confirm("Are you sure you want to remove this connection?");
+        if (confirmed) {
+          try {
+            const urlParams = new URLSearchParams(window.location.search);
+            const profileEmail = urlParams.get('email');
+            
+            await fetchWithAuth(`${API_BASE_URL}/api/user/friends/remove`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ friendEmail: profileEmail })
+            });
+            
+            updateFriendButton('none');
+            // Always refresh the count from server after operation
+            const profile = await fetchWithAuth(`${API_BASE_URL}/api/user/by-email/${encodeURIComponent(profileEmail)}`);
+            await fetchAndUpdateFriendCount(profile.id);
+            showAlert("Friend removed", "success");
+          } catch (error) {
+            console.error("Error removing friend:", error);
+            showError(error.message || "Failed to remove friend");
+          }
+        }
+      });
+    }
+
+    async function fetchAndUpdateFriendCount(userId) {
+      try {
+        const response = await fetchWithAuth(`${API_BASE_URL}/api/user/friends/count?userId=${userId}`);
+        const count = response.count || 0;
+        updateFriendCount(count);
+        return count;
+      } catch (error) {
+        console.error("Error fetching friend count:", error);
+        updateFriendCount(0);
+        return 0;
+      }
+    }
+
+    function updateFriendCount(count) {
+      const friendCountElement = document.getElementById('friend-count-number');
+      if (friendCountElement) {
+        friendCountElement.textContent = count;
+      }
+    }
+
     // Utility Functions
     async function fetchWithAuth(url, options = {}) {
       const headers = {
@@ -449,7 +613,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function showError(message) {
-      alert(message); // Replace with your preferred error display method
+      showAlert(message, "error");
+    }
+    
+    function showAlert(message, type = "info") {
+      const alertDiv = document.createElement("div");
+      alertDiv.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg z-50 ${
+        type === "error" ? "bg-red-600" : 
+        type === "success" ? "bg-green-600" : "bg-blue-600"
+      } text-white`;
+      alertDiv.textContent = message;
+      
+      document.body.appendChild(alertDiv);
+      
+      setTimeout(() => {
+        alertDiv.classList.add("opacity-0", "transition-opacity", "duration-500");
+        setTimeout(() => alertDiv.remove(), 500);
+      }, 3000);
     }
 
     function getProfileImageUrl(profile) {

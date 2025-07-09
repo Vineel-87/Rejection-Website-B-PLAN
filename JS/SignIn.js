@@ -33,13 +33,12 @@ document.getElementById("signin-form").addEventListener("submit", async (e) => {
     const result = await response.json();
 
     if (response.ok) {
-      // Store token and user data
+      // Store only the token (needed for authentication)
       localStorage.setItem('token', result.token);
-      localStorage.setItem('user', JSON.stringify(result.user));
       
       showAlert("✔️ Login successful! Redirecting...", "success");
       setTimeout(() => {
-        window.location.href = "job-links.html";
+        window.location.href = "dashboard.html";
       }, 1500);
     } else {
       showAlert(`❌ ${result.message || "Login failed. Please check your credentials"}`, "error");

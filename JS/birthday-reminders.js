@@ -1,4 +1,7 @@
-// Confetti functions
+// birthday-reminders.js - Database Integrated Version
+const API_BASE_URL = 'http://localhost:5000';
+
+// Confetti functions (unchanged)
 function createConfetti() {
   const colors = ['#d4af37', '#50c878', '#ff6b6b', '#48dbfb', '#f368e0'];
   const container = document.querySelector('.birthday-card');
@@ -26,7 +29,6 @@ function createConfetti() {
   }
 }
 
-// Add CSS for confetti animation
 function addConfettiStyle() {
   const style = document.createElement('style');
   style.textContent = `
@@ -44,7 +46,7 @@ function addConfettiStyle() {
   document.head.appendChild(style);
 }
 
-// Update marquee with today's birthdays (improved version)
+// Update marquee with today's birthdays
 function updateBirthdayMarquee(todayBirthdays) {
   const marqueeContent = document.getElementById('marquee-content');
   const marqueeContainer = document.getElementById('birthday-marquee');
@@ -70,34 +72,59 @@ function updateBirthdayMarquee(todayBirthdays) {
   }
 }
 
-// Add Birthday Notes functionality
-function setupBirthdayNotes() {
-  const currentUser = localStorage.getItem("currentUser");
-  if (!currentUser || currentUser === "Guest") return;
-  
-  const notesKey = `birthdayNotes_${currentUser}`;
+// Birthday Notes functionality with database
+async function setupBirthdayNotes() {
+  const token = localStorage.getItem("token");
+  if (!token) return;
+
   const notesTextarea = document.getElementById('birthday-notes');
   const saveButton = document.getElementById('save-notes');
   
-  // Load saved notes
-  const savedNotes = localStorage.getItem(notesKey);
-  if (savedNotes) {
-    notesTextarea.value = savedNotes;
+  try {
+    // Load saved notes from database
+    const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+    
+    if (response.ok) {
+      const profile = await response.json();
+      if (profile.birthday_notes) {
+        notesTextarea.value = profile.birthday_notes;
+      }
+    }
+  } catch (error) {
+    console.error("Error loading birthday notes:", error);
   }
   
-  // Save notes
-  saveButton.addEventListener('click', () => {
+  // Save notes to database
+  saveButton.addEventListener('click', async () => {
     const notes = notesTextarea.value;
-    localStorage.setItem(notesKey, notes);
     
-    // Show confirmation
-    const originalText = saveButton.textContent;
-    saveButton.textContent = 'Saved!';
-    saveButton.classList.add('bg-[#3da865]');
-    setTimeout(() => {
-      saveButton.textContent = originalText;
-      saveButton.classList.remove('bg-[#3da865]');
-    }, 2000);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ birthday_notes: notes })
+      });
+
+      if (response.ok) {
+        // Show confirmation
+        const originalText = saveButton.textContent;
+        saveButton.textContent = 'Saved!';
+        saveButton.classList.add('bg-[#3da865]');
+        setTimeout(() => {
+          saveButton.textContent = originalText;
+          saveButton.classList.remove('bg-[#3da865]');
+        }, 2000);
+      }
+    } catch (error) {
+      console.error("Error saving birthday notes:", error);
+    }
   });
 }
 
@@ -129,50 +156,39 @@ function updateSidebarUpcoming(upcomingBirthdays) {
   }
 }
 
-// Load profile data for vertical container
-function loadVerticalProfile() {
-  const currentUser = localStorage.getItem("currentUser") || "Guest";
+// Load profile data for vertical container from database
+async function loadVerticalProfile() {
+  const token = localStorage.getItem("token");
+  if (!token) return;
+
   const verticalProfilePic = document.getElementById("vertical-profile-pic");
   const verticalUsername = document.getElementById("vertical-username");
   
-  if (currentUser && currentUser !== "Guest") {
-    const savedProfilePic = localStorage.getItem(`profilePic_${currentUser}`);
-    if (savedProfilePic) {
-      verticalProfilePic.src = savedProfilePic;
-    } else {
-      verticalProfilePic.src = `https://www.gravatar.com/avatar/${CryptoJS.MD5(currentUser.trim().toLowerCase())}?d=identicon&s=200`;
-    }
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/user`, {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
     
-    const savedUsername = localStorage.getItem(`username_${currentUser}`) || 
-                         (currentUser.includes("@") ? currentUser.split("@")[0] : currentUser);
-    verticalUsername.textContent = savedUsername;
+    if (response.ok) {
+      const user = await response.json();
+      // Handle avatar URL properly
+      const avatarUrl = user.avatar 
+        ? user.avatar.startsWith('http') 
+          ? user.avatar 
+          : `${API_BASE_URL}${user.avatar}`
+        : `https://www.gravatar.com/avatar/${CryptoJS.MD5(user.email.trim().toLowerCase())}?d=identicon&s=200`;
+      
+      verticalProfilePic.src = avatarUrl;
+      verticalUsername.textContent = user.name || user.email.split('@')[0];
+    }
+  } catch (error) {
+    console.error("Error loading profile:", error);
   }
 }
 
-// Parse date in dd/mm/yyyy format
-function parseBirthDate(dateString) {
-  if (!dateString) return null;
-  
-  // Try to parse as dd/mm/yyyy
-  const parts = dateString.split('/');
-  if (parts.length === 3) {
-    const day = parseInt(parts[0], 10);
-    const month = parseInt(parts[1], 10) - 1; // Months are 0-based
-    const year = parseInt(parts[2], 10);
-    
-    // Validate date
-    const date = new Date(year, month, day);
-    if (date.getDate() === day && date.getMonth() === month && date.getFullYear() === year) {
-      return date;
-    }
-  }
-  
-  // Fallback to native Date parsing
-  const date = new Date(dateString);
-  return isNaN(date.getTime()) ? null : date;
-}
-
-// Calculate days until birthday (handles dd/mm/yyyy format)
+// Calculate days until birthday
 function getDaysUntilBirthday(birthday) {
   if (!birthday) return Infinity;
   
@@ -199,13 +215,13 @@ function getDaysUntilBirthday(birthday) {
 }
 
 // Main initialization
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   addConfettiStyle();
-  loadVerticalProfile();
-  setupBirthdayNotes(); 
+  await loadVerticalProfile();
+  await setupBirthdayNotes();
 
-  const currentUser = localStorage.getItem("currentUser");
-  if (!currentUser || currentUser === "Guest") {
+  const token = localStorage.getItem("token");
+  if (!token) {
     document.getElementById("today-birthdays").innerHTML = `
       <div class="text-center py-8">
         <p class="text-gray-400 mb-4">Please sign in to view birthday reminders</p>
@@ -215,71 +231,88 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // Get friends list
-  const friends = JSON.parse(localStorage.getItem(`friends_${currentUser}`) || "[]");
-  const todayBirthdays = [];
-  const upcomingBirthdays = [];
-  const allBirthdays = [];
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  friends.forEach(friendEmail => {
-    const dobString = localStorage.getItem(`dob_${friendEmail}`);
+  try {
+    // Get friends list from database
+    const friendsResponse = await fetch(`${API_BASE_URL}/api/user/friends`, {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
     
-    if (!dobString) return;
+    if (!friendsResponse.ok) {
+      throw new Error("Failed to fetch friends list");
+    }
+    
+    const friends = await friendsResponse.json();
+    const todayBirthdays = [];
+    const upcomingBirthdays = [];
+    const allBirthdays = [];
 
-    const dob = parseBirthDate(dobString);
-    if (!dob) {
-      console.warn(`Invalid date format for ${friendEmail}: ${dobString}`);
-      return;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Process each friend's birthday
+    for (const friend of friends) {
+      if (!friend.dob) continue;
+
+      const dob = new Date(friend.dob);
+      if (isNaN(dob.getTime())) continue;
+
+      const daysUntil = getDaysUntilBirthday(dob);
+
+      // Generate proper avatar URL
+      const avatarUrl = friend.avatar 
+        ? friend.avatar.startsWith('http') 
+          ? friend.avatar 
+          : `${API_BASE_URL}${friend.avatar}`
+        : `https://www.gravatar.com/avatar/${CryptoJS.MD5(friend.email.trim().toLowerCase())}?d=identicon&s=200`;
+
+      const birthdayItem = {
+        id: friend.id,
+        email: friend.email,
+        username: friend.name || friend.email.split('@')[0],
+        profilePic: avatarUrl,
+        date: dob,
+        formattedDate: formatDate(dob),
+        daysUntil,
+        isToday: daysUntil === 0
+      };
+
+      allBirthdays.push(birthdayItem);
+
+      if (daysUntil === 0) {
+        todayBirthdays.push(birthdayItem);
+      } else if (daysUntil > 0 && daysUntil <= 30) {
+        upcomingBirthdays.push(birthdayItem);
+      }
     }
 
-    const username = localStorage.getItem(`username_${friendEmail}`) || friendEmail.split('@')[0];
-    const profilePic = localStorage.getItem(`profilePic_${friendEmail}`) || 
-      `https://www.gravatar.com/avatar/${CryptoJS.MD5(friendEmail)}?d=identicon&s=200`;
+    // Rest of the code remains the same...
+    upcomingBirthdays.sort((a, b) => a.daysUntil - b.daysUntil);
+    
+    allBirthdays.sort((a, b) => {
+      const aMonth = a.date.getMonth();
+      const aDay = a.date.getDate();
+      const bMonth = b.date.getMonth();
+      const bDay = b.date.getDate();
+      return aMonth === bMonth ? aDay - bDay : aMonth - bMonth;
+    });
 
-    const daysUntil = getDaysUntilBirthday(dob);
+    displayBirthdays(todayBirthdays, 'today-birthdays', true);
+    displayBirthdays(upcomingBirthdays, 'upcoming-birthdays', true);
+    displayBirthdays(allBirthdays, 'all-birthdays', false);
 
-    const birthdayItem = {
-      email: friendEmail,
-      username,
-      profilePic,
-      date: dob,
-      formattedDate: formatDate(dob),
-      daysUntil,
-      isToday: daysUntil === 0
-    };
+    updateBirthdayMarquee(todayBirthdays);
+    updateSidebarUpcoming(upcomingBirthdays);
 
-    allBirthdays.push(birthdayItem);
-
-    if (daysUntil === 0) {
-      todayBirthdays.push(birthdayItem);
-    } else if (daysUntil > 0 && daysUntil <= 30) {
-      upcomingBirthdays.push(birthdayItem);
-    }
-  });
-
-  // Sort upcoming birthdays by days until
-  upcomingBirthdays.sort((a, b) => a.daysUntil - b.daysUntil);
-  
-  // Sort all birthdays by month and day
-  allBirthdays.sort((a, b) => {
-    const aMonth = a.date.getMonth();
-    const aDay = a.date.getDate();
-    const bMonth = b.date.getMonth();
-    const bDay = b.date.getDate();
-    return aMonth === bMonth ? aDay - bDay : aMonth - bMonth;
-  });
-
-  // Display birthdays in their respective sections
-  displayBirthdays(todayBirthdays, 'today-birthdays', true);
-  displayBirthdays(upcomingBirthdays, 'upcoming-birthdays', true);
-  displayBirthdays(allBirthdays, 'all-birthdays', false);
-
-  // Update marquee and sidebar
-  updateBirthdayMarquee(todayBirthdays);
-  updateSidebarUpcoming(upcomingBirthdays);
+  } catch (error) {
+    console.error("Initialization error:", error);
+    document.getElementById("today-birthdays").innerHTML = `
+      <div class="text-center py-8">
+        <p class="text-gray-400">Failed to load birthday data</p>
+      </div>
+    `;
+  }
 });
 
 // Helper functions
@@ -312,10 +345,14 @@ function displayBirthdays(birthdays, containerId, showDaysUntil) {
 }
 
 function createBirthdayCard(bday, showDaysUntil) {
+  // Generate fallback avatar URL if no avatar is provided
+  const avatarUrl = bday.profilePic || 
+    `https://www.gravatar.com/avatar/${CryptoJS.MD5(bday.email.trim().toLowerCase())}?d=identicon&s=200`;
+  
   return `
     <div class="flex items-center gap-4 p-3 hover:bg-[#252525] rounded-lg transition group cursor-pointer" onclick="window.location.href='profile.html?email=${encodeURIComponent(bday.email)}'">
       <div class="relative">
-        <img src="${bday.profilePic}" alt="${bday.username}" 
+        <img src="${avatarUrl}" alt="${bday.username}" 
              class="w-12 h-12 rounded-full object-cover border-2 ${bday.isToday ? 'border-[#d4af37] animate-pulse' : 'border-[#50c878]'}">
         ${bday.isToday ? `
           <div class="absolute -top-1 -right-1 w-5 h-5 bg-[#d4af37] rounded-full flex items-center justify-center">

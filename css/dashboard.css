@@ -1,67 +1,68 @@
-/* dashboard.css */
-.sidebar {
-  transition: transform 0.3s ease-in-out;
-  scrollbar-width: thin;
-  scrollbar-color: #a855f7 #1f2937;
+/* Add these new styles to your dashboard.css */
+
+/* Search results styling */
+#search-results-list {
+  max-height: 300px;
+  overflow-y: auto;
 }
 
-.glow-text {
-  text-shadow: 0 0 6px rgba(255, 0, 0, 0.7), 0 0 12px rgba(255, 0, 0, 0.6);
+/* Search result item styling */
+#search-results-list a {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
 }
 
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-.animate-pulse {
-  animation: pulse 0.5s ease-in-out;
-}
-
-/* Light mode styles - Only background colors */
-.light-mode {
-  --bg-primary: #f8f9fa;
-  --bg-secondary: #e9ecef;
-  --bg-tertiary: #dee2e6;
+/* Profile picture styling in search results */
+#search-results-list img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #50c878;
+  margin-right: 12px;
+  flex-shrink: 0;
 }
 
-/* Dark mode styles (default) - Only background colors */
-.dark-mode {
-  --bg-primary: #0f0f0f;
-  --bg-secondary: #1a1a1a;
-  --bg-tertiary: #252525;
+/* Username styling in search results */
+#search-results-list .font-semibold {
+  font-size: 14px;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
 }
 
-/* Apply theme variables to background elements */
-body {
-  background-color: var(--bg-primary);
+/* Hover state for search items */
+#search-results-list a:hover {
+  background-color: rgba(80, 200, 120, 0.1);
 }
 
-.bg-\[\#0f0f0f\] {
-  background-color: var(--bg-primary);
-}
-.bg-\[\#1a1a1a\] {
-  background-color: var(--bg-secondary);
-}
-.bg-\[\#252525\] {
-  background-color: var(--bg-tertiary);
-}
-.hover\:bg-\[\#1a1a1a\]:hover {
-  background-color: var(--bg-secondary);
+/* Loading indicator */
+#search-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
 }
 
-/* Specific elements that need background changes */
-.fixed.top-0.left-0.w-full.h-16, /* Header bar */
-.fixed.top-16.left-0.w-full.h-12, /* Second horizontal bar */
-.fixed.top-28.left-0.w-64.h-\[calc\(100vh-7rem\)\] /* Vertical container */ {
-  background-color: var(--bg-secondary);
+/* No results message */
+#search-results-list .text-center {
+  padding: 15px;
+  color: #9ca3af;
+  font-size: 14px;
 }
 
-/* Search results dropdown */
+/* Ensure the dropdown has proper z-index */
 #search-results {
-  background-color: var(--bg-secondary);
+  z-index: 50;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(80, 200, 120, 0.3);
 }
 
-/* Sidebar */
-#sidebar {
-  background-color: var(--bg-secondary);
-}
+  #page-loader {
+      transition: opacity 0.7s ease;
+    }

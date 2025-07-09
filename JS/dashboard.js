@@ -21,121 +21,242 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchResultsList = document.getElementById("search-results-list");
 
   // Current user session
-  const currentUser = localStorage.getItem("currentUser") || "Guest";
+  const token = localStorage.getItem("token");
+  let currentUser = null;
 
-  // Sidebar toggle functionality
-  function toggleSidebar() {
-    sidebar.classList.toggle("-translate-x-full");
-    toggleBtn.style.display = sidebar.classList.contains("-translate-x-full") ? "block" : "none";
+  // Initialize the dashboard
+  initDashboard();
+
+  async function initDashboard() {
+    // Sidebar toggle functionality
+    function toggleSidebar() {
+      sidebar.classList.toggle("-translate-x-full");
+      toggleBtn.style.display = sidebar.classList.contains("-translate-x-full") ? "block" : "none";
+    }
+
+    toggleBtn?.addEventListener("click", toggleSidebar);
+    closeBtn?.addEventListener("click", toggleSidebar);
+
+    // Load user data if logged in, otherwise show guest view
+    if (token) {
+      await loadProfileData();
+      setupProfileUpload();
+    } else {
+      showGuestView();
+    }
+
+    setupThemeToggle();
+    setupPageLoaders();
+    
+    // Check if we're coming from profile edit
+    checkProfileUpdate();
   }
 
-  toggleBtn?.addEventListener("click", toggleSidebar);
-  closeBtn?.addEventListener("click", toggleSidebar);
+  // Check if we're coming from profile edit and refresh data
+  function checkProfileUpdate() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('profileUpdated') === 'true') {
+      // Remove the parameter from URL without reload
+      window.history.replaceState({}, document.title, window.location.pathname);
+      // Refresh profile data
+      loadProfileData();
+    }
+  }
 
-  // Page loader for internal navigation
-  const internalLinks = document.querySelectorAll(
-    'a[href]:not([href^="mailto:"]):not([target="_blank"])'
-  );
+  // Show guest view when not logged in
+  function showGuestView() {
+    const guestName = "Guest";
+    const guestAvatar = "Images/default-avatar.png";
+    
+    if (userNameElement) {
+      userNameElement.textContent = guestName;
+    }
+    
+    if (verticalUsername) {
+      verticalUsername.textContent = guestName;
+    }
+    
+    if (profilePic) {
+      profilePic.src = guestAvatar;
+    }
+    
+    if (verticalProfilePic) {
+      verticalProfilePic.src = guestAvatar;
+    }
+    
+    // Hide upload button for guests
+    if (profileUpload) {
+      profileUpload.style.display = "none";
+    }
+  }
 
-  internalLinks.forEach((link) => {
-    link.addEventListener("click", function (e) {
-      const targetUrl = link.getAttribute("href");
-      if (targetUrl && targetUrl !== "#" && !targetUrl.startsWith("http")) {
-        e.preventDefault();
-        if (pageLoader) pageLoader.classList.remove("hidden");
-        setTimeout(() => {
-          window.location.href = targetUrl;
-        }, 1200);
+  // Fetch current user data from API
+  async function fetchCurrentUser() {
+    try {
+      const response = await fetch("http://localhost:5000/api/user/profile", {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const user = await response.json();
+        currentUser = user;
+        return user;
       }
+      return null;
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      return null;
+    }
+  }
+
+  // Setup page loaders for navigation
+  function setupPageLoaders() {
+    const internalLinks = document.querySelectorAll(
+      'a[href]:not([href^="mailto:"]):not([target="_blank"])'
+    );
+
+    internalLinks.forEach((link) => {
+      link.addEventListener("click", function (e) {
+        const targetUrl = link.getAttribute("href");
+        if (targetUrl && targetUrl !== "#" && !targetUrl.startsWith("http")) {
+          e.preventDefault();
+          if (pageLoader) pageLoader.classList.remove("hidden");
+          setTimeout(() => {
+            window.location.href = targetUrl;
+          }, 1200);
+        }
+      });
     });
-  });
+  }
 
   // Load user profile data
-  function loadProfileData() {
+  async function loadProfileData() {
     try {
+      const user = await fetchCurrentUser();
+      if (!user) return;
+
       // Load profile picture
-      loadProfilePicture();
+      await loadProfilePicture(user);
       
       // Update username display
-      if (userNameElement) {
-        const displayName = localStorage.getItem(`username_${currentUser}`) || 
-                         (currentUser.includes("@") ? currentUser.split("@")[0] : currentUser);
-        userNameElement.textContent = displayName;
-        
-        if (verticalUsername) {
-          verticalUsername.textContent = displayName;
-        }
-      }
+      updateUsernameDisplay(user);
+      
+      // Load friends and check birthdays if logged in
+      setupFriendsList();
+      checkBirthdays();
     } catch (error) {
       console.error("Error loading profile data:", error);
     }
   }
 
-  // Load user-specific profile picture
-  function loadProfilePicture() {
-    try {
-      if (currentUser && currentUser !== "Guest") {
-        const userProfileKey = `profilePic_${currentUser}`;
-        const savedProfilePic = localStorage.getItem(userProfileKey);
-        
-        if (savedProfilePic) {
-          profilePic.src = savedProfilePic;
-          if (verticalProfilePic) {
-            verticalProfilePic.src = savedProfilePic;
-          }
-        } else {
-          // Use Gravatar as fallback
-          const gravatarUrl = `https://www.gravatar.com/avatar/${CryptoJS.MD5(currentUser.trim().toLowerCase())}?d=identicon&s=200`;
-          profilePic.src = gravatarUrl;
-          if (verticalProfilePic) {
-            verticalProfilePic.src = gravatarUrl;
-          }
-        }
-      } else {
-        profilePic.src = "Images/default-avatar.png";
-        if (verticalProfilePic) {
-          verticalProfilePic.src = "Images/default-avatar.png";
-        }
+  // Update username display
+  function updateUsernameDisplay(user) {
+    if (userNameElement) {
+      const displayName = user.name || (user.email.includes("@") ? user.email.split("@")[0] : user.email);
+      userNameElement.textContent = displayName;
+      
+      if (verticalUsername) {
+        verticalUsername.textContent = displayName;
       }
-    } catch (error) {
-      console.error("Error loading profile picture:", error);
     }
   }
 
-  // Profile picture upload
-  profileUpload?.addEventListener("change", function (e) {
-    const file = e.target.files[0];
-    if (file && file.type.startsWith("image/")) {
-      const reader = new FileReader();
-      reader.onload = function (event) {
-        try {
-          const imageData = event.target.result;
-
-          // Save with user-specific key
-          localStorage.setItem(`profilePic_${currentUser}`, imageData);
-          profilePic.src = imageData;
-          if (verticalProfilePic) {
-            verticalProfilePic.src = imageData;
-          }
-
-          // Show success feedback
-          const originalBorder = profilePic.classList.toString();
-          profilePic.classList.add("border-pink-500", "animate-pulse");
-          setTimeout(() => {
-            profilePic.className = originalBorder;
-          }, 1000);
-        } catch (error) {
-          console.error("Error saving profile picture:", error);
-          alert("Failed to upload profile picture. Please try again.");
-        }
-      };
-      reader.onerror = () => {
-        console.error("Error reading file");
-        alert("Error reading image file. Please try another image.");
-      };
-      reader.readAsDataURL(file);
+  // Load user-specific profile picture
+  async function loadProfilePicture(user) {
+    try {
+      let avatarUrl;
+      
+      if (user.avatar) {
+        // Use the avatar from the database with the correct server URL
+        avatarUrl = user.avatar.startsWith('http') ? 
+          user.avatar : 
+          `http://localhost:5000${user.avatar.startsWith('/') ? '' : '/'}${user.avatar}`;
+      } else {
+        // Fallback to Gravatar
+        avatarUrl = `https://www.gravatar.com/avatar/${CryptoJS.MD5(user.email.trim().toLowerCase())}?d=identicon&s=200`;
+      }
+      
+      if (profilePic) {
+        profilePic.src = avatarUrl;
+      }
+      
+      if (verticalProfilePic) {
+        verticalProfilePic.src = avatarUrl;
+      }
+    } catch (error) {
+      console.error("Error loading profile picture:", error);
+      // Fallback to default avatar from your server
+      const fallbackAvatar = "http://localhost:5000/Images/default-avatar.png";
+      if (profilePic) {
+        profilePic.src = fallbackAvatar;
+      }
+      if (verticalProfilePic) {
+        verticalProfilePic.src = fallbackAvatar;
+      }
     }
-  });
+  }
+
+    // Setup profile picture upload functionality
+    function setupProfileUpload() {
+      if (!profileUpload) return;
+      
+      profileUpload.addEventListener("change", async function (e) {
+        const file = e.target.files[0];
+        if (file && file.type.startsWith("image/")) {
+          const reader = new FileReader();
+          reader.onload = async function (event) {
+            try {
+              const formData = new FormData();
+              formData.append("avatar", file);
+
+              const response = await fetch("http://localhost:5000/api/user/avatar", {
+                method: "POST",
+                headers: {
+                  "Authorization": `Bearer ${token}`
+                },
+                body: formData
+              });
+
+              if (response.ok) {
+                const result = await response.json();
+                
+                // Update both profile pictures
+                if (profilePic) {
+                  profilePic.src = result.avatar;
+                }
+                if (verticalProfilePic) {
+                  verticalProfilePic.src = result.avatar;
+                }
+
+                // Show success feedback
+                if (profilePic) {
+                  const originalBorder = profilePic.classList.toString();
+                  profilePic.classList.add("border-pink-500", "animate-pulse");
+                  setTimeout(() => {
+                    profilePic.className = originalBorder;
+                  }, 1000);
+                }
+                
+                // Show success alert
+                showAlert("Profile picture updated successfully", "success");
+              } else {
+                throw new Error("Failed to upload avatar");
+              }
+            } catch (error) {
+              console.error("Error saving profile picture:", error);
+              showAlert("Failed to upload profile picture. Please try again.", "error");
+            }
+          };
+          reader.onerror = () => {
+            console.error("Error reading file");
+            showAlert("Error reading image file. Please try another image.", "error");
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
 
   // Friends list functionality
   function setupFriendsList() {
@@ -148,7 +269,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function toggleFriendsDropdown(friendsItem) {
+  async function toggleFriendsDropdown(friendsItem) {
     // Remove existing dropdown if any
     const existingDropdown = document.querySelector('.friends-dropdown');
     if (existingDropdown) {
@@ -160,16 +281,24 @@ document.addEventListener("DOMContentLoaded", () => {
     dropdown.className = 'friends-dropdown absolute left-0 mt-2 w-72 bg-[#1a1a1a] border border-[#50c878]/50 rounded-lg shadow-lg z-50 py-2';
 
     try {
-      const friends = JSON.parse(localStorage.getItem(`friends_${currentUser}`) || '[]');
+      const response = await fetch("http://localhost:5000/api/user/friends", {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
       
+      if (!response.ok) throw new Error("Failed to fetch friends");
+      
+      const friends = await response.json();
+
       if (friends.length === 0) {
         const emptyItem = document.createElement('div');
         emptyItem.className = 'px-4 py-2 text-gray-400 text-sm';
         emptyItem.textContent = 'No friends yet';
         dropdown.appendChild(emptyItem);
       } else {
-        friends.forEach(friendEmail => {
-          const friendItem = createFriendItem(friendEmail);
+        friends.forEach(friend => {
+          const friendItem = createFriendItem(friend);
           dropdown.appendChild(friendItem);
         });
       }
@@ -187,7 +316,39 @@ document.addEventListener("DOMContentLoaded", () => {
       document.addEventListener('click', closeDropdown);
     } catch (error) {
       console.error("Error loading friends list:", error);
+      const errorItem = document.createElement('div');
+      errorItem.className = 'px-4 py-2 text-red-400 text-sm';
+      errorItem.textContent = 'Error loading friends';
+      dropdown.appendChild(errorItem);
+      friendsItem.parentNode.appendChild(dropdown);
     }
+  }
+
+  function createFriendItem(friend) {
+    const friendItem = document.createElement('a');
+    friendItem.href = `profile.html?email=${encodeURIComponent(friend.email)}`;
+    friendItem.className = 'px-4 py-2 hover:bg-[#252525] flex items-center gap-2';
+    
+    const profilePic = document.createElement('img');
+    profilePic.src = friend.avatar || `https://www.gravatar.com/avatar/${CryptoJS.MD5(friend.email)}?d=identicon&s=200`;
+    profilePic.className = 'w-8 h-8 rounded-full';
+    
+    const username = document.createElement('div');
+    username.textContent = friend.name || friend.email.split('@')[0];
+    
+    friendItem.appendChild(profilePic);
+    friendItem.appendChild(username);
+
+    // Add click handler to show loading before navigation
+    friendItem.addEventListener("click", (e) => {
+      e.preventDefault();
+      document.getElementById("page-loader").classList.remove("hidden");
+      setTimeout(() => {
+        window.location.href = friendItem.href;
+      }, 500);
+    });
+
+    return friendItem;
   }
 
   // Theme toggle functionality
@@ -243,34 +404,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function createFriendItem(friendEmail) {
-    const friendItem = document.createElement('a');
-    friendItem.href = `profile.html?email=${encodeURIComponent(friendEmail)}`;
-    friendItem.className = 'px-4 py-2 hover:bg-[#252525] flex items-center gap-2';
-    
-    const profilePic = document.createElement('img');
-    profilePic.src = localStorage.getItem(`profilePic_${friendEmail}`) || 
-                   `https://www.gravatar.com/avatar/${CryptoJS.MD5(friendEmail)}?d=identicon&s=200`;
-    profilePic.className = 'w-8 h-8 rounded-full';
-    
-    const username = document.createElement('div');
-    username.textContent = localStorage.getItem(`username_${friendEmail}`) || friendEmail.split('@')[0];
-    
-    friendItem.appendChild(profilePic);
-    friendItem.appendChild(username);
-
-    // Add click handler to show loading before navigation
-    friendItem.addEventListener("click", (e) => {
-      e.preventDefault();
-      document.getElementById("page-loader").classList.remove("hidden");
-      setTimeout(() => {
-        window.location.href = friendItem.href;
-      }, 500);
-    });
-
-    return friendItem;
-  }
-
   // Search functionality
   let searchTimeout;
   let currentSearchTerm = '';
@@ -298,7 +431,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Perform the search
   async function performSearch(term) {
     if (!searchLoading || !searchResultsList || !searchResults) return;
     
@@ -307,34 +439,25 @@ document.addEventListener("DOMContentLoaded", () => {
     searchResults.classList.remove("hidden");
     
     try {
-      // First check localStorage for usernames
-      const localUsers = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key.startsWith('username_')) {
-          const email = key.replace('username_', '');
-          // Skip current user
-          if (email === currentUser) continue;
-          
-          const username = localStorage.getItem(key);
-          const profilePic = localStorage.getItem(`profilePic_${email}`) || 
-                           `https://www.gravatar.com/avatar/${CryptoJS.MD5(email)}?d=identicon&s=200`;
-          
-          localUsers.push({
-            email,
-            username,
-            profilePic
-          });
+      const response = await fetch(`http://localhost:5000/api/user/search/${encodeURIComponent(term)}`, {
+        headers: {
+          "Authorization": `Bearer ${token}`
         }
+      });
+      
+      if (!response.ok) throw new Error("Search failed");
+      
+      const users = await response.json();
+      
+      if (!users || users.length === 0) {
+        searchResultsList.innerHTML = `
+          <div class="p-4 text-center text-gray-400">
+            No users found matching "${escapeHtml(term)}"
+          </div>
+        `;
+      } else {
+        displaySearchResults(users);
       }
-
-      // Filter by search term
-      const filteredUsers = localUsers.filter(user => 
-        user.username.toLowerCase().includes(term.toLowerCase()) || 
-        user.email.toLowerCase().includes(term.toLowerCase())
-      );
-
-      displaySearchResults(filteredUsers);
     } catch (error) {
       console.error("Search error:", error);
       searchResultsList.innerHTML = `
@@ -350,99 +473,103 @@ document.addEventListener("DOMContentLoaded", () => {
   // Display search results
   function displaySearchResults(users) {
     if (!searchResultsList) return;
-    
-    searchResultsList.innerHTML = '';
-    
-    if (!users || users.length === 0) {
-      searchResultsList.innerHTML = `
-        <div class="p-4 text-center text-gray-400">
-          No users found for "${escapeHtml(currentSearchTerm)}"
-        </div>
-      `;
-      return;
-    }
-    
-    users.forEach(user => {
-      const userElement = document.createElement("a");
-      userElement.href = `profile.html?email=${encodeURIComponent(user.email)}`;
-      userElement.className = "flex items-center gap-3 p-3 hover:bg-[#252525] transition cursor-pointer border-b border-[#50c878]/10 last:border-0";
-      
-      userElement.innerHTML = `
-        <img src="${user.profilePic || 'Images/default-avatar.png'}" 
-             class="w-10 h-10 rounded-full border border-[#50c878] object-cover">
-        <div class="overflow-hidden">
-          <div class="font-semibold text-white truncate">${escapeHtml(user.username || user.email.split('@')[0])}</div>
-          <div class="text-sm text-gray-400 truncate">${escapeHtml(user.email)}</div>
-        </div>
-      `;
-      
-      // Add click handler to show loading before navigation
-      userElement.addEventListener("click", (e) => {
-        e.preventDefault();
-        document.getElementById("page-loader").classList.remove("hidden");
-        setTimeout(() => {
-          window.location.href = userElement.href;
-        }, 500);
-      });
-      
-      searchResultsList.appendChild(userElement);
-    });
+  
+  searchResultsList.innerHTML = '';
+  
+  if (!users || users.length === 0) {
+    searchResultsList.innerHTML = `
+      <div class="p-4 text-center text-gray-400">
+        No users found for "${escapeHtml(currentSearchTerm)}"
+      </div>
+    `;
+    return;
   }
+  
+  users.forEach(user => {
+    const userElement = document.createElement("a");
+    userElement.href = `profile.html?email=${encodeURIComponent(user.email)}`;
+    userElement.className = "flex items-center gap-3 p-3 hover:bg-[#252525] transition cursor-pointer border-b border-[#50c878]/10 last:border-0";
+    
+    // Handle avatar URL properly
+    let avatarUrl;
+    if (user.avatar) {
+      avatarUrl = user.avatar.startsWith('http') ? 
+        user.avatar : 
+        `http://localhost:5000${user.avatar.startsWith('/') ? '' : '/'}${user.avatar}`;
+    } else {
+      // Fallback to Gravatar
+      const emailHash = CryptoJS.MD5(user.email.trim().toLowerCase()).toString();
+      avatarUrl = `https://www.gravatar.com/avatar/${emailHash}?d=identicon&s=200`;
+    }
+
+    userElement.innerHTML = `
+      <img src="${avatarUrl}" 
+          class="w-10 h-10 rounded-full border border-[#50c878] object-cover">
+      <div class="font-semibold text-white truncate">
+        ${escapeHtml(user.name || user.email.split('@')[0])}
+      </div>
+    `;
+    
+    userElement.addEventListener("click", (e) => {
+      e.preventDefault();
+      document.getElementById("page-loader").classList.remove("hidden");
+      setTimeout(() => {
+        window.location.href = userElement.href;
+      }, 500);
+    });
+    
+    searchResultsList.appendChild(userElement);
+  });
+}
 
   // Check for today's birthdays
-  function checkBirthdays() {
-    const currentUser = localStorage.getItem("currentUser");
-    if (!currentUser || currentUser === "Guest") return;
+  async function checkBirthdays() {
+    try {
+      const response = await fetch("http://localhost:5000/api/user/friends", {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) return;
+      
+      const friends = await response.json();
+      const todayBirthdays = [];
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-    // Get friends list
-    const friends = JSON.parse(localStorage.getItem(`friends_${currentUser}`) || "[]");
-    const todayBirthdays = [];
+      friends.forEach(friend => {
+        if (!friend.dob) return;
+        
+        const dob = new Date(friend.dob);
+        if (isNaN(dob.getTime())) return;
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+        // Create this year's birthday date
+        const thisYearBirthday = new Date(today.getFullYear(), dob.getMonth(), dob.getDate());
+        thisYearBirthday.setHours(0, 0, 0, 0);
 
-    friends.forEach(friendEmail => {
-      const dobString = localStorage.getItem(`dob_${friendEmail}`);
-      if (!dobString) return;
+        // Calculate difference in days
+        const diffTime = thisYearBirthday - today;
+        const daysUntil = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-      // Parse date (handles dd/mm/yyyy format)
-      const parts = dobString.split('/');
-      let dob;
-      if (parts.length === 3) {
-        const day = parseInt(parts[0], 10);
-        const month = parseInt(parts[1], 10) - 1;
-        const year = parseInt(parts[2], 10);
-        dob = new Date(year, month, day);
+        // If birthday is today (daysUntil === 0)
+        if (daysUntil === 0) {
+          todayBirthdays.push(friend.name || friend.email.split('@')[0]);
+        }
+      });
+
+      // Update notification badge
+      const badge = document.getElementById('birthday-notification-badge');
+      const countElement = document.getElementById('birthday-count');
+      
+      if (todayBirthdays.length > 0) {
+        badge?.classList.remove('hidden');
+        if (countElement) countElement.textContent = todayBirthdays.length;
       } else {
-        dob = new Date(dobString);
+        badge?.classList.add('hidden');
       }
-
-      if (isNaN(dob.getTime())) return;
-
-      // Create this year's birthday date
-      const thisYearBirthday = new Date(today.getFullYear(), dob.getMonth(), dob.getDate());
-      thisYearBirthday.setHours(0, 0, 0, 0);
-
-      // Calculate difference in days
-      const diffTime = thisYearBirthday - today;
-      const daysUntil = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-      // If birthday is today (daysUntil === 0)
-      if (daysUntil === 0) {
-        const username = localStorage.getItem(`username_${friendEmail}`) || friendEmail.split('@')[0];
-        todayBirthdays.push(username);
-      }
-    });
-
-    // Update notification badge
-    const badge = document.getElementById('birthday-notification-badge');
-    const countElement = document.getElementById('birthday-count');
-    
-    if (todayBirthdays.length > 0) {
-      badge.classList.remove('hidden');
-      countElement.textContent = todayBirthdays.length;
-    } else {
-      badge.classList.add('hidden');
+    } catch (error) {
+      console.error("Error checking birthdays:", error);
     }
   }
 
@@ -456,10 +583,4 @@ document.addEventListener("DOMContentLoaded", () => {
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
   }
-
-  // Initialize all functionality
-  loadProfileData();
-  setupFriendsList();
-  checkBirthdays(); // Add this line to check for birthdays on load
-  setupThemeToggle();
 });

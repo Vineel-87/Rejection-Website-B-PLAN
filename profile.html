@@ -6,15 +6,28 @@
   <title>Profile | Rejection</title> 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="css/profile.css" />
+  <link rel="icon" href="Images/reorganization.png" />
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.css" rel="stylesheet">
   <!-- Add CryptoJS for Gravatar support -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
-<body class="bg-[#0f0f0f] text-white min-h-screen font-[Poppins] flex">
+<body class="bg-[#0f0f0f] text-white min-h-screen font-[Poppins] flex flex-col md:flex-row">
+
+  <!-- Mobile Sidebar Toggle -->
+  <div class="md:hidden flex items-center justify-between p-4 bg-[#1a1a1a] border-b border-[#50c878]/30">
+    <h1 class="text-2xl font-extrabold gradient-text drop-shadow-lg tracking-wide" style="font-family: 'Great Vibes', cursive;">
+      Rejection
+    </h1>
+    <button id="sidebar-toggle" class="text-white">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+  </div>
 
   <!-- Sidebar -->
-  <div class="w-64 bg-[#1a1a1a] h-screen sticky top-0 overflow-y-auto scroll-container p-4 hidden md:block border-r border-[#50c878]/30">
+  <div id="sidebar" class="w-64 bg-[#1a1a1a] h-screen sticky top-0 overflow-y-auto scroll-container p-4 hidden md:block border-r border-[#50c878]/30">
     <div class="mb-6 px-2">
       <h1 class="text-4xl font-extrabold gradient-text drop-shadow-lg tracking-wide" style="font-family: 'Great Vibes', cursive;">
         Rejection
@@ -35,7 +48,7 @@
   </div>
 
   <!-- Main Content -->
-  <div class="flex-1">
+  <div class="flex-1 w-full">
     <header id="profile-header" class="w-full h-64 gradient-header relative overflow-hidden">
       <a href="dashboard.html" class="absolute top-4 left-4 text-white hover:text-[#d4af37] z-10 transition">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -65,15 +78,19 @@
       </div>
 
       <!-- Username and Bio Section -->
-      <div class="mt-6 w-screen -ml-[256px] pl-[60px]">
-        <div class="bg-[#1a1a1a] shadow-lg w-full p-4 flex items-center justify-between border border-[#50c878]/30">
-          <div class="flex-1 text-center md:text-left space-y-2">
+      <div class="mt-6 w-full md:w-auto md:ml-0 pl-0 md:pl-0">
+        <div class="bg-[#1a1a1a] shadow-lg w-full p-4 flex flex-col md:flex-row items-center justify-between border border-[#50c878]/30">
+          <div class="flex-1 text-center md:text-left space-y-2 mb-4 md:mb-0">
             <h2 id="profile-username" class="text-2xl font-bold gradient-text">Username</h2>
             <p id="profile-bio" class="text-gray-300">This is a sample bio.</p>
+            <!-- In the username and bio section, replace the friend-count div with this: -->
+            <div id="friend-count" class="text-[#d4af37] font-medium">
+              <span id="friend-count-number">0</span> friends
+            </div>
           </div>
           
           <!-- Action Buttons Container -->
-          <div class="flex items-center gap-2 flex-wrap justify-end">
+          <div class="flex items-center gap-2 flex-wrap justify-center md:justify-end">
               <!-- Friend Request Buttons -->
               <button id="add-friend-btn" class="bg-gradient-to-r from-[#50c878] to-[#3da865] hover:from-[#3da865] hover:to-[#50c878] text-white px-4 py-2 rounded-lg text-sm transition shadow-lg hidden">
                   Add Friend
@@ -93,26 +110,26 @@
               <button id="remove-connection-btn" class="bg-gradient-to-r from-[#f87171] to-[#ef4444] hover:from-[#ef4444] hover:to-[#f87171] text-white px-4 py-2 rounded-lg text-sm transition shadow-lg hidden">
                   Remove Friend
               </button>
-              
-              <!-- Other Action Buttons -->
-              <button id="block-btn" class="bg-gradient-to-r from-[#f87171] to-[#ef4444] hover:from-[#ef4444] hover:to-[#f87171] text-white px-4 py-2 rounded-lg text-sm transition shadow-lg">
-                  Block
-              </button>
-              <button id="message-btn" class="bg-gradient-to-r from-[#60a5fa] to-[#3b82f6] hover:from-[#3b82f6] hover:to-[#60a5fa] text-white px-4 py-2 rounded-lg text-sm transition shadow-lg">
-                  Message
-              </button>
-              <button class="text-gray-400 hover:text-[#d4af37] p-2 rounded-full hover:bg-[#252525] transition border border-[#50c878]/30">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                  </svg>
-              </button>
+            
+            <!-- Other Action Buttons -->
+            <button id="block-btn" class="bg-gradient-to-r from-[#f87171] to-[#ef4444] hover:from-[#ef4444] hover:to-[#f87171] text-white px-4 py-2 rounded-lg text-sm transition shadow-lg">
+                Block
+            </button>
+            <button id="message-btn" class="bg-gradient-to-r from-[#60a5fa] to-[#3b82f6] hover:from-[#3b82f6] hover:to-[#60a5fa] text-white px-4 py-2 rounded-lg text-sm transition shadow-lg">
+                Message
+            </button>
+            <button class="text-gray-400 hover:text-[#d4af37] p-2 rounded-full hover:bg-[#252525] transition border border-[#50c878]/30">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                </svg>
+            </button>
           </div>
         </div>
       </div>
 
       <!-- Scrollable Container with User Info -->
-      <div class="mt-10 w-screen -ml-[256px] pl-[60px]">
-        <div class="h-[600px] bg-[#1a1a1a] shadow-lg w-full p-8 overflow-y-auto space-y-10 scroll-container border border-[#50c878]/30">
+      <div class="mt-10 w-full md:w-auto md:ml-0 pl-0 md:pl-0">
+        <div class="h-[600px] bg-[#1a1a1a] shadow-lg w-full p-4 md:p-8 overflow-y-auto space-y-10 scroll-container border border-[#50c878]/30">
 
           <!-- Personal Information Section -->
           <div>
@@ -199,7 +216,7 @@
                 <div>
                   <p class="text-gray-400 flex items-center">
                     <svg class="w-5 h-5 mr-2" fill="#0088CC" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 5.185c-.133.349-.465.631-.851.631H8.915c-.39 0-.724-.282-.851-.631L6.09 8.221c-.142-.373.037-.782.43-.91l1.93-.617c.38-.122.8.09.922.47.015.045.078.226.096.288l.854 2.699c.133.422.529.68.96.68h3.897c.432 0 .828-.258.96-.68l.854-2.699c.02-.063.082-.243.096-.288.122-.38.542-.592.922-.47l1.93.617c.393.128.572.537.43.91z" />
+                      <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 22.5c-5.799 0-10.5-4.701-10.5-10.5S6.201 1.5 12 1.5 22.5 6.201 22.5 12 17.799 22.5 12 22.5zm4.5-13.5c0-.828-.672-1.5-1.5-1.5s-1.5.672-1.5 1.5.672 1.5 1.5 1.5 1.5-.672 1.5-1.5zm-9 0c0-.828-.672-1.5-1.5-1.5s-1.5.672-1.5 1.5.672 1.5 1.5 1.5 1.5-.672 1.5-1.5zm4.5 9c-2.484 0-4.5-2.016-4.5-4.5h1.5c0 1.654 1.346 3 3 3s3-1.346 3-3h1.5c0 2.484-2.016 4.5-4.5 4.5z" />
                     </svg>
                     Telegram
                   </p>
@@ -241,13 +258,13 @@
 
     <!-- Image Editor Modal -->
     <div id="editor-modal" class="fixed inset-0 bg-black bg-opacity-80 z-[10000] hidden flex items-center justify-center">
-      <div class="bg-[#1a1a1a] p-6 rounded-xl max-w-3xl w-full relative border border-[#50c878]/30">
+      <div class="bg-[#1a1a1a] p-6 rounded-xl max-w-3xl w-full mx-4 relative border border-[#50c878]/30">
         <img id="editor-image" class="max-h-96 w-full object-contain mb-4 rounded" />
         <div class="flex flex-col gap-2 mb-4">
           <label class="text-sm text-white">Brightness</label>
           <input type="range" id="brightness-range" min="0.5" max="1.5" step="0.01" value="1" class="w-full accent-[#d4af37]">
         </div>
-        <div class="flex justify-between mt-4 gap-3">
+        <div class="flex flex-wrap justify-between mt-4 gap-3">
           <button id="zoom-in" class="bg-gradient-to-r from-[#50c878] to-[#3da865] hover:from-[#3da865] hover:to-[#50c878] text-white px-4 py-2 rounded hover:opacity-90 transition shadow-lg">Zoom In</button>
           <button id="zoom-out" class="bg-gradient-to-r from-[#50c878] to-[#3da865] hover:from-[#3da865] hover:to-[#50c878] text-white px-4 py-2 rounded hover:opacity-90 transition shadow-lg">Zoom Out</button>
           <button id="apply-edit" class="bg-gradient-to-r from-[#50c878] to-[#d4af37] hover:from-[#d4af37] hover:to-[#50c878] text-white px-4 py-2 rounded hover:opacity-90 transition shadow-lg">Apply</button>

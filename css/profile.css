@@ -1,26 +1,110 @@
 .gradient-header {
-      background: linear-gradient(135deg, #50c878 0%, #3da865 50%, #d4af37 100%);
+  background: linear-gradient(135deg, #50c878 0%, #3da865 50%, #d4af37 100%);
+}
+.gradient-text {
+  background: linear-gradient(90deg, #50c878, #d4af37);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.input-focus {
+  transition: all 0.3s ease;
+}
+.input-focus:focus {
+  box-shadow: 0 0 0 3px rgba(80, 200, 120, 0.3);
+  border-color: #d4af37;
+}
+.scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+.scroll-container::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+.scroll-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(#50c878, #d4af37);
+  border-radius: 3px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .max-w-4xl {
+    max-width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  #profile-header {
+    height: 200px;
+  }
+  
+  .scroll-container {
+    padding: 1rem;
+  }
+}
+  
+  /* Add these styles to profile.css */
+  #profile-username {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  #profile-bio {
+    max-width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* For the action buttons container */
+  .bg-\[\#1a1a1a\] {
+    min-height: 100px; /* Ensure minimum height */
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  /* For the buttons themselves */
+  #add-friend-btn, 
+  #request-sent-btn, 
+  #accept-request-btn, 
+  #decline-request-btn, 
+  #connected-btn, 
+  #remove-connection-btn,
+  #block-btn,
+  #message-btn {
+    white-space: nowrap;
+    min-width: fit-content;
+  }
+
+  /* Responsive adjustments for buttons */
+  @media (max-width: 640px) {
+    .flex-wrap {
+      justify-content: center;
     }
-    .gradient-text {
-      background: linear-gradient(90deg, #50c878, #d4af37);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
+    
+    .bg-\[\#1a1a1a\] {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
     }
-    .input-focus {
-      transition: all 0.3s ease;
+    
+    #profile-username, #profile-bio {
+      text-align: center;
     }
-    .input-focus:focus {
-      box-shadow: 0 0 0 3px rgba(80, 200, 120, 0.3);
-      border-color: #d4af37;
-    }
-    .scroll-container::-webkit-scrollbar {
-      width: 6px;
-    }
-    .scroll-container::-webkit-scrollbar-track {
-      background: #1a1a1a;
-    }
-    .scroll-container::-webkit-scrollbar-thumb {
-      background: linear-gradient(#50c878, #d4af37);
-      border-radius: 3px;
-    }
+  }
+
+  #page-loader img {
+    box-shadow: 0 0 20px #50c878;
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  #page-loader img:hover {
+    transform: scale(1.1);
+  }

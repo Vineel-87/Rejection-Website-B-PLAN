@@ -454,13 +454,27 @@ app.get("/api/user/profile", authenticateToken, async (req, res) => {
   }
 });
 
-// Update user profile
+
+// Update user profile (partial updates supported)
 app.put("/api/user/profile", authenticateToken, async (req, res) => {
-  const {
-    bio, dob, gender, address,
-    facebook, instagram, linkedin, telegram,
-    snapchat, github, portfolio
-  } = req.body;
+  const allowedFields = [
+    'bio', 'dob', 'gender', 'address',
+    'facebook', 'instagram', 'linkedin', 'telegram',
+    'snapchat', 'github', 'portfolio'
+  ];
+  
+  // Filter only allowed fields that exist in the request
+  const updateData = {};
+  for (const field of allowedFields) {
+    if (req.body[field] !== undefined) {
+      updateData[field] = req.body[field];
+    }
+  }
+
+  // If no valid fields to update
+  if (Object.keys(updateData).length === 0) {
+    return res.status(400).json({ message: "No valid fields provided for update" });
+  }
 
   let connection;
   try {
@@ -473,38 +487,39 @@ app.put("/api/user/profile", authenticateToken, async (req, res) => {
     );
 
     if (existing.length > 0) {
-      // Update existing profile
+      // Build the SET clause dynamically
+      const setClause = Object.keys(updateData)
+        .map(field => `${field} = ?`)
+        .join(', ');
+      
+      // Create values array in the correct order
+      const values = [...Object.values(updateData), req.user.userId];
+
+      // Update only the provided fields
       await connection.query(
         `UPDATE user_profiles SET
-          bio = ?, dob = ?, gender = ?, address = ?,
-          facebook = ?, instagram = ?, linkedin = ?, telegram = ?,
-          snapchat = ?, github = ?, portfolio = ?,
+          ${setClause},
           updated_at = CURRENT_TIMESTAMP
         WHERE user_id = ?`,
-        [
-          bio, dob, gender, address,
-          facebook, instagram, linkedin, telegram,
-          snapchat, github, portfolio,
-          req.user.userId
-        ]
+        values
       );
     } else {
-      // Create new profile
+      // Create new profile with only the provided fields
+      const fields = ['user_id', ...Object.keys(updateData)];
+      const placeholders = fields.map(() => '?').join(', ');
+      const values = [req.user.userId, ...Object.values(updateData)];
+
       await connection.query(
-        `INSERT INTO user_profiles (
-          user_id, bio, dob, gender, address,
-          facebook, instagram, linkedin, telegram,
-          snapchat, github, portfolio
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [
-          req.user.userId, bio, dob, gender, address,
-          facebook, instagram, linkedin, telegram,
-          snapchat, github, portfolio
-        ]
+        `INSERT INTO user_profiles (${fields.join(', ')}) 
+        VALUES (${placeholders})`,
+        values
       );
     }
 
-    res.status(200).json({ message: "Profile updated successfully" });
+    res.status(200).json({ 
+      message: "Profile updated successfully",
+      updatedFields: Object.keys(updateData)
+    });
   } catch (error) {
     console.error("Profile update error:", error);
     res.status(500).json({ message: "Failed to update profile" });
@@ -690,6 +705,115 @@ app.get("/api/user/by-email/:email", authenticateToken, async (req, res) => {
   }
 });
 
+// Get user's friends
+// In your server.js
+app.get("/api/user/friends/count", authenticateToken, async (req, res) => {
+  const { userId } = req.query;
+  
+  if (!userId) {
+    return res.status(400).json({ message: "User ID is required" });
+  }
+
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    
+    const [result] = await connection.query(`
+      SELECT COUNT(*) as count 
+      FROM friends 
+      WHERE (user_id = ? OR friend_id = ?) 
+      AND status = 'accepted'
+    `, [userId, userId]);
+    
+    res.status(200).json({ count: result[0].count });
+  } catch (error) {
+    console.error("Friend count error:", error);
+    res.status(500).json({ message: "Failed to get friend count" });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
+
+// Add friend
+app.post("/api/user/friends", authenticateToken, async (req, res) => {
+  const { friendEmail } = req.body;
+  
+  if (!friendEmail) {
+    return res.status(400).json({ message: "Friend email is required" });
+  }
+
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    
+    // Get friend user
+    const [friendUsers] = await connection.query(
+      "SELECT id FROM users WHERE email = ?",
+      [friendEmail]
+    );
+    
+    if (friendUsers.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const friendId = friendUsers[0].id;
+    
+    // Check if already friends
+    const [existing] = await connection.query(
+      "SELECT id FROM friends WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)",
+      [req.user.userId, friendId, friendId, req.user.userId]
+    );
+    
+    if (existing.length > 0) {
+      return res.status(400).json({ message: "Friend request already exists" });
+    }
+
+    // Create friend request
+    await connection.query(
+      "INSERT INTO friends (user_id, friend_id, status) VALUES (?, ?, ?)",
+      [req.user.userId, friendId, 'pending']
+    );
+
+    res.status(201).json({ message: "Friend request sent" });
+  } catch (error) {
+    console.error("Add friend error:", error);
+    res.status(500).json({ message: "Failed to add friend" });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
+
+// Update the existing endpoint to support partial matching
+app.get("/api/user/search/:term", authenticateToken, async (req, res) => {
+  const searchTerm = `%${req.params.term}%`;
+  
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    
+    // Search by email or name
+    const [users] = await connection.query(`
+      SELECT 
+        u.id, 
+        u.email, 
+        u.name, 
+        u.avatar,
+        up.dob
+      FROM users u
+      LEFT JOIN user_profiles up ON u.id = up.user_id
+      WHERE u.email LIKE ? OR u.name LIKE ?
+      LIMIT 15
+    `, [searchTerm, searchTerm]);
+    
+    res.status(200).json(users);
+  } catch (error) {
+    console.error("User search error:", error);
+    res.status(500).json({ message: "Failed to search users" });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
+
 // Job Posts Endpoints
 // Get all job posts
 app.get("/api/job-posts", authenticateToken, async (req, res) => {
@@ -835,6 +959,192 @@ app.delete("/api/job-posts/:id", authenticateToken, async (req, res) => {
       message: "Failed to delete job post",
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
+
+// Get friend status with another user
+app.get("/api/user/friend-status/:email", authenticateToken, async (req, res) => {
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    
+    // Get target user ID
+    const [targetUsers] = await connection.query(
+      "SELECT id FROM users WHERE email = ?",
+      [req.params.email]
+    );
+    
+    if (targetUsers.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    
+    const targetUserId = targetUsers[0].id;
+    
+    if (targetUserId === req.user.userId) {
+      return res.status(400).json({ message: "Cannot check friend status with yourself" });
+    }
+    
+    // Check friend status
+    const [friendships] = await connection.query(
+      `SELECT status, user_id, friend_id FROM friends 
+       WHERE (user_id = ? AND friend_id = ?) 
+       OR (user_id = ? AND friend_id = ?)`,
+      [req.user.userId, targetUserId, targetUserId, req.user.userId]
+    );
+    
+    if (friendships.length === 0) {
+      return res.status(200).json({ status: "none" });
+    }
+    
+    const friendship = friendships[0];
+    
+    if (friendship.status === 'accepted') {
+      return res.status(200).json({ status: "friends" });
+    }
+    
+    if (friendship.user_id === req.user.userId) {
+      return res.status(200).json({ status: "pending_sent" });
+    } else {
+      return res.status(200).json({ status: "pending_received" });
+    }
+  } catch (error) {
+    console.error("Friend status error:", error);
+    res.status(500).json({ message: "Failed to check friend status" });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
+
+app.post("/api/user/friends/accept", authenticateToken, async (req, res) => {
+  const { friendEmail } = req.body;
+  
+  if (!friendEmail) {
+    return res.status(400).json({ message: "Friend email is required" });
+  }
+
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    
+    const [friendUsers] = await connection.query(
+      "SELECT id FROM users WHERE email = ?",
+      [friendEmail]
+    );
+    
+    if (friendUsers.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const friendId = friendUsers[0].id;
+    
+    const [existing] = await connection.query(
+      "SELECT id FROM friends WHERE user_id = ? AND friend_id = ? AND status = 'pending'",
+      [friendId, req.user.userId]
+    );
+    
+    if (existing.length === 0) {
+      return res.status(400).json({ message: "No pending friend request from this user" });
+    }
+
+    await connection.query(
+      "UPDATE friends SET status = 'accepted' WHERE user_id = ? AND friend_id = ?",
+      [friendId, req.user.userId]
+    );
+    
+    res.status(200).json({ message: "Friend request accepted" });
+  } catch (error) {
+    console.error("Accept friend error:", error);
+    res.status(500).json({ message: "Failed to accept friend request" });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
+
+
+// Decline friend request
+app.post("/api/user/friends/decline", authenticateToken, async (req, res) => {
+  const { friendEmail } = req.body;
+  
+  if (!friendEmail) {
+    return res.status(400).json({ message: "Friend email is required" });
+  }
+
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    
+    // Get friend user
+    const [friendUsers] = await connection.query(
+      "SELECT id FROM users WHERE email = ?",
+      [friendEmail]
+    );
+    
+    if (friendUsers.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const friendId = friendUsers[0].id;
+    
+    // Check if there's a pending request from this user
+    const [existing] = await connection.query(
+      "SELECT id FROM friends WHERE user_id = ? AND friend_id = ? AND status = 'pending'",
+      [friendId, req.user.userId]
+    );
+    
+    if (existing.length === 0) {
+      return res.status(400).json({ message: "No pending friend request from this user" });
+    }
+
+    // Delete the friend request
+    await connection.query(
+      "DELETE FROM friends WHERE user_id = ? AND friend_id = ?",
+      [friendId, req.user.userId]
+    );
+    
+    res.status(200).json({ message: "Friend request declined" });
+  } catch (error) {
+    console.error("Decline friend error:", error);
+    res.status(500).json({ message: "Failed to decline friend request" });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
+
+// Remove friend connection
+// Update the friends/remove endpoint to return the new count
+app.post("/api/user/friends/remove", authenticateToken, async (req, res) => {
+  const { friendEmail } = req.body;
+  
+  if (!friendEmail) {
+    return res.status(400).json({ message: "Friend email is required" });
+  }
+
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    
+    const [friendUsers] = await connection.query(
+      "SELECT id FROM users WHERE email = ?",
+      [friendEmail]
+    );
+    
+    if (friendUsers.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const friendId = friendUsers[0].id;
+    
+    await connection.query(
+      "DELETE FROM friends WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)",
+      [req.user.userId, friendId, friendId, req.user.userId]
+    );
+    
+    res.status(200).json({ message: "Friend removed" });
+  } catch (error) {
+    console.error("Remove friend error:", error);
+    res.status(500).json({ message: "Failed to remove friend" });
   } finally {
     if (connection) await connection.release();
   }
