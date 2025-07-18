@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Friends | Rejection</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/friends.css" />
+  <link rel="icon" href="Images/reorganization.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    .gradient-header {
+      background: linear-gradient(135deg, #1E1E1E 0%, #2A0E35 50%, #8E44AD 100%);
+    }
+    .gradient-text {
+      background: linear-gradient(90deg, #1E1E1E, #8E44AD);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .friend-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(142, 68, 173, 0.3);
+    }
+  </style>
+</head>
+<body class="bg-[#1E1E1E] text-[#E6E6FA] min-h-screen font-[Poppins] flex flex-col md:flex-row">
+
+  <!-- Sidebar -->
+  <div id="sidebar" class="w-64 bg-[#1E1E1E] h-screen sticky top-0 overflow-y-auto p-3 hidden md:block border-r border-[#8E44AD]/30">
+    <div class="mb-6 px-2">
+      <h1 class="text-4xl font-extrabold gradient-text drop-shadow-lg tracking-wide" style="font-family: 'Great Vibes', cursive;">
+        Rejection
+      </h1>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex-1 w-full">
+    <header id="profile-header" class="w-full h-64 gradient-header relative overflow-hidden">
+      <!-- Back button -->
+      <a href="dashboard.html" class="absolute top-4 left-4 text-[#E6E6FA] hover:text-[#8E44AD] z-10 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+      </a>
+    </header>
+
+    <div class="w-full px-4 -mt-16 relative">
+      <!-- Profile Picture -->
+      <div class="relative mx-auto w-32 h-32">
+        <img id="profile-preview" src="" class="w-32 h-32 rounded-full object-cover border-4 border-[#1E1E1E] shadow-lg">
+        <label for="edit-upload" class="absolute bottom-0 right-0 w-8 h-8 bg-gradient-to-r from-[#1E1E1E] to-[#8E44AD] text-[#E6E6FA] flex items-center justify-center rounded-full cursor-pointer hover:opacity-90 transition shadow-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+        </label>
+        <input type="file" id="edit-upload" accept="image/*" class="hidden">
+      </div>
+
+      <!-- Profile Info -->
+      <div class="mt-6 w-full">
+        <div class="w-full p-4 md:p-6">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+            <div class="flex-1 min-w-0">
+              <h2 id="profile-username" class="text-2xl font-bold text-[#E6E6FA] truncate">Loading...</h2>
+              <div id="friend-count" class="text-[#8E44AD] font-medium mt-1">
+                <span id="friend-count-number">0</span> friends
+              </div>
+            </div>
+          </div>
+          <div class="mt-4">
+            <p id="profile-bio" class="text-[#E6E6FA] text-sm md:text-base break-words whitespace-pre-line">Loading bio...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+   
+    <!-- Navigation Section -->
+    <div class="w-full px-4 mt-8">
+      <div class="border-t border-[#8E44AD]/20 pt-6">
+        <div class="bg-[#1E1E1E] rounded-xl px-6 py-4 flex flex-wrap items-center gap-8 text-sm md:text-base">
+          <!-- Navigation Menu Items -->
+          <div class="flex flex-wrap items-center gap-6 md:gap-8">
+            <span id="connected-tab" class="cursor-pointer text-[#8E44AD] font-medium px-2 py-1 rounded border-b-2 border-[#8E44AD]">
+              Connected
+            </span>
+            <span id="requests-tab" class="cursor-pointer text-[#E6E6FA] hover:text-[#8E44AD] transition-colors duration-200 font-medium px-2 py-1 rounded relative">
+              Requests
+              <span id="requests-notification" class="hidden absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-[#FF073A] rounded-full"></span>
+            </span>
+            <span id="favorites-tab" class="cursor-pointer text-[#E6E6FA] hover:text-[#8E44AD] transition-colors duration-200 font-medium px-2 py-1 rounded">
+              Favorites
+            </span>
+            <span id="suggestions-tab" class="cursor-pointer text-[#E6E6FA] hover:text-[#8E44AD] transition-colors duration-200 font-medium px-2 py-1 rounded">
+              Suggestions
+            </span>
+            <span id="bookmarks-tab" class="cursor-pointer text-[#E6E6FA] hover:text-[#8E44AD] transition-colors duration-200 font-medium px-2 py-1 rounded">
+              Bookmarks
+            </span>
+            <!-- Update the tabs section to include birthdays -->
+            <span id="birthdays-tab" class="cursor-pointer text-[#E6E6FA] hover:text-[#8E6FA] transition-colors duration-200 font-medium px-2 py-1 rounded">
+              Birthdays
+            </span>
+          </div>
+          
+          <!-- Search Box -->
+          <div class="ml-auto w-full md:w-64 mt-4 md:mt-0">
+            <div class="relative">
+              <input
+                type="text"
+                id="friend-search"
+                placeholder="Search friends..."
+                class="w-full px-4 py-2 bg-[#2A0E35]/30 text-[#E6E6FA] placeholder-[#8E44AD]/70 border border-[#8E44AD]/30 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#8E44AD]/50 focus:border-[#8E44AD]/50 transition"
+              />
+              <svg class="absolute right-3 top-2.5 h-5 w-5 text-[#8E44AD]/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Friends Content Section -->
+    <div class="w-full px-4 mt-6">
+      <div id="connected-content" class="space-y-4">
+        <h3 class="text-xl font-bold text-[#E6E6FA] mb-4">Your Connections</h3>
+        <div id="friends-list" class="flex flex-col gap-4">
+          <!-- Friend cards will be inserted here by JavaScript -->
+        </div>
+      </div>
+
+      <div id="requests-content" class="hidden space-y-4">
+        <h3 class="text-xl font-bold text-[#E6E6FA] mb-4">Friend Requests</h3>
+        <div id="requests-list" class="space-y-4">
+          <!-- Requests will be inserted here by JavaScript -->
+        </div>
+      </div>
+
+      <div id="favorites-content" class="hidden space-y-4">
+        <h3 class="text-xl font-bold text-[#E6E6FA] mb-4">Favorites</h3>
+        <div id="favorites-list" class="space-y-4">
+          <!-- Favorite cards will be inserted here by JavaScript -->
+        </div>
+      </div>
+     
+      <div id="suggestions-content" class="hidden space-y-4">
+        <h3 class="text-xl font-bold text-[#E6E6FA] mb-4">People You May Know</h3>
+        <div id="suggestions-list" class="space-y-4">
+          <!-- Suggestions will be inserted here by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Add this in the content section after suggestions-content -->
+      <div id="bookmarks-content" class="hidden space-y-4">
+        <h3 class="text-xl font-bold text-[#E6E6FA] mb-4">Your Bookmarks</h3>
+        <div id="bookmarks-list" class="space-y-4">
+          <!-- Bookmark cards will be inserted here by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Add this after the bookmarks-content div -->
+      <div id="birthdays-content" class="hidden space-y-4">
+        <h3 class="text-xl font-bold text-[#E6E6FA] mb-4">Birthdays</h3>
+        <div class="flex items-center justify-between mb-4">
+          <div class="text-sm text-[#8E44AD]">
+            Showing upcoming birthdays
+          </div>
+          <div class="relative">
+            <select id="birthday-month-filter" class="bg-[#1E1E1E] text-[#E6E6FA] text-sm rounded-lg border border-[#8E44AD]/30 px-3 py-1 focus:outline-none focus:ring-1 focus:ring-[#8E44AD]">
+            <option value="all">All Months</option>
+            <option value="0">January</option>
+            <option value="1">February</option>
+            <option value="2">March</option>
+            <option value="3">April</option>
+            <option value="4">May</option>
+            <option value="5">June</option>
+            <option value="6">July</option>
+            <option value="7">August</option>
+            <option value="8">September</option>
+            <option value="9">October</option>
+            <option value="10">November</option>
+            <option value="11">December</option>
+           </select>
+          </div>
+        </div>
+        <div id="birthdays-list" class="space-y-4">
+          <!-- Birthday cards will be inserted here by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Image Editor Modal -->
+  <div id="editor-modal" class="fixed inset-0 bg-black bg-opacity-90 z-[10000] hidden flex items-center justify-center">
+    <div class="bg-[#1E1E1E] p-6 rounded-xl max-w-3xl w-full mx-4 relative border border-[#8E44AD]/30">
+      <img id="editor-image" class="max-h-96 w-full object-contain mb-4 rounded" />
+      <div class="flex flex-col gap-2 mb-4">
+        <label class="text-sm text-[#E6E6FA]">Brightness</label>
+        <input type="range" id="brightness-range" min="0.5" max="1.5" step="0.01" value="1" class="w-full accent-[#8E44AD]">
+      </div>
+      <div class="flex flex-wrap justify-between mt-4 gap-3">
+        <button id="zoom-in" class="bg-gradient-to-r from-[#1E1E1E] to-[#8E44AD] hover:from-[#8E44AD] hover:to-[#1E1E1E] text-[#E6E6FA] px-4 py-2 rounded hover:opacity-90 transition shadow-lg">Zoom In</button>
+        <button id="zoom-out" class="bg-gradient-to-r from-[#1E1E1E] to-[#8E44AD] hover:from-[#8E44AD] hover:to-[#1E1E1E] text-[#E6E6FA] px-4 py-2 rounded hover:opacity-90 transition shadow-lg">Zoom Out</button>
+        <button id="apply-edit" class="bg-gradient-to-r from-[#1E1E1E] to-[#8E44AD] hover:from-[#8E44AD] hover:to-[#1E1E1E] text-[#E6E6FA] px-4 py-2 rounded hover:opacity-90 transition shadow-lg">Apply</button>
+        <button id="cancel-edit" class="bg-[#1E1E1E] px-4 py-2 text-[#E6E6FA] rounded hover:bg-[#2A0E35] transition border border-[#8E44AD]/30">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.js"></script>
+  <script src="JS/friends.js"></script>
+  <script src="JS/logout.js"></script>
+</body>
+</html>

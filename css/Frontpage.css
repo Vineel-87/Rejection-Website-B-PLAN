@@ -11,17 +11,17 @@
 
 /* Marquee Container */
 .marquee-container {
-  background: linear-gradient(90deg, rgba(80, 200, 120, 0.15) 0%, rgba(212, 175, 55, 0.2) 50%, rgba(80, 200, 120, 0.15) 100%);
-  border-top: 1px solid rgba(212, 175, 55, 0.3);
-  border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+  background: linear-gradient(90deg, rgba(30, 41, 59, 0.15) 0%, rgba(124, 58, 237, 0.2) 50%, rgba(30, 41, 59, 0.15) 100%);
+  border-top: 1px solid rgba(124, 58, 237, 0.3);
+  border-bottom: 1px solid rgba(124, 58, 237, 0.3);
   overflow: hidden;
   margin: 0;
 }
 
 /* Marquee Text */
 .marquee-text {
-  color: #f8f8f8; /* Ivory color */
-  text-shadow: 0 0 8px rgba(212, 175, 55, 0.3); /* Gold shadow */
+  color: #f8f8f8;
+  text-shadow: 0 0 8px rgba(124, 58, 237, 0.3);
   font-weight: 500;
   letter-spacing: 0.5px;
   padding: 0.5rem 0;
@@ -35,7 +35,7 @@ body::after {
   top: 0;
   bottom: 0;
   width: 150px;
-  background: linear-gradient(rgba(80, 200, 120, 0.1), rgba(80, 200, 120, 0.1));
+  background: linear-gradient(rgba(30, 41, 59, 0.1), rgba(30, 41, 59, 0.1));
   z-index: 0;
   opacity: 0.3;
 }

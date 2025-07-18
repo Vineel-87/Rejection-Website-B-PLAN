@@ -1,20 +1,20 @@
-/* Color Variables */
+/* Magenta Purple + Slate Black + Lavender Mist Theme */
 :root {
-  --emerald: #50c878;
-  --emerald-dark: #3da865;
-  --gold: #d4af37;
-  --gold-light: rgba(212, 175, 55, 0.3);
-  --ivory: #fffff0;
-  --dark-base: #0f0f0f;
-  --dark-card: #1a1a1a;
-  --dark-card-accent: #1a2a1a;
+  --magenta-purple: #8E44AD;
+  --magenta-purple-dark: #7D3C98;
+  --magenta-purple-light: rgba(142, 68, 173, 0.3);
+  --slate-black: #1E1E1E;
+  --slate-black-light: rgba(30, 30, 30, 0.7);
+  --lavender-mist: #E6E6FA;
+  --lavender-mist-dark: #D8BFD8;
+  --lavender-mist-light: rgba(230, 230, 250, 0.3);
   --text-muted: #e8e8e8;
 }
 
 /* Base Styles */
 body {
   font-family: 'Poppins', sans-serif;
-  background: var(--dark-base);
+  background: var(--slate-black);
   color: var(--text-muted);
   min-height: 100vh;
 }
@@ -22,16 +22,17 @@ body {
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--dark-card);
+  background: var(--slate-black);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--emerald);
+  background: var(--magenta-purple);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--emerald-dark);
+  background: var(--magenta-purple-dark);
 }
 
 /* Header */
@@ -41,9 +42,9 @@ body {
   left: 0;
   width: 100%;
   height: 4rem;
-  background: rgba(26, 26, 26, 0.9);
+  background: rgba(30, 30, 30, 0.9);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--gold-light);
+  border-bottom: 1px solid var(--magenta-purple-light);
   z-index: 30;
   display: flex;
   align-items: center;
@@ -56,24 +57,23 @@ body {
   left: 0;
   width: 100%;
   height: 3rem;
-  background: rgba(26, 26, 26, 0.8);
-  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  background: rgba(30, 30, 30, 0.8);
+  border-bottom: 1px solid rgba(142, 68, 173, 0.2);
   z-index: 30;
   display: flex;
   align-items: center;
   overflow: hidden;
 }
 
-/* Improved Marquee */
+/* Marquee */
 #marquee-content {
-  font-family: 'Great Vibes', cursive;
-  font-size: 1.5rem;
-  text-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
-}
-
-@keyframes marquee {
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  color: var(--lavender-mist);
+  padding-right: 100%;
+  display: inline-block;
+  white-space: nowrap;
+  animation: marquee 20s linear infinite;
 }
 
 /* Sidebar */
@@ -83,15 +83,15 @@ body {
   left: 0;
   width: 16rem;
   height: calc(100vh - 7rem);
-  background: rgba(26, 26, 26, 0.7);
-  border-right: 1px solid rgba(80, 200, 120, 0.2);
+  background: rgba(30, 30, 30, 0.7);
+  border-right: 1px solid rgba(142, 68, 173, 0.2);
   z-index: 30;
   overflow-y: auto;
 }
 
 .sidebar-section {
   padding: 1rem;
-  border-bottom: 1px solid rgba(80, 200, 120, 0.1);
+  border-bottom: 1px solid rgba(142, 68, 173, 0.1);
 }
 
 /* Main Content */
@@ -112,14 +112,14 @@ body {
 .page-title {
   font-size: 1.875rem;
   font-weight: 700;
-  color: var(--gold);
+  color: var(--lavender-mist);
   margin-bottom: 1.5rem;
 }
 
 .card-title {
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--gold);
+  color: var(--lavender-mist);
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
@@ -134,9 +134,9 @@ body {
 
 /* Cards */
 .birthday-card {
-  background: rgba(26, 26, 26, 0.7);
+  background: rgba(30, 30, 30, 0.7);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(80, 200, 120, 0.2);
+  border: 1px solid rgba(142, 68, 173, 0.2);
   border-radius: 0.75rem;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
@@ -149,7 +149,7 @@ body {
 .birthday-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  border-color: rgba(212, 175, 55, 0.5);
+  border-color: rgba(142, 68, 173, 0.5);
 }
 
 .card-header {
@@ -163,8 +163,8 @@ body {
 
 /* Badges */
 .badge-today {
-  background: var(--gold);
-  color: #000;
+  background: var(--lavender-mist);
+  color: var(--slate-black);
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
   font-size: 0.875rem;
@@ -183,16 +183,12 @@ body {
   z-index: 10;
 }
 
+/* Grid Layout */
 .all-birthdays-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-}
-
-@media (min-width: 768px) {
-  .all-birthdays-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 1rem;
+  padding: 0.5rem;
 }
 
 /* Birthday Items */
@@ -204,69 +200,172 @@ body {
   border-radius: 0.5rem;
   transition: all 0.3s ease;
   cursor: pointer;
-  background: rgba(80, 200, 120, 0.05);
+  background: rgba(142, 68, 173, 0.05);
 }
 
 .birthday-item:hover {
-  background: rgba(80, 200, 120, 0.1);
+  background: rgba(142, 68, 173, 0.1);
 }
 
-.profile-img {
+/* Avatar Styles */
+.birthday-avatar {
+  position: relative;
   width: 3rem;
   height: 3rem;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--emerald);
+  border: 2px solid var(--lavender-mist);
   transition: all 0.3s ease;
 }
 
-.profile-img.today {
-  border-color: var(--gold);
+.birthday-avatar.today {
+  border-color: var(--magenta-purple);
   animation: pulse 2s infinite;
 }
 
-.days-badge {
-  background: rgba(212, 175, 55, 0.2);
-  color: var(--gold);
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
+.birthday-avatar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.birthday-avatar-container:hover {
+  transform: translateY(-3px);
+}
+
+.birthday-avatar-container .avatar-name {
+  font-size: 0.75rem;
+  text-align: center;
+  margin-top: 0.5rem;
+  color: var(--lavender-mist);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.birthday-avatar-container .avatar-date {
+  font-size: 0.65rem;
+  color: var(--magenta-purple);
+  margin-top: 0.25rem;
+}
+
+/* Pagination */
+#birthday-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding: 1rem 0;
+}
+
+.pagination-btn {
+  background: rgba(30, 30, 30, 0.8);
+  color: var(--lavender-mist);
+  border: 1px solid rgba(142, 68, 173, 0.3);
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+}
+
+.pagination-btn:hover {
+  background: rgba(142, 68, 173, 0.2);
+  border-color: var(--magenta-purple);
+}
+
+.pagination-btn.active {
+  background: rgba(142, 68, 173, 0.3);
+  color: var(--lavender-mist);
+  border-color: var(--magenta-purple);
+}
+
+/* Month Filter */
+#month-filter {
+  background: rgba(30, 30, 30, 0.8);
+  color: var(--lavender-mist);
+  border: 1px solid rgba(142, 68, 173, 0.3);
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem;
   font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238E44AD' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1rem;
+  padding-right: 2rem;
+}
+
+#month-filter:focus {
+  outline: none;
+  border-color: var(--magenta-purple);
+  box-shadow: 0 0 0 2px rgba(142, 68, 173, 0.2);
+}
+
+/* Birthday Notes Section */
+#birthday-notes {
+  background: rgba(30, 30, 30, 0.7);
+  border: 1px solid rgba(142, 68, 173, 0.3);
+  color: var(--lavender-mist);
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.3s ease;
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  resize: none;
+  min-height: 8rem;
+}
+
+#birthday-notes:focus {
+  outline: none;
+  border-color: var(--magenta-purple);
+  box-shadow: 0 0 0 2px rgba(142, 68, 173, 0.2);
+}
+
+#save-notes {
+  transition: all 0.3s ease;
+  width: 100%;
+  margin-top: 0.5rem;
+  background: var(--magenta-purple);
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
   font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
-/* Confetti */
-.birthday-confetti {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  opacity: 0;
-  animation: drop 3s linear forwards;
+#save-notes:hover {
+  background: var(--magenta-purple-dark);
 }
 
-@keyframes drop {
-  0% {
-    transform: translateY(0) translateX(0);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(calc(100vh - 100px)) translateX(var(--random-x));
-    opacity: 0;
-  }
-}
-
+/* Animations */
 @keyframes pulse {
   0% { 
-    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
+    box-shadow: 0 0 0 0 rgba(142, 68, 173, 0.4);
     transform: scale(1);
   }
   50% {
     transform: scale(1.05);
   }
   70% { 
-    box-shadow: 0 0 0 10px rgba(212, 175, 55, 0);
+    box-shadow: 0 0 0 10px rgba(142, 68, 173, 0);
   }
   100% { 
-    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+    box-shadow: 0 0 0 0 rgba(142, 68, 173, 0);
     transform: scale(1);
   }
 }
@@ -284,23 +383,53 @@ body {
     margin-left: 0;
     width: 100%;
   }
+  
+  .all-birthdays-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
 }
 
-/* Birthday Notes Section */
-#birthday-notes {
-  background: rgba(26, 26, 26, 0.7);
-  border: 1px solid rgba(80, 200, 120, 0.3);
-  color: var(--text-muted);
-  font-family: 'Poppins', sans-serif;
-  transition: all 0.3s ease;
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
 }
 
-#birthday-notes:focus {
-  outline: none;
-  border-color: var(--gold);
-  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+/* Today's Birthday Highlight */
+.today-highlight {
+  position: relative;
 }
 
-#save-notes {
-  transition: all 0.3s ease;
+.birthday-header {
+  background: linear-gradient(90deg, 
+    rgba(142, 68, 173, 0.2) 0%, 
+    rgba(142, 68, 173, 0.4) 50%, 
+    rgba(142, 68, 173, 0.2) 100%);
+  border-bottom: 1px solid rgba(142, 68, 173, 0.3);
+}
+
+.today-highlight::after {
+  content: '';
+  position: absolute;
+  top: -0.25rem;
+  right: -0.25rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  background-color: var(--magenta-purple);
+  border-radius: 50%;
+  border: 2px solid var(--slate-black);
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  display: inline-block;
+  width: 2rem;
+  height: 2rem;
+  border: 0.25rem solid rgba(142, 68, 173, 0.3);
+  border-radius: 50%;
+  border-top-color: var(--magenta-purple);
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

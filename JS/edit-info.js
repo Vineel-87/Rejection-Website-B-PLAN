@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Check authentication
   const token = localStorage.getItem("token");
   if (!token) {
-    window.location.href = "login.html";
+    window.location.href = "SignIn.html";
     return;
   }
 

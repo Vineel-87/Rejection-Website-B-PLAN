@@ -1,4 +1,115 @@
-/* Add these new styles to your dashboard.css */
+/* Updated dashboard.css with all menu items in white */
+
+/* Magenta Purple + Slate Black Theme with White Menus */
+body {
+  background-color: #1E1E1E;
+  color: #ffffff;
+}
+
+/* Header bars */
+.bg-header {
+  background-color: rgba(30, 30, 30, 0.9);
+  border-bottom-color: rgba(142, 68, 173, 0.3);
+}
+
+/* Sidebar and menus */
+.bg-sidebar {
+  background-color: rgba(30, 30, 30, 0.85);
+}
+
+/* Profile section */
+.border-profile {
+  border-color: #8E44AD;
+}
+
+/* Brand text */
+.text-brand {
+  color: #8E44AD;
+}
+
+/* Search bar */
+.bg-search {
+  background-color: #1E1E1E;
+  border-color: #8E44AD;
+}
+
+/* Menu Item Colors - All converted to white */
+.menu-messages,
+.menu-friends,
+.menu-notifications,
+.menu-memories,
+.menu-saved,
+.menu-groups,
+.menu-ads,
+.menu-birthday,
+.menu-activity,
+.menu-queries,
+.menu-jobs {
+  color: white;
+}
+
+.menu-messages.bg-opacity-20,
+.menu-friends.bg-opacity-20,
+.menu-notifications.bg-opacity-20,
+.menu-memories.bg-opacity-20,
+.menu-saved.bg-opacity-20,
+.menu-groups.bg-opacity-20,
+.menu-ads.bg-opacity-20,
+.menu-birthday.bg-opacity-20,
+.menu-activity.bg-opacity-20,
+.menu-queries.bg-opacity-20,
+.menu-jobs.bg-opacity-20 {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Search results */
+#search-results {
+  background-color: #1E1E1E;
+  border: 1px solid rgba(142, 68, 173, 0.3);
+}
+
+#search-results-list a:hover {
+  background-color: rgba(142, 68, 173, 0.1);
+}
+
+/* Page loader */
+.bg-gradient-to-b {
+  background: linear-gradient(to bottom, #1E1E1E, #2A0E35, #1E1E1E);
+}
+
+/* Spinner */
+.border-top-color {
+  border-top-color: #8E44AD;
+}
+.border-right-color {
+  border-right-color: #8E44AD;
+}
+.border-bottom-color {
+  border-bottom-color: #8E44AD;
+}
+
+/* Notification badge */
+.bg-notification {
+  background-color: #8E44AD;
+}
+
+/* Search loading spinner */
+.text-search-loading {
+  color: #8E44AD;
+}
+
+/* Profile upload button */
+.bg-upload-button {
+  background-color: #8E44AD;
+}
+.bg-upload-button:hover {
+  background-color: #7D3C98;
+}
+
+/* Search icon */
+.text-search-icon {
+  color: #8E44AD;
+}
 
 /* Search results styling */
 #search-results-list {
@@ -6,7 +117,6 @@
   overflow-y: auto;
 }
 
-/* Search result item styling */
 #search-results-list a {
   display: flex;
   align-items: center;
@@ -15,18 +125,16 @@
   transition: background-color 0.2s ease;
 }
 
-/* Profile picture styling in search results */
 #search-results-list img {
   width: 40px;
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #50c878;
+  border: 2px solid #8E44AD;
   margin-right: 12px;
   flex-shrink: 0;
 }
 
-/* Username styling in search results */
 #search-results-list .font-semibold {
   font-size: 14px;
   color: white;
@@ -36,12 +144,6 @@
   max-width: 180px;
 }
 
-/* Hover state for search items */
-#search-results-list a:hover {
-  background-color: rgba(80, 200, 120, 0.1);
-}
-
-/* Loading indicator */
 #search-loading {
   display: flex;
   justify-content: center;
@@ -49,20 +151,167 @@
   padding: 20px;
 }
 
-/* No results message */
 #search-results-list .text-center {
   padding: 15px;
   color: #9ca3af;
   font-size: 14px;
 }
 
-/* Ensure the dropdown has proper z-index */
 #search-results {
   z-index: 50;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(80, 200, 120, 0.3);
 }
 
-  #page-loader {
-      transition: opacity 0.7s ease;
-    }
+#page-loader {
+  transition: opacity 0.7s ease;
+}
+
+/* Menu item hover background */
+.hover:bg-black:hover {
+  background-color: rgba(142, 68, 173, 0.1);
+}
+
+/* Menu item active state */
+.menu-item-active {
+  background-color: rgba(142, 68, 173, 0.2);
+}
+
+/* Menu icons */
+.menu-icon {
+  transition: all 0.2s ease;
+}
+
+.group:hover .menu-icon {
+  transform: scale(1.1);
+}
+
+/* Sidebar Base Styles */
+.sidebar {
+  background-color: rgba(30, 30, 30, 0.95);
+  backdrop-filter: blur(4px);
+  border-right: 1px solid rgba(142, 68, 173, 0.3);
+}
+
+/* Brand Text - Reduced to 3xl */
+.sidebar h1 {
+  font-size: 1.875rem; /* text-3xl */
+  line-height: 2.25rem;
+  font-family: 'Great Vibes', cursive;
+  color: #8E44AD;
+  text-shadow: 0 2px 4px rgba(142, 68, 173, 0.3);
+}
+
+/* Menu Items Container */
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Base Menu Item Styles */
+.sidebar a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+/* Icon Container */
+.sidebar a div:first-child {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+/* All menu items white except logout */
+.sidebar a:not([onclick="logout()"]) span {
+  color: white;
+}
+
+.sidebar a:not([onclick="logout()"]) div:first-child {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* Log Out (Danger - Red) - Keep original color */
+.menu-danger {
+  color: #ef4444;
+}
+.menu-danger.bg-opacity-20 {
+  background-color: rgba(239, 68, 68, 0.2);
+}
+
+/* Hover States */
+.sidebar a:hover {
+  background-color: rgba(142, 68, 173, 0.1);
+}
+
+.sidebar a:not([onclick="logout()"]):hover span {
+  color: white;
+}
+
+/* Logout hover state */
+.sidebar a[onclick="logout()"]:hover .menu-danger {
+  color: #f87171;
+}
+
+/* Close Button */
+#close-sidebar {
+  transition: all 0.2s ease;
+}
+#close-sidebar:hover {
+  transform: rotate(90deg);
+  color: white;
+}
+
+/* Active State */
+.menu-item-active {
+  background-color: rgba(142, 68, 173, 0.2) !important;
+  color: white !important;
+}
+
+/* Scrollbar */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar::-webkit-scrollbar-track {
+  background: rgba(142, 68, 173, 0.1);
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(142, 68, 173, 0.4);
+  border-radius: 3px;
+}
+
+/* Courses menu item - matches other white menu items */
+.menu-courses {
+  color: white;
+}
+
+.menu-courses.bg-opacity-20 {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Ensure the hover state matches other menu items */
+.group:hover .menu-courses {
+  color: white;
+}
+
+/* Remove all color-specific hover states for menu items */
+.group:hover .menu-messages,
+.group:hover .menu-friends,
+.group:hover .menu-notifications,
+.group:hover .menu-memories,
+.group:hover .menu-saved,
+.group:hover .menu-groups,
+.group:hover .menu-ads,
+.group:hover .menu-birthday,
+.group:hover .menu-activity,
+.group:hover .menu-queries,
+.group:hover .menu-jobs {
+  color: white;
+}

@@ -56,9 +56,9 @@ document.getElementById("signin-form").addEventListener("submit", async (e) => {
 function showAlert(message, type = "info") {
   const alertDiv = document.createElement("div");
   alertDiv.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg z-50 ${
-    type === "error" ? "bg-red-600" : 
-    type === "success" ? "bg-green-600" : "bg-blue-600"
-  } text-white`;
+    type === "error" ? "bg-[#FF073A]" : 
+    type === "success" ? "bg-[#50c878]" : "bg-[#0a0a0a]"
+  } text-white border border-[#FF073A]/50`;
   alertDiv.textContent = message;
   
   document.body.appendChild(alertDiv);

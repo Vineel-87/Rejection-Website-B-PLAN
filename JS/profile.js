@@ -2,7 +2,6 @@
 const API_BASE_URL = 'http://localhost:5000';
 
 document.addEventListener("DOMContentLoaded", async () => {
-  // Authentication and Initialization
   try {
     const urlParams = new URLSearchParams(window.location.search);
     const profileEmail = urlParams.get('email');
@@ -32,6 +31,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       zoomOutBtn: document.getElementById("zoom-out"),
       cancelEditBtn: document.getElementById("cancel-edit"),
       applyEditBtn: document.getElementById("apply-edit"),
+      friendActionsContainer: document.getElementById('friend-actions-container'),
+      otherActionsContainer: document.getElementById('other-actions-container'),
+      favoriteBtn: document.getElementById('favorite-btn'),
+      bookmarkBtn: document.getElementById('bookmark-btn'),
       displayElements: {
         fullname: document.getElementById("display-fullname"),
         dob: document.getElementById("display-dob"),
@@ -53,14 +56,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         acceptRequest: document.getElementById("accept-request-btn"),
         declineRequest: document.getElementById("decline-request-btn"),
         connected: document.getElementById("connected-btn"),
-        removeConnection: document.getElementById("remove-connection-btn")
+        removeConnection: document.getElementById("remove-connection-btn"),
+        messageBtn: document.getElementById("message-btn"),
+        blockBtn: document.getElementById("block-btn")
       }
     };
 
-    // Mobile sidebar toggle functionality
+    // Mobile sidebar toggle
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const sidebar = document.getElementById('sidebar');
-
     if (sidebarToggle && sidebar) {
       sidebarToggle.addEventListener('click', () => {
         sidebar.classList.toggle('hidden');
@@ -73,17 +77,32 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Initialize
     await initializeProfile();
-     
 
     // Core Functions
     async function initializeProfile() {
       try {
-        if (isViewingOtherProfile) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const profileEmail = urlParams.get('email');
+        const currentUserEmail = localStorage.getItem("currentUserEmail");
+        
+        if (profileEmail && profileEmail !== currentUserEmail) {
+          // Viewing someone else's profile
           disableEditingFeatures();
           await loadOtherProfileInfo(profileEmail);
-          // Add the friend status check right here
           await checkFriendStatus(profileEmail);
+          
+          // Always show message and block buttons for other profiles
+          if (elements.friendButtons.messageBtn) {
+            elements.friendButtons.messageBtn.classList.remove('hidden');
+          }
+          if (elements.friendButtons.blockBtn) {
+            elements.friendButtons.blockBtn.classList.remove('hidden');
+          }
+          
+          // Setup friend button handlers
+          setupFriendButtonHandlers();
         } else {
+          // Viewing own profile
           hideAllFriendButtons();
           await loadProfileInfo();
           setupEditListeners();
@@ -91,6 +110,41 @@ document.addEventListener("DOMContentLoaded", async () => {
       } catch (error) {
         console.error("Initialization error:", error);
         showError("Failed to initialize profile");
+      }
+    }
+
+    async function loadProfileInfo() {
+      try {
+        const profile = await fetchWithAuth(`${API_BASE_URL}/api/user/profile`);
+        
+        // Update profile image
+        if (elements.profileImage) {
+          elements.profileImage.src = getProfileImageUrl(profile);
+        }
+        
+        // Update username and bio
+        if (elements.usernameEl) {
+          elements.usernameEl.textContent = getDisplayName(profile);
+        }
+        if (elements.bioEl) {
+          elements.bioEl.textContent = profile.bio || 'No bio yet';
+        }
+        
+        // Update background if available
+        if (profile.background_image && elements.header) {
+          applyBackgroundImage(profile.background_image);
+        }
+
+        // Update display elements
+        updateDisplayElements(profile);
+        await fetchAndUpdateFriendCount(profile.id);
+        
+        // Add this line to setup favorite button for own profile
+        setupFavoriteButton(profile.id);
+        setupBookmarkButton(profile.id); // Bookmark function
+      } catch (error) {
+        console.error("Failed to load profile info:", error);
+        showError("Failed to load profile information");
       }
     }
 
@@ -104,41 +158,43 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (editCoverBtn) editCoverBtn.style.display = 'none';
     }
 
-    // Helper function to fetch and update friend count
     async function loadOtherProfileInfo(email) {
-    try {
-      const profile = await fetchWithAuth(`${API_BASE_URL}/api/user/by-email/${encodeURIComponent(email)}`);
-      
-      // Update profile image
-      if (elements.profileImage) {
-        elements.profileImage.src = getProfileImageUrl(profile);
-      }
-      
-      // Update username and bio
-      if (elements.usernameEl) {
-        elements.usernameEl.textContent = getDisplayName(profile);
-      }
-      if (elements.bioEl) {
-        elements.bioEl.textContent = profile.bio || '';
-      }
-      
-      // Update background if available
-      if (profile.background_image && elements.header) {
-        applyBackgroundImage(profile.background_image);
-      }
-
-      // Update display elements (only public info)
-      updateDisplayElements(profile, true);
-      
-      // Update friend count - use fetchAndUpdateFriendCount instead
-      await fetchAndUpdateFriendCount(profile.id);
-    } catch (error) {
-      console.error("Failed to load other profile info:", error);
-      showError("Failed to load profile information");
-    }
-  }
+      try {
+        const profile = await fetchWithAuth(`${API_BASE_URL}/api/user/by-email/${encodeURIComponent(email)}`);
         
+        // Update profile image
+        if (elements.profileImage) {
+          elements.profileImage.src = getProfileImageUrl(profile);
+        }
+        
+        // Update username and bio
+        if (elements.usernameEl) {
+          elements.usernameEl.textContent = getDisplayName(profile);
+        }
+        if (elements.bioEl) {
+          elements.bioEl.textContent = profile.bio || '';
+        }
+        
+        // Update background if available
+        if (profile.background_image && elements.header) {
+          applyBackgroundImage(profile.background_image);
+        }
 
+        // Update display elements (only public info)
+        updateDisplayElements(profile, true);
+        
+        // Update friend count
+        await fetchAndUpdateFriendCount(profile.id);
+        
+        // Add this line to setup favorite button for other profiles
+        setupFavoriteButton(profile.id);
+        setupBookmarkButton(profile.id);//bookmark setup
+      } catch (error) {
+        console.error("Failed to load other profile info:", error);
+        showError("Failed to load profile information");
+      }
+    }
+        
     function updateDisplayElements(profile, isPublicView = false) {
       const { displayElements } = elements;
       
@@ -190,13 +246,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         element.href = url.startsWith('http') ? url : 'https://' + url;
         element.target = '_blank';
         element.classList.remove('text-gray-400');
-        element.classList.add('text-blue-400', 'hover:underline');
+        element.classList.add('text-purple-400', 'hover:underline');
       } else {
         element.textContent = "Not connected";
         element.href = "#";
         element.removeAttribute('target');
         element.classList.add('text-gray-400');
-        element.classList.remove('text-blue-400', 'hover:underline');
+        element.classList.remove('text-purple-400', 'hover:underline');
       }
     }
 
@@ -238,7 +294,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
 
-    // In the handleNameEdit function
     async function handleNameEdit() {
       const currentName = elements.usernameEl?.textContent.trim() || '';
       const newName = prompt("Enter your name (max 30 characters):", currentName);
@@ -277,7 +332,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const newBio = prompt("Edit your bio (max 120 characters):", currentBio);
       
       if (newBio !== null && newBio !== currentBio) {
-        if (newBio.length > 60) {
+        if (newBio.length > 120) {
           showAlert("Bio must be 120 characters or less", "error");
           return;
         }
@@ -318,6 +373,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       reader.onload = (e) => {
         elements.editorImage.src = e.target.result;
         elements.editorModal.classList.remove("hidden");
+        
+        // Apply theme to editor modal
+        elements.editorModal.classList.add('bg-slate-900', 'text-purple-100', 'border', 'border-purple-800');
         
         if (elements.brightnessSlider) {
           elements.brightnessSlider.value = 1;
@@ -377,11 +435,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (currentEditType === "profile" && elements.profileImage) {
           elements.profileImage.src = result.avatar;
-          // Show success message
           showAlert("Profile picture updated successfully", "success");
         } else if (currentEditType === "background") {
           applyBackgroundImage(result.background);
-          // Show success message
           showAlert("Background image updated successfully", "success");
         }
 
@@ -411,7 +467,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     function applyBackgroundImage(imagePath) {
       if (!elements.header) return;
       elements.header.style.background = `
-        linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+        linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
         url(${API_BASE_URL}${imagePath}?t=${Date.now()})
       `;
       elements.header.style.backgroundSize = 'cover';
@@ -419,156 +475,191 @@ document.addEventListener("DOMContentLoaded", async () => {
       elements.header.style.backgroundRepeat = 'no-repeat';
     }
 
-    function hideAllFriendButtons() {
-      Object.values(elements.friendButtons).forEach(btn => {
-        if (btn) btn.style.display = 'none';
-      });
-    }
-
-    // Add these new functions to profile.js
     async function checkFriendStatus(targetEmail) {
       try {
+        if (!targetEmail) return;
+        
         const response = await fetchWithAuth(`${API_BASE_URL}/api/user/friend-status/${encodeURIComponent(targetEmail)}`);
-        updateFriendButton(response.status);
+        
+        if (response && response.status) {
+          updateFriendButton(response.status);
+        } else {
+          updateFriendButton('none');
+        }
+        
+        // Load profile to get ID for friend count
+        const profile = await fetchWithAuth(`${API_BASE_URL}/api/user/by-email/${encodeURIComponent(targetEmail)}`);
+        await fetchAndUpdateFriendCount(profile.id);
       } catch (error) {
         console.error("Error checking friend status:", error);
-        // Default to "Add Friend" if there's an error
         updateFriendButton('none');
       }
     }
 
     function updateFriendButton(status) {
+      // Hide all friend action buttons first
       hideAllFriendButtons();
       
+      // Show the appropriate button based on status
       switch(status) {
         case 'none':
-          if (elements.friendButtons.addFriend) elements.friendButtons.addFriend.style.display = 'block';
+          if (elements.friendButtons.addFriend) {
+            elements.friendButtons.addFriend.classList.remove('hidden');
+          }
           break;
         case 'pending_sent':
-          if (elements.friendButtons.requestSent) elements.friendButtons.requestSent.style.display = 'block';
+          if (elements.friendButtons.requestSent) {
+            elements.friendButtons.requestSent.classList.remove('hidden');
+          }
           break;
         case 'pending_received':
-          if (elements.friendButtons.acceptRequest) elements.friendButtons.acceptRequest.style.display = 'block';
-          if (elements.friendButtons.declineRequest) elements.friendButtons.declineRequest.style.display = 'block';
+          if (elements.friendButtons.acceptRequest) {
+            elements.friendButtons.acceptRequest.classList.remove('hidden');
+            elements.friendButtons.declineRequest.classList.remove('hidden');
+            document.getElementById('request-buttons-group').classList.remove('hidden');
+          }
           break;
         case 'friends':
-          if (elements.friendButtons.connected) elements.friendButtons.connected.style.display = 'block';
-          if (elements.friendButtons.removeConnection) elements.friendButtons.removeConnection.style.display = 'block';
+          if (elements.friendButtons.connected) {
+            elements.friendButtons.connected.classList.remove('hidden');
+          }
+          if (elements.friendButtons.removeConnection) {
+            elements.friendButtons.removeConnection.classList.remove('hidden');
+          }
           break;
-        default:
-          if (elements.friendButtons.addFriend) elements.friendButtons.addFriend.style.display = 'block';
       }
     }
 
-    // Add friend event listener
-    if (elements.friendButtons.addFriend) {
-      elements.friendButtons.addFriend.addEventListener('click', async () => {
-        try {
-          const urlParams = new URLSearchParams(window.location.search);
-          const profileEmail = urlParams.get('email');
-          
-          await fetchWithAuth(`${API_BASE_URL}/api/user/friends`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ friendEmail: profileEmail })
-          });
-          
-          updateFriendButton('pending_sent');
-          showAlert("Friend request sent", "success");
-        } catch (error) {
-          console.error("Error sending friend request:", error);
-          showError(error.message || "Failed to send friend request");
-        }
+    function hideAllFriendButtons() {
+      Object.values(elements.friendButtons).forEach(btn => {
+        if (btn) btn.classList.add('hidden');
       });
+      document.getElementById('request-buttons-group').classList.add('hidden');
     }
 
-    // Accept friend request
-    // Update the friend-related event listeners to always refresh the count
-    if (elements.friendButtons.acceptRequest) {
-      elements.friendButtons.acceptRequest.addEventListener('click', async () => {
-        try {
-          const urlParams = new URLSearchParams(window.location.search);
-          const profileEmail = urlParams.get('email');
-          
-          await fetchWithAuth(`${API_BASE_URL}/api/user/friends/accept`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ friendEmail: profileEmail })
-          });
-          
-          updateFriendButton('friends');
-          // Always refresh the count from server after operation
-          const profile = await fetchWithAuth(`${API_BASE_URL}/api/user/by-email/${encodeURIComponent(profileEmail)}`);
-          await fetchAndUpdateFriendCount(profile.id);
-          showAlert("Friend request accepted", "success");
-        } catch (error) {
-          console.error("Error accepting friend request:", error);
-          showError(error.message || "Failed to accept friend request");
-        }
-      });
-    }
+    function setupFriendButtonHandlers() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const profileEmail = urlParams.get('email');
 
-
-    // Decline friend request
-    if (elements.friendButtons.declineRequest) {
-      elements.friendButtons.declineRequest.addEventListener('click', async () => {
-        try {
-          const urlParams = new URLSearchParams(window.location.search);
-          const profileEmail = urlParams.get('email');
-          
-          await fetchWithAuth(`${API_BASE_URL}/api/user/friends/decline`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ friendEmail: profileEmail })
-          });
-          
-          updateFriendButton('none');
-          showAlert("Friend request declined", "success");
-        } catch (error) {
-          console.error("Error declining friend request:", error);
-          showError(error.message || "Failed to decline friend request");
-        }
-      });
-    }
-
-    // Remove friend connection
-    if (elements.friendButtons.removeConnection) {
-      elements.friendButtons.removeConnection.addEventListener('click', async () => {
-        const confirmed = confirm("Are you sure you want to remove this connection?");
-        if (confirmed) {
+      // Add Friend button
+      if (elements.friendButtons.addFriend) {
+        elements.friendButtons.addFriend.onclick = async () => {
           try {
-            const urlParams = new URLSearchParams(window.location.search);
-            const profileEmail = urlParams.get('email');
-            
-            await fetchWithAuth(`${API_BASE_URL}/api/user/friends/remove`, {
+            await fetchWithAuth(`${API_BASE_URL}/api/user/friends`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ friendEmail: profileEmail })
             });
-            
-            updateFriendButton('none');
-            // Always refresh the count from server after operation
+            updateFriendButton('pending_sent');
+            showAlert("Friend request sent", "success");
+          } catch (error) {
+            console.error("Error sending friend request:", error);
+            showError(error.message || "Failed to send friend request");
+          }
+        };
+      }
+
+      // Request Sent button - Add option to cancel request
+      if (elements.friendButtons.requestSent) {
+        elements.friendButtons.requestSent.onclick = async () => {
+          const confirmed = confirm("Cancel this friend request?");
+          if (confirmed) {
+            try {
+              await fetchWithAuth(`${API_BASE_URL}/api/user/friends/remove`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ friendEmail: profileEmail })
+              });
+              updateFriendButton('none');
+              showAlert("Friend request cancelled", "success");
+            } catch (error) {
+              console.error("Error cancelling friend request:", error);
+              showError(error.message || "Failed to cancel friend request");
+            }
+          }
+        };
+      }
+
+      // Accept Request button
+      if (elements.friendButtons.acceptRequest) {
+        elements.friendButtons.acceptRequest.onclick = async () => {
+          try {
+            await fetchWithAuth(`${API_BASE_URL}/api/user/friends/accept`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ friendEmail: profileEmail })
+            });
+            updateFriendButton('friends');
             const profile = await fetchWithAuth(`${API_BASE_URL}/api/user/by-email/${encodeURIComponent(profileEmail)}`);
             await fetchAndUpdateFriendCount(profile.id);
-            showAlert("Friend removed", "success");
+            showAlert("Friend request accepted", "success");
           } catch (error) {
-            console.error("Error removing friend:", error);
-            showError(error.message || "Failed to remove friend");
+            console.error("Error accepting friend request:", error);
+            showError(error.message || "Failed to accept friend request");
           }
-        }
-      });
+        };
+      }
+
+      // Decline Request button
+      if (elements.friendButtons.declineRequest) {
+        elements.friendButtons.declineRequest.onclick = async () => {
+          try {
+            await fetchWithAuth(`${API_BASE_URL}/api/user/friends/decline`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ friendEmail: profileEmail })
+            });
+            updateFriendButton('none');
+            showAlert("Friend request declined", "success");
+          } catch (error) {
+            console.error("Error declining friend request:", error);
+            showError(error.message || "Failed to decline friend request");
+          }
+        };
+      }
+
+      // Remove Connection button
+      if (elements.friendButtons.removeConnection) {
+        elements.friendButtons.removeConnection.onclick = async () => {
+          const confirmed = confirm("Remove this friend connection?");
+          if (confirmed) {
+            try {
+              await fetchWithAuth(`${API_BASE_URL}/api/user/friends/remove`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ friendEmail: profileEmail })
+              });
+              updateFriendButton('none');
+              const profile = await fetchWithAuth(`${API_BASE_URL}/api/user/by-email/${encodeURIComponent(profileEmail)}`);
+              await fetchAndUpdateFriendCount(profile.id);
+              showAlert("Friend removed", "success");
+            } catch (error) {
+              console.error("Error removing friend:", error);
+              showError(error.message || "Failed to remove friend");
+            }
+          }
+        };
+      }
     }
 
     async function fetchAndUpdateFriendCount(userId) {
       try {
-        const response = await fetchWithAuth(`${API_BASE_URL}/api/user/friends/count?userId=${userId}`);
-        const count = response.count || 0;
-        updateFriendCount(count);
-        return count;
+        const token = localStorage.getItem("token");
+        const response = await fetch(`${API_BASE_URL}/api/user/friends/count?userId=${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        
+        const data = await response.json();
+        const count = data.count || 0;
+
+        const countElement = document.getElementById("friend-count-number");
+        if (countElement) {
+          countElement.textContent = count;
+        }
       } catch (error) {
         console.error("Error fetching friend count:", error);
-        updateFriendCount(0);
-        return 0;
       }
     }
 
@@ -606,54 +697,245 @@ document.addEventListener("DOMContentLoaded", async () => {
         showError(error.message || "An error occurred");
       }
     }
-
-    function redirectToLogin() {
-      localStorage.removeItem("token");
-      window.location.href = "/SignIn.html";
-    }
-
-    function showError(message) {
-      showAlert(message, "error");
-    }
-    
-    function showAlert(message, type = "info") {
-      const alertDiv = document.createElement("div");
-      alertDiv.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg z-50 ${
-        type === "error" ? "bg-red-600" : 
-        type === "success" ? "bg-green-600" : "bg-blue-600"
-      } text-white`;
-      alertDiv.textContent = message;
-      
-      document.body.appendChild(alertDiv);
-      
-      setTimeout(() => {
-        alertDiv.classList.add("opacity-0", "transition-opacity", "duration-500");
-        setTimeout(() => alertDiv.remove(), 500);
-      }, 3000);
-    }
-
-    function getProfileImageUrl(profile) {
-      return profile.avatar 
-        ? `${API_BASE_URL}${profile.avatar}?t=${Date.now()}`
-        : `https://ui-avatars.com/api/?name=${encodeURIComponent(getDisplayName(profile))}&background=random`;
-    }
-
-    function getDisplayName(profile) {
-      return profile.name || (profile.email ? profile.email.split('@')[0] : 'User');
-    }
-
-    function formatDate(dateString) {
-      if (!dateString) return "";
-      const options = { year: 'numeric', month: 'long', day: 'numeric' };
-      return new Date(dateString).toLocaleDateString(undefined, options);
-    }
-
-    function capitalizeFirstLetter(string) {
-      return string.charAt(0).toUpperCase() + string.slice(1);
-    }
-
   } catch (error) {
     console.error("Global error handler:", error);
     redirectToLogin();
   }
 });
+
+// Add this function
+async function checkFavoriteStatus(targetUserId) {
+  try {
+    if (!targetUserId) return;
+    
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/user/favorite-status/${targetUserId}`);
+    if (response && response.isFavorite) {
+      elements.favoriteBtn.classList.add('text-red-500');
+      elements.favoriteBtn.classList.remove('text-gray-400');
+    } else {
+      elements.favoriteBtn.classList.remove('text-red-500');
+      elements.favoriteBtn.classList.add('text-gray-400');
+    }
+  } catch (error) {
+    console.error("Error checking favorite status:", error);
+  }
+}
+
+// Add this event listener
+if (elements.favoriteBtn) {
+  elements.favoriteBtn.addEventListener('click', async () => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const profileEmail = urlParams.get('email');
+      
+      if (!profileEmail) return;
+      
+      const response = await fetchWithAuth(`${API_BASE_URL}/api/user/by-email/${encodeURIComponent(profileEmail)}`);
+      const targetUserId = response.id;
+      
+      const currentStatus = elements.favoriteBtn.classList.contains('text-red-500');
+      const newStatus = !currentStatus;
+      
+      await fetchWithAuth(`${API_BASE_URL}/api/user/favorite`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          targetUserId,
+          isFavorite: newStatus
+        })
+      });
+      
+      if (newStatus) {
+        elements.favoriteBtn.classList.add('text-red-500');
+        elements.favoriteBtn.classList.remove('text-gray-400');
+      } else {
+        elements.favoriteBtn.classList.remove('text-red-500');
+        elements.favoriteBtn.classList.add('text-gray-400');
+      }
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+    }
+  });
+}
+
+// Place this outside DOMContentLoaded or at the bottom (once only)
+async function setupFavoriteButton(userId) {
+  const favoriteBtn = document.getElementById('favorite-btn');
+  if (!favoriteBtn) return;
+
+  try {
+    const token = localStorage.getItem("token");
+    // Check initial favorite status
+    await updateFavoriteButtonState(favoriteBtn, token, userId);
+    
+    // Set up click handler
+    favoriteBtn.addEventListener('click', async () => {
+      try {
+        const isFavorite = favoriteBtn.querySelector('svg').getAttribute('fill') === 'red';
+        await toggleFavoriteStatus(token, userId, !isFavorite);
+        await updateFavoriteButtonState(favoriteBtn, token, userId);
+      } catch (error) {
+        console.error("Error toggling favorite:", error);
+        showError("Failed to update favorite status");
+      }
+    });
+  } catch (error) {
+    console.error("Error setting up favorite button:", error);
+  }
+}
+
+async function updateFavoriteButtonState(button, token, userId) {
+  const response = await fetch(`${API_BASE_URL}/api/user/favorite-status/${userId}`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  
+  if (response.ok) {
+    const data = await response.json();
+    if (data.isFavorite) {
+      button.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="red" viewBox="0 0 24 24" stroke="red">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+      `;
+    } else {
+      button.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+      `;
+    }
+  }
+}
+
+async function toggleFavoriteStatus(token, userId, isFavorite) {
+  const response = await fetch(`${API_BASE_URL}/api/user/favorite`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      targetUserId: userId,
+      isFavorite: isFavorite
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to toggle favorite status');
+  }
+
+  return response.json();
+}
+
+// Add these new functions to profile.js
+async function setupBookmarkButton(userId) {
+  const bookmarkBtn = document.getElementById('bookmark-btn');
+  if (!bookmarkBtn) return;
+
+  try {
+    const token = localStorage.getItem("token");
+    await updateBookmarkButtonState(bookmarkBtn, token, userId);
+    
+    bookmarkBtn.addEventListener('click', async () => {
+      try {
+        const isBookmarked = bookmarkBtn.querySelector('svg').getAttribute('fill') === 'yellow';
+        await toggleBookmarkStatus(token, userId, !isBookmarked);
+        await updateBookmarkButtonState(bookmarkBtn, token, userId);
+      } catch (error) {
+        console.error("Error toggling bookmark:", error);
+        showError("Failed to update bookmark status");
+      }
+    });
+  } catch (error) {
+    console.error("Error setting up bookmark button:", error);
+  }
+}
+
+async function updateBookmarkButtonState(button, token, userId) {
+  const response = await fetch(`${API_BASE_URL}/api/user/bookmark-status/${userId}`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  
+  if (response.ok) {
+    const data = await response.json();
+    if (data.isBookmarked) {
+      button.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="yellow" viewBox="0 0 24 24" stroke="yellow">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+        </svg>
+      `;
+    } else {
+      button.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+        </svg>
+      `;
+    }
+  }
+}
+
+async function toggleBookmarkStatus(token, userId, isBookmarked) {
+  const response = await fetch(`${API_BASE_URL}/api/user/bookmark`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      targetUserId: userId,
+      isBookmarked: isBookmarked
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to toggle bookmark status');
+  }
+
+  return response.json();
+}
+
+// Utility functions outside the main event listener
+function redirectToLogin() {
+  localStorage.removeItem("token");
+  window.location.href = "/SignIn.html";
+}
+
+function showError(message) {
+  showAlert(message, "error");
+}
+
+function showAlert(message, type = "info") {
+  const alertDiv = document.createElement("div");
+  alertDiv.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg z-50 ${
+    type === "error" ? "bg-red-600" : 
+    type === "success" ? "bg-purple-600" : "bg-slate-800"
+  } text-white`;
+  alertDiv.textContent = message;
+  
+  document.body.appendChild(alertDiv);
+  
+  setTimeout(() => {
+    alertDiv.classList.add("opacity-0", "transition-opacity", "duration-500");
+    setTimeout(() => alertDiv.remove(), 500);
+  }, 3000);
+}
+
+function getProfileImageUrl(profile) {
+  return profile.avatar 
+    ? `${API_BASE_URL}${profile.avatar}?t=${Date.now()}`
+    : `https://ui-avatars.com/api/?name=${encodeURIComponent(getDisplayName(profile))}&background=random`;
+}
+
+function getDisplayName(profile) {
+  return profile.name || (profile.email ? profile.email.split('@')[0] : 'User');
+}
+
+function formatDate(dateString) {
+  if (!dateString) return "";
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  return new Date(dateString).toLocaleDateString(undefined, options);
+}
+
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}

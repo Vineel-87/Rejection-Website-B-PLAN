@@ -75,4 +75,26 @@ CREATE TABLE IF NOT EXISTS friends (
   UNIQUE KEY (user_id, friend_id)
 ) ENGINE=InnoDB;
 
-select * from user_profiles
+CREATE TABLE IF NOT EXISTS favorites (
+  id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  user_id VARCHAR(36) NOT NULL,
+  favorite_user_id VARCHAR(36) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (favorite_user_id) REFERENCES users(id) ON DELETE CASCADE,
+  UNIQUE KEY (user_id, favorite_user_id)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS bookmarks (
+  id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  user_id VARCHAR(36) NOT NULL,
+  bookmark_user_id VARCHAR(36) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (bookmark_user_id) REFERENCES users(id) ON DELETE CASCADE,
+  UNIQUE KEY (user_id, bookmark_user_id)
+) ENGINE=InnoDB;
+
+ALTER TABLE user_profiles 
+ADD COLUMN latitude DECIMAL(10, 8),
+ADD COLUMN longitude DECIMAL(11, 8);

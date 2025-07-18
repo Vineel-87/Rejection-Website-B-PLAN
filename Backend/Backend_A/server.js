@@ -815,26 +815,29 @@ app.get("/api/user/search/:term", authenticateToken, async (req, res) => {
 });
 
 // Get user's friends list
+// Get user's friends list with bio and connection time
 app.get("/api/user/friends", authenticateToken, async (req, res) => {
   let connection;
   try {
     connection = await pool.getConnection();
     
-    // Get accepted friends (both directions)
+    // Get accepted friends (both directions) with bio and created_at
     const [friends] = await connection.query(`
       SELECT 
         u.id, 
         u.email, 
         u.name, 
         u.avatar,
-        up.dob
+        up.bio,
+        f.created_at,
+        f.updated_at as connected_at
       FROM friends f
       JOIN users u ON 
         (f.user_id = ? AND f.friend_id = u.id) OR 
         (f.friend_id = ? AND f.user_id = u.id)
       LEFT JOIN user_profiles up ON u.id = up.user_id
       WHERE f.status = 'accepted'
-      ORDER BY u.name
+      ORDER BY f.updated_at DESC
     `, [req.user.userId, req.user.userId]);
 
     res.status(200).json(friends);
@@ -1142,6 +1145,62 @@ app.post("/api/user/friends/decline", authenticateToken, async (req, res) => {
   }
 });
 
+
+// Get friend requests (both sent and received)
+// Get friend requests (both sent and received) with bio
+app.get("/api/user/friend-requests", authenticateToken, async (req, res) => {
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    
+    // Get received requests (where current user is the friend_id) with bio
+    const [receivedRequests] = await connection.query(`
+      SELECT 
+        f.id, 
+        f.status, 
+        f.created_at,
+        u.id as user_id,
+        u.name,
+        u.email,
+        u.avatar,
+        up.bio
+      FROM friends f
+      JOIN users u ON f.user_id = u.id
+      LEFT JOIN user_profiles up ON u.id = up.user_id
+      WHERE f.friend_id = ? AND f.status = 'pending'
+      ORDER BY f.created_at DESC
+    `, [req.user.userId]);
+
+    // Get sent requests (where current user is the user_id) with bio
+    const [sentRequests] = await connection.query(`
+      SELECT 
+        f.id, 
+        f.status, 
+        f.created_at,
+        u.id as friend_id,
+        u.name,
+        u.email,
+        u.avatar,
+        up.bio
+      FROM friends f
+      JOIN users u ON f.friend_id = u.id
+      LEFT JOIN user_profiles up ON u.id = up.user_id
+      WHERE f.user_id = ? AND f.status = 'pending'
+      ORDER BY f.created_at DESC
+    `, [req.user.userId]);
+
+    res.status(200).json({
+      received: receivedRequests,
+      sent: sentRequests
+    });
+  } catch (error) {
+    console.error("Friend requests error:", error);
+    res.status(500).json({ message: "Failed to fetch friend requests" });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
+
 // Remove friend connection
 // Update the friends/remove endpoint to return the new count
 app.post("/api/user/friends/remove", authenticateToken, async (req, res) => {
@@ -1179,6 +1238,267 @@ app.post("/api/user/friends/remove", authenticateToken, async (req, res) => {
     if (connection) await connection.release();
   }
 });
+
+// Add favorite status check endpoint
+app.get("/api/user/favorite-status/:userId", authenticateToken, async (req, res) => {
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    const [rows] = await connection.query(
+      `SELECT 1 FROM favorites 
+       WHERE user_id = ? AND favorite_user_id = ?`,
+      [req.user.userId, req.params.userId]
+    );
+    
+    res.status(200).json({ isFavorite: rows.length > 0 });
+  } catch (error) {
+    console.error("Favorite status error:", error);
+    res.status(500).json({ message: "Failed to check favorite status" });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
+
+// Add favorite toggle endpoint
+app.post("/api/user/favorite", authenticateToken, async (req, res) => {
+  const { targetUserId, isFavorite } = req.body;
+  
+  if (!targetUserId || typeof isFavorite !== 'boolean') {
+    return res.status(400).json({ message: "Invalid request" });
+  }
+
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    
+    if (isFavorite) {
+      // Add to favorites
+      await connection.query(
+        `INSERT INTO favorites (user_id, favorite_user_id)
+         VALUES (?, ?)
+         ON DUPLICATE KEY UPDATE created_at = CURRENT_TIMESTAMP`,
+        [req.user.userId, targetUserId]
+      );
+    } else {
+      // Remove from favorites
+      await connection.query(
+        `DELETE FROM favorites 
+         WHERE user_id = ? AND favorite_user_id = ?`,
+        [req.user.userId, targetUserId]
+      );
+    }
+    
+    res.status(200).json({ message: "Favorite status updated" });
+  } catch (error) {
+    console.error("Favorite toggle error:", error);
+    res.status(500).json({ message: "Failed to update favorite status" });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
+
+// Add get favorites endpoint
+app.get("/api/user/favorites", authenticateToken, async (req, res) => {
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    
+    const [favorites] = await connection.query(`
+      SELECT 
+        u.id, 
+        u.email, 
+        u.name, 
+        u.avatar,
+        up.bio
+      FROM favorites f
+      JOIN users u ON f.favorite_user_id = u.id
+      LEFT JOIN user_profiles up ON u.id = up.user_id
+      WHERE f.user_id = ?
+      ORDER BY f.created_at DESC
+    `, [req.user.userId]);
+    
+    res.status(200).json(favorites);
+  } catch (error) {
+    console.error("Get favorites error:", error);
+    res.status(500).json({ message: "Failed to get favorites" });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
+
+// Get favorite status
+app.get("/api/user/favorite-status/:userId", authenticateToken, async (req, res) => {
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    const [rows] = await connection.query(
+      `SELECT 1 FROM favorites 
+       WHERE user_id = ? AND favorite_user_id = ?`,
+      [req.user.userId, req.params.userId]
+    );
+    
+    res.status(200).json({ isFavorite: rows.length > 0 });
+  } catch (error) {
+    console.error("Favorite status error:", error);
+    res.status(500).json({ message: "Failed to check favorite status" });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
+
+// Get friend suggestions (people you may know)
+app.get("/api/user/friend-suggestions", authenticateToken, async (req, res) => {
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    
+    // Get suggestions based on:
+    // 1. Mutual friends
+    // 2. People who are not already friends or have pending requests
+    // 3. Random suggestions if needed
+    
+    const [suggestions] = await connection.query(`
+      SELECT 
+        u.id, 
+        u.email, 
+        u.name, 
+        u.avatar,
+        up.bio,
+        (
+          SELECT COUNT(*) 
+          FROM friends f1
+          JOIN friends f2 ON f1.friend_id = f2.user_id OR f1.friend_id = f2.friend_id
+          WHERE (f1.user_id = ? OR f1.friend_id = ?)
+          AND (f2.user_id = u.id OR f2.friend_id = u.id)
+          AND f1.status = 'accepted'
+          AND f2.status = 'accepted'
+        ) as mutualCount
+      FROM users u
+      LEFT JOIN user_profiles up ON u.id = up.user_id
+      WHERE u.id != ?
+        AND u.id NOT IN (
+          SELECT IF(user_id = ?, friend_id, user_id) as friend_id
+          FROM friends
+          WHERE (user_id = ? OR friend_id = ?)
+        )
+      ORDER BY mutualCount DESC, RAND()
+      LIMIT 10
+    `, [req.user.userId, req.user.userId, req.user.userId, req.user.userId, req.user.userId, req.user.userId]);
+    
+    res.status(200).json(suggestions);
+  } catch (error) {
+    console.error("Friend suggestions error:", error);
+    res.status(500).json({ message: "Failed to get friend suggestions" });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
+
+
+app.get("/api/user-count", async (req, res) => {
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    const [result] = await connection.query("SELECT COUNT(*) as count FROM users");
+    res.status(200).json({ count: result[0].count });
+  } catch (error) {
+    console.error("Error getting user count:", error);
+    res.status(500).json({ message: "Failed to get user count" });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
+
+
+// Add these endpoints to server.js
+
+// Get user's bookmarks
+app.get("/api/user/bookmarks", authenticateToken, async (req, res) => {
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    
+    const [bookmarks] = await connection.query(`
+      SELECT 
+        u.id, 
+        u.email, 
+        u.name, 
+        u.avatar,
+        up.bio
+      FROM bookmarks b
+      JOIN users u ON b.bookmark_user_id = u.id
+      LEFT JOIN user_profiles up ON u.id = up.user_id
+      WHERE b.user_id = ?
+      ORDER BY b.created_at DESC
+    `, [req.user.userId]);
+    
+    res.status(200).json(bookmarks);
+  } catch (error) {
+    console.error("Get bookmarks error:", error);
+    res.status(500).json({ message: "Failed to get bookmarks" });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
+
+// Bookmark status check
+app.get("/api/user/bookmark-status/:userId", authenticateToken, async (req, res) => {
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    const [rows] = await connection.query(
+      `SELECT 1 FROM bookmarks 
+       WHERE user_id = ? AND bookmark_user_id = ?`,
+      [req.user.userId, req.params.userId]
+    );
+    
+    res.status(200).json({ isBookmarked: rows.length > 0 });
+  } catch (error) {
+    console.error("Bookmark status error:", error);
+    res.status(500).json({ message: "Failed to check bookmark status" });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
+
+// Toggle bookmark
+app.post("/api/user/bookmark", authenticateToken, async (req, res) => {
+  const { targetUserId, isBookmarked } = req.body;
+  
+  if (!targetUserId || typeof isBookmarked !== 'boolean') {
+    return res.status(400).json({ message: "Invalid request" });
+  }
+
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    
+    if (isBookmarked) {
+      // Add to bookmarks
+      await connection.query(
+        `INSERT INTO bookmarks (user_id, bookmark_user_id)
+         VALUES (?, ?)
+         ON DUPLICATE KEY UPDATE created_at = CURRENT_TIMESTAMP`,
+        [req.user.userId, targetUserId]
+      );
+    } else {
+      // Remove from bookmarks
+      await connection.query(
+        `DELETE FROM bookmarks 
+         WHERE user_id = ? AND bookmark_user_id = ?`,
+        [req.user.userId, targetUserId]
+      );
+    }
+    
+    res.status(200).json({ message: "Bookmark status updated" });
+  } catch (error) {
+    console.error("Bookmark toggle error:", error);
+    res.status(500).json({ message: "Failed to update bookmark status" });
+  } finally {
+    if (connection) await connection.release();
+  }
+});
+
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {

@@ -5,21 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Profile | Rejection</title> 
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="css/profile.css" />
+  <link rel="stylesheet" href="css/profile-dark.css" />
   <link rel="icon" href="Images/reorganization.png" />
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.css" rel="stylesheet">
-  <!-- Add CryptoJS for Gravatar support -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <style>
+    .gradient-header {
+      background: linear-gradient(135deg, #1E1E1E 0%, #2A0E35 50%, #8E44AD 100%);
+    }
+    .gradient-text {
+      background: linear-gradient(90deg, #1E1E1E, #8E44AD);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .scroll-container::-webkit-scrollbar-thumb {
+      background: linear-gradient(#1E1E1E, #8E44AD);
+    }
+    #page-loader {
+      background: linear-gradient(to right, #1E1E1E, #8E44AD, #1E1E1E);
+    }
+  </style>
 </head>
-<body class="bg-[#0f0f0f] text-white min-h-screen font-[Poppins] flex flex-col md:flex-row">
+<body class="bg-[#1E1E1E] text-[#E6E6FA] min-h-screen font-[Poppins] flex flex-col md:flex-row">
 
   <!-- Mobile Sidebar Toggle -->
-  <div class="md:hidden flex items-center justify-between p-4 bg-[#1a1a1a] border-b border-[#50c878]/30">
-    <h1 class="text-2xl font-extrabold gradient-text drop-shadow-lg tracking-wide" style="font-family: 'Great Vibes', cursive;">
+  <div class="md:hidden flex items-center justify-between p-4 bg-[#1E1E1E] border-b border-[#8E44AD]/30">
+    <h1 class="text-3xl font-extrabold gradient-text drop-shadow-lg tracking-wide" style="font-family: 'Great Vibes', cursive;">
       Rejection
     </h1>
-    <button id="sidebar-toggle" class="text-white">
+    <button id="sidebar-toggle" class="text-[#E6E6FA]">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
       </svg>
@@ -27,36 +43,36 @@
   </div>
 
   <!-- Sidebar -->
-  <div id="sidebar" class="w-64 bg-[#1a1a1a] h-screen sticky top-0 overflow-y-auto scroll-container p-4 hidden md:block border-r border-[#50c878]/30">
+  <div id="sidebar" class="w-64 bg-[#1E1E1E] h-screen sticky top-0 overflow-y-auto scroll-container p-3 hidden md:block border-r border-[#8E44AD]/30">
     <div class="mb-6 px-2">
       <h1 class="text-4xl font-extrabold gradient-text drop-shadow-lg tracking-wide" style="font-family: 'Great Vibes', cursive;">
         Rejection
       </h1>
     </div>
 
-    <h2 class="text-xl font-bold text-[#d4af37] mb-4 px-2 mt-4">Profile Users</h2>
-    <ul class="space-y-3 text-white">
-      <li class="text-[#d4af37] cursor-pointer transition">📌 Overview</li>
-      <li class="hover:text-[#50c878] cursor-pointer transition"><a href="edit-info.html">🖊️ Edit Info</a></li>
-      <li class="hover:text-[#50c878] cursor-pointer transition"><a href="linked-accounts.html">🌐 Linked Accounts</a></li>
-      <li class="hover:text-[#50c878] cursor-pointer transition">💬 Messages</li>
-      <li class="hover:text-[#50c878] cursor-pointer transition">⭐ Bookmarks</li>
-      <li class="hover:text-[#50c878] cursor-pointer transition">🎓 Education</li>
-      <li class="hover:text-[#50c878] cursor-pointer transition">⚙️ Account Settings</li>
-      <li class="hover:text-red-400 cursor-pointer transition"><a href="signin.html" onclick="logout()">🚪 Log Out</a></li>
+    <h2 class="text-xl font-bold text-[#8E44AD] mb-4 px-2 mt-4">Profile Users</h2>
+    <ul class="space-y-3 text-[#E6E6FA]">
+      <li class="text-[#8E44AD] cursor-pointer transition">📌 Overview</li>
+      <li class="hover:text-[#8E44AD] cursor-pointer transition"><a href="edit-info.html">🖊️ Edit Info</a></li>
+      <li class="hover:text-[#8E44AD] cursor-pointer transition"><a href="linked-accounts.html">🌐 Linked Accounts</a></li>
+      <li class="hover:text-[#8E44AD] cursor-pointer transition">💬 Messages</li>
+      <li class="hover:text-[#8E44AD] cursor-pointer transition">⭐ Bookmarks</li>
+      <li class="hover:text-[#8E44AD] cursor-pointer transition">🎓 Education</li>
+      <li class="hover:text-[#8E44AD] cursor-pointer transition">⚙️ Account Settings</li>
+      <li class="hover:text-[#8E44AD] cursor-pointer transition"><a href="signin.html" onclick="logout()">🚪 Log Out</a></li>
     </ul>
   </div>
 
   <!-- Main Content -->
   <div class="flex-1 w-full">
     <header id="profile-header" class="w-full h-64 gradient-header relative overflow-hidden">
-      <a href="dashboard.html" class="absolute top-4 left-4 text-white hover:text-[#d4af37] z-10 transition">
+      <a href="dashboard.html" class="absolute top-4 left-4 text-[#E6E6FA] hover:text-[#8E44AD] z-10 transition">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
       </a>
       <div class="absolute bottom-4 right-4">
-        <label for="bg-upload" class="bg-gradient-to-r from-[#50c878] to-[#d4af37] text-white px-3 py-1 rounded-full text-sm flex items-center gap-1 cursor-pointer hover:opacity-90 transition shadow-lg">
+        <label for="bg-upload" class="bg-gradient-to-r from-[#1E1E1E] to-[#8E44AD] text-[#E6E6FA] px-3 py-1 rounded-full text-sm flex items-center gap-1 cursor-pointer hover:opacity-90 transition shadow-lg">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
@@ -68,8 +84,8 @@
 
     <div class="max-w-4xl mx-auto px-4 -mt-16 relative">
       <div class="relative mx-auto w-32 h-32">
-        <img id="profile-preview" src="uploads/default-avatar.png" class="w-32 h-32 rounded-full object-cover border-4 border-[#1a1a1a] shadow-lg">
-        <label for="edit-upload" class="absolute bottom-0 right-0 w-8 h-8 bg-gradient-to-r from-[#50c878] to-[#d4af37] text-white flex items-center justify-center rounded-full cursor-pointer hover:opacity-90 transition shadow-lg">
+        <img id="profile-preview" src="uploads/default-avatar.png" class="w-32 h-32 rounded-full object-cover border-4 border-[#1E1E1E] shadow-lg">
+        <label for="edit-upload" class="absolute bottom-0 right-0 w-8 h-8 bg-gradient-to-r from-[#1E1E1E] to-[#8E44AD] text-[#E6E6FA] flex items-center justify-center rounded-full cursor-pointer hover:opacity-90 transition shadow-lg">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
@@ -78,94 +94,122 @@
       </div>
 
       <!-- Username and Bio Section -->
-      <div class="mt-6 w-full md:w-auto md:ml-0 pl-0 md:pl-0">
-        <div class="bg-[#1a1a1a] shadow-lg w-full p-4 flex flex-col md:flex-row items-center justify-between border border-[#50c878]/30">
-          <div class="flex-1 text-center md:text-left space-y-2 mb-4 md:mb-0">
-            <h2 id="profile-username" class="text-2xl font-bold gradient-text">Username</h2>
-            <p id="profile-bio" class="text-gray-300">This is a sample bio.</p>
-            <!-- In the username and bio section, replace the friend-count div with this: -->
-            <div id="friend-count" class="text-[#d4af37] font-medium">
-              <span id="friend-count-number">0</span> friends
+      <div class="mt-6 w-full">
+        <div class="bg-[#1E1E1E] shadow-lg w-full p-4 md:p-6 border border-[#8E44AD]/30 rounded-lg">
+          <!-- Top Row - Username and Friend Count -->
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+            <div class="flex-1 min-w-0">
+              <h2 id="profile-username" class="text-2xl font-bold text-[#E6E6FA] truncate">Username</h2>
+              <div id="friend-count" class="text-[#8E44AD] font-medium mt-1">
+                <span id="friend-count-number">0</span> friends
+              </div>
+            </div>
+
+        
+
+            
+            <!-- Action Buttons Container -->
+            <div class="flex flex-wrap items-center gap-2 justify-start md:justify-end">
+              <!-- Friend Request Buttons -->
+              <div class="flex flex-wrap gap-2" id="friend-actions-container">
+                <button id="add-friend-btn" class="bg-gradient-to-r from-[#1E1E1E] to-[#8E44AD] hover:from-[#8E44AD] hover:to-[#1E1E1E] text-[#E6E6FA] px-4 py-2 rounded-lg text-sm transition shadow-lg hidden whitespace-nowrap">
+                  Add Friend
+                </button>
+                <button id="request-sent-btn" class="bg-gradient-to-r from-[#1E1E1E] to-[#7D3C98] hover:from-[#7D3C98] hover:to-[#1E1E1E] text-[#E6E6FA] px-4 py-2 rounded-lg text-sm transition shadow-lg hidden whitespace-nowrap">
+                  Request Sent
+                </button>
+                <div class="flex gap-2 hidden" id="request-buttons-group">
+                  <button id="accept-request-btn" class="bg-gradient-to-r from-[#1E1E1E] to-[#8E44AD] hover:from-[#8E44AD] hover:to-[#1E1E1E] text-[#E6E6FA] px-4 py-2 rounded-lg text-sm transition shadow-lg whitespace-nowrap">
+                    Accept
+                  </button>
+                  <button id="decline-request-btn" class="bg-gradient-to-r from-[#1E1E1E] to-[#7D3C98] hover:from-[#7D3C98] hover:to-[#1E1E1E] text-[#E6E6FA] px-4 py-2 rounded-lg text-sm transition shadow-lg whitespace-nowrap">
+                    Decline
+                  </button>
+                </div>
+                <button id="connected-btn" class="bg-[#1E1E1E] text-[#E6E6FA] px-4 py-2 rounded-lg text-sm cursor-default border border-[#8E44AD]/30 hidden whitespace-nowrap">
+                  Connected
+                </button>
+                <button id="remove-connection-btn" class="bg-gradient-to-r from-[#1E1E1E] to-[#7D3C98] hover:from-[#7D3C98] hover:to-[#1E1E1E] text-[#E6E6FA] px-4 py-2 rounded-lg text-sm transition shadow-lg hidden whitespace-nowrap">
+                  Remove Friend
+                </button>
+              </div>
+              
+              <!-- Other Action Buttons -->
+              <div class="flex gap-2" id="other-actions-container">
+                <button id="block-btn" class="bg-gradient-to-r from-[#1E1E1E] to-[#7D3C98] hover:from-[#7D3C98] hover:to-[#1E1E1E] text-[#E6E6FA] px-4 py-2 rounded-lg text-sm transition shadow-lg hidden whitespace-nowrap">
+                  Block
+                </button>
+                <button id="message-btn" class="bg-gradient-to-r from-[#1E1E1E] to-[#8E44AD] hover:from-[#8E44AD] hover:to-[#1E1E1E] text-[#E6E6FA] px-4 py-2 rounded-lg text-sm transition shadow-lg hidden whitespace-nowrap">
+                  Message
+                </button>
+                <button class="text-gray-400 hover:text-[#8E44AD] p-2 rounded-full hover:bg-[#1E1E1E] transition border border-[#8E44AD]/30">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                  </svg>
+                </button>
+                 <!-- Favorite Button -->
+                <button id="favorite-btn" class="text-gray-400 hover:text-red-500 p-2 rounded-full hover:bg-[#1E1E1E] transition">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                </button>
+
+                <button id="bookmark-btn" class="text-gray-400 hover:text-yellow-500 p-2 rounded-full hover:bg-[#1E1E1E] transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                </svg>
+              </button>
+              </div>
             </div>
           </div>
           
-          <!-- Action Buttons Container -->
-          <div class="flex items-center gap-2 flex-wrap justify-center md:justify-end">
-              <!-- Friend Request Buttons -->
-              <button id="add-friend-btn" class="bg-gradient-to-r from-[#50c878] to-[#3da865] hover:from-[#3da865] hover:to-[#50c878] text-white px-4 py-2 rounded-lg text-sm transition shadow-lg hidden">
-                  Add Friend
-              </button>
-              <button id="request-sent-btn" class="bg-gradient-to-r from-[#d4af37] to-[#b79330] hover:from-[#b79330] hover:to-[#d4af37] text-white px-4 py-2 rounded-lg text-sm transition shadow-lg hidden">
-                  Request Sent
-              </button>
-              <button id="accept-request-btn" class="bg-gradient-to-r from-[#50c878] to-[#3da865] hover:from-[#3da865] hover:to-[#50c878] text-white px-4 py-2 rounded-lg text-sm transition shadow-lg hidden">
-                  Accept
-              </button>
-              <button id="decline-request-btn" class="bg-gradient-to-r from-[#f87171] to-[#ef4444] hover:from-[#ef4444] hover:to-[#f87171] text-white px-4 py-2 rounded-lg text-sm transition shadow-lg hidden">
-                  Decline
-              </button>
-              <button id="connected-btn" class="bg-[#252525] text-white px-4 py-2 rounded-lg text-sm cursor-default border border-[#50c878]/30 hidden" disabled>
-                  Connected
-              </button>
-              <button id="remove-connection-btn" class="bg-gradient-to-r from-[#f87171] to-[#ef4444] hover:from-[#ef4444] hover:to-[#f87171] text-white px-4 py-2 rounded-lg text-sm transition shadow-lg hidden">
-                  Remove Friend
-              </button>
-            
-            <!-- Other Action Buttons -->
-            <button id="block-btn" class="bg-gradient-to-r from-[#f87171] to-[#ef4444] hover:from-[#ef4444] hover:to-[#f87171] text-white px-4 py-2 rounded-lg text-sm transition shadow-lg">
-                Block
-            </button>
-            <button id="message-btn" class="bg-gradient-to-r from-[#60a5fa] to-[#3b82f6] hover:from-[#3b82f6] hover:to-[#60a5fa] text-white px-4 py-2 rounded-lg text-sm transition shadow-lg">
-                Message
-            </button>
-            <button class="text-gray-400 hover:text-[#d4af37] p-2 rounded-full hover:bg-[#252525] transition border border-[#50c878]/30">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                </svg>
-            </button>
+          <!-- Bio Section -->
+          <div class="mt-4">
+            <p id="profile-bio" class="text-[#E6E6FA] text-sm md:text-base break-words whitespace-pre-line">This is a sample bio.</p>
+            <!-- Add this section below the bio section in profile.html -->
           </div>
         </div>
       </div>
 
       <!-- Scrollable Container with User Info -->
       <div class="mt-10 w-full md:w-auto md:ml-0 pl-0 md:pl-0">
-        <div class="h-[600px] bg-[#1a1a1a] shadow-lg w-full p-4 md:p-8 overflow-y-auto space-y-10 scroll-container border border-[#50c878]/30">
+        <div class="h-[600px] bg-[#1E1E1E] shadow-lg w-full p-4 md:p-8 overflow-y-auto space-y-10 scroll-container border border-[#8E44AD]/30">
 
           <!-- Personal Information Section -->
           <div>
-            <h2 class="text-2xl font-bold gradient-text mb-6">Personal Information</h2>
+            <h2 class="text-2xl font-bold text-[#E6E6FA] mb-6">Personal Information</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
               <!-- Basic Details -->
               <div class="space-y-4">
-                <h3 class="text-xl font-semibold text-[#d4af37] border-b border-[#50c878]/30 pb-2">Basic Details</h3>
+                <h3 class="text-xl font-semibold text-[#8E44AD] border-b border-[#8E44AD]/30 pb-2">Basic Details</h3>
                 <div>
                   <p class="text-gray-400">Full Name</p>
-                  <p id="display-fullname" class="text-white">Not specified</p>
+                  <p id="display-fullname" class="text-[#E6E6FA]">Not specified</p>
                 </div>
                 <div>
                   <p class="text-gray-400">Date of Birth</p>
-                  <p id="display-dob" class="text-white">Not specified</p>
+                  <p id="display-dob" class="text-[#E6E6FA]">Not specified</p>
                 </div>
                 <div>
                   <p class="text-gray-400">Gender</p>
-                  <p id="display-gender" class="text-white">Not specified</p>
+                  <p id="display-gender" class="text-[#E6E6FA]">Not specified</p>
                 </div>
               </div>
 
               <!-- Contact Information -->
               <div class="space-y-4">
-                <h3 class="text-xl font-semibold text-[#d4af37] border-b border-[#50c878]/30 pb-2">Contact Information</h3>
+                <h3 class="text-xl font-semibold text-[#8E44AD] border-b border-[#8E44AD]/30 pb-2">Contact Information</h3>
                 <div>
                   <p class="text-gray-400">Email</p>
-                  <p id="display-email" class="text-white">Not specified</p>
+                  <p id="display-email" class="text-[#E6E6FA]">Not specified</p>
                 </div>
                 <div>
                   <p class="text-gray-400">Mobile Number</p>
-                  <p id="display-mobile" class="text-white">Not specified</p>
+                  <p id="display-mobile" class="text-[#E6E6FA]">Not specified</p>
                 </div>
                 <div>
                   <p class="text-gray-400">Address</p>
-                  <p id="display-address" class="text-white whitespace-pre-line">Not specified</p>
+                  <p id="display-address" class="text-[#E6E6FA] whitespace-pre-line">Not specified</p>
                 </div>
               </div>
             </div>
@@ -173,11 +217,11 @@
 
           <!-- Linked Accounts Section -->
           <div>
-            <h2 class="text-2xl font-bold gradient-text mb-6">Linked Accounts</h2>
+            <h2 class="text-2xl font-bold text-[#E6E6FA] mb-6">Linked Accounts</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
               <!-- Social Media -->
               <div class="space-y-4">
-                <h3 class="text-xl font-semibold text-[#d4af37] border-b border-[#50c878]/30 pb-2">Social Media</h3>
+                <h3 class="text-xl font-semibold text-[#8E44AD] border-b border-[#8E44AD]/30 pb-2">Social Media</h3>
                 <!-- Facebook -->
                 <div>
                   <p class="text-gray-400 flex items-center">
@@ -212,7 +256,7 @@
 
               <!-- Other Accounts -->
               <div class="space-y-4">
-                <h3 class="text-xl font-semibold text-[#d4af37] border-b border-[#50c878]/30 pb-2">Other Accounts</h3>
+                <h3 class="text-xl font-semibold text-[#8E44AD] border-b border-[#8E44AD]/30 pb-2">Other Accounts</h3>
                 <div>
                   <p class="text-gray-400 flex items-center">
                     <svg class="w-5 h-5 mr-2" fill="#0088CC" viewBox="0 0 24 24" aria-hidden="true">
@@ -242,12 +286,12 @@
                 </div>
                 <div>
                   <p class="text-gray-400 flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="#50c878" viewBox="0 0 24 24" aria-hidden="true">
+                    <svg class="w-5 h-5 mr-2" fill="#8E44AD" viewBox="0 0 24 24" aria-hidden="true">
                       <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 22.5c-5.799 0-10.5-4.701-10.5-10.5S6.201 1.5 12 1.5 22.5 6.201 22.5 12 17.799 22.5 12 22.5zm-3.75-7.5h7.5v-1.5h-7.5v1.5zm0-3h7.5v-1.5h-7.5v1.5zm-1.5-3h1.5v-1.5h-1.5v1.5zm3 0h1.5v-1.5h-1.5v1.5zm3 0h1.5v-1.5h-1.5v1.5z" />
                     </svg>
                     Portfolio
                   </p>
-                  <a id="display-portfolio" href="#" target="_blank" class="text-[#50c878] hover:text-[#3da865] break-all transition">Not connected</a>
+                  <a id="display-portfolio" href="#" target="_blank" class="text-[#8E44AD] hover:text-[#7D3C98] break-all transition">Not connected</a>
                 </div>
               </div>
             </div>
@@ -257,26 +301,22 @@
     </div>
 
     <!-- Image Editor Modal -->
-    <div id="editor-modal" class="fixed inset-0 bg-black bg-opacity-80 z-[10000] hidden flex items-center justify-center">
-      <div class="bg-[#1a1a1a] p-6 rounded-xl max-w-3xl w-full mx-4 relative border border-[#50c878]/30">
+    <div id="editor-modal" class="fixed inset-0 bg-black bg-opacity-90 z-[10000] hidden flex items-center justify-center">
+      <div class="bg-[#1E1E1E] p-6 rounded-xl max-w-3xl w-full mx-4 relative border border-[#8E44AD]/30">
         <img id="editor-image" class="max-h-96 w-full object-contain mb-4 rounded" />
         <div class="flex flex-col gap-2 mb-4">
-          <label class="text-sm text-white">Brightness</label>
-          <input type="range" id="brightness-range" min="0.5" max="1.5" step="0.01" value="1" class="w-full accent-[#d4af37]">
+          <label class="text-sm text-[#E6E6FA]">Brightness</label>
+          <input type="range" id="brightness-range" min="0.5" max="1.5" step="0.01" value="1" class="w-full accent-[#8E44AD]">
         </div>
         <div class="flex flex-wrap justify-between mt-4 gap-3">
-          <button id="zoom-in" class="bg-gradient-to-r from-[#50c878] to-[#3da865] hover:from-[#3da865] hover:to-[#50c878] text-white px-4 py-2 rounded hover:opacity-90 transition shadow-lg">Zoom In</button>
-          <button id="zoom-out" class="bg-gradient-to-r from-[#50c878] to-[#3da865] hover:from-[#3da865] hover:to-[#50c878] text-white px-4 py-2 rounded hover:opacity-90 transition shadow-lg">Zoom Out</button>
-          <button id="apply-edit" class="bg-gradient-to-r from-[#50c878] to-[#d4af37] hover:from-[#d4af37] hover:to-[#50c878] text-white px-4 py-2 rounded hover:opacity-90 transition shadow-lg">Apply</button>
-          <button id="cancel-edit" class="bg-[#252525] px-4 py-2 text-white rounded hover:bg-[#333] transition border border-[#50c878]/30">Cancel</button>
+          <button id="zoom-in" class="bg-gradient-to-r from-[#1E1E1E] to-[#8E44AD] hover:from-[#8E44AD] hover:to-[#1E1E1E] text-[#E6E6FA] px-4 py-2 rounded hover:opacity-90 transition shadow-lg">Zoom In</button>
+          <button id="zoom-out" class="bg-gradient-to-r from-[#1E1E1E] to-[#8E44AD] hover:from-[#8E44AD] hover:to-[#1E1E1E] text-[#E6E6FA] px-4 py-2 rounded hover:opacity-90 transition shadow-lg">Zoom Out</button>
+          <button id="apply-edit" class="bg-gradient-to-r from-[#1E1E1E] to-[#8E44AD] hover:from-[#8E44AD] hover:to-[#1E1E1E] text-[#E6E6FA] px-4 py-2 rounded hover:opacity-90 transition shadow-lg">Apply</button>
+          <button id="cancel-edit" class="bg-[#1E1E1E] px-4 py-2 text-[#E6E6FA] rounded hover:bg-[#2A0E35] transition border border-[#8E44AD]/30">Cancel</button>
         </div>
       </div>
     </div>
 
-    <!-- Page Loader -->
-    <div id="page-loader" class="fixed inset-0 bg-gradient-to-r from-[#d4af37] via-[#50c878] to-[#d4af37] z-[9999] hidden flex items-center justify-center">
-      <div class="w-16 h-16 border-4 border-white border-dashed rounded-full animate-spin"></div>
-    </div>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.js"></script>

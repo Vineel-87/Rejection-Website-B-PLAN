@@ -1,4 +1,3 @@
-<!-- dashboard.html with Emerald Green + Gold Theme -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,138 +9,143 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <!-- Add CryptoJS for Gravatar support -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
 
-<body class="bg-[#0f0f0f] text-white min-h-screen flex font-[Poppins]">
+<body class="bg-[#1E1E1E] text-white min-h-screen flex font-[Poppins]">
   <!-- Background header bar -->
-  <div class="fixed top-0 left-0 w-full h-16 bg-[#1a1a1a]/90 backdrop-blur-sm z-30 border-b border-[#50c878]/30"></div>
+  <div class="fixed top-0 left-0 w-full h-16 bg-[#1E1E1E]/90 backdrop-blur-sm z-30 border-b border-[#8E44AD]/30"></div>
 
   <!-- Second horizontal container bar -->
-  <div class="fixed top-16 left-0 w-full h-12 bg-[#1a1a1a]/80 z-30 border-b border-[#50c878]/20"></div>
+  <div class="fixed top-16 left-0 w-full h-12 bg-[#1E1E1E]/80 z-30 border-b border-[#8E44AD]/20"></div>
 
   <!-- Vertical container on left side below second horizontal bar -->
-  <div class="fixed top-28 left-0 w-64 h-[calc(100vh-7rem)] bg-[#1a1a1a]/70 z-30 border-r border-[#50c878]/20 overflow-y-auto">
+  <div class="fixed top-28 left-0 w-64 h-[calc(100vh-7rem)] bg-[#1E1E1E]/70 z-30 border-r border-[#8E44AD]/20 overflow-y-auto">
+    
     <!-- Profile Section -->
-    <div class="p-4 border-b border-[#50c878]/20">
-      <a href="profile.html" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition duration-200 group">
+    <!-- In dashboard.html, inside the Profile Section div (around line 45) -->
+    <div class="p-4 border-b border-[#8E44AD]/20">
+      <a href="profile.html" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1E1E1E] transition duration-200 group">
         <div class="relative w-10 h-10">
-          <img id="vertical-profile-pic" src="Images/default-avatar.png" alt="Profile" class="w-full h-full rounded-full border-2 border-[#50c878] object-cover">
-          <div class="absolute inset-0 rounded-full border-2 border-transparent group-hover:border-[#d4af37] transition duration-200"></div>
+          <img id="vertical-profile-pic" src="Images/default-avatar.png" alt="Profile" class="w-full h-full rounded-full border-2 border-[#8E44AD] object-cover">
+          <div class="absolute inset-0 rounded-full border-2 border-transparent group-hover:border-[#8E44AD] transition duration-200"></div>
         </div>
         <div class="flex flex-col">
-          <span id="vertical-username" class="font-semibold text-white group-hover:text-[#d4af37] transition duration-200">Guest</span>
+          <span id="vertical-username" class="font-semibold text-white group-hover:text-[#8E44AD] transition duration-200">Guest</span>
           <span class="text-xs text-gray-400">View Profile</span>
         </div>
       </a>
+      <!-- Slightly indented user count -->
+      <div class="mt-2 flex items-center justify-start gap-2 pl-6">
+        <div class="relative flex h-3 w-3">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+        </div>
+        <span id="user-count" class="text-xs text-gray-400">Loading users...</span>
+      </div>
     </div>
 
-    <!-- Menu Items -->
     <div class="p-4 space-y-1">
-      <!-- Friends - Social/Connection (Blue) -->
-      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition duration-200 group">
-        <div class="w-8 h-8 flex items-center justify-center bg-[#3b82f6]/20 rounded-full text-[#3b82f6]">
+      <!-- Friends - Social/Connection -->
+      <a href="friends.html" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1E1E1E] transition duration-200 group">
+        <div class="w-8 h-8 flex items-center justify-center rounded-full bg-opacity-20 group-hover:bg-opacity-30 menu-friends">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
           </svg>
         </div>
-        <span class="text-white group-hover:text-[#3b82f6] transition duration-200">Friends</span>
+        <span class="menu-friends">Friends</span>
       </a>
 
-      <!-- Messages - Communication (Teal) -->
-      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition duration-200 group">
-        <div class="w-8 h-8 flex items-center justify-center bg-[#06b6d4]/20 rounded-full text-[#06b6d4]">
+      <!-- Messages - Communication (Blue) -->
+      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1E1E1E] transition duration-200 group">
+        <div class="w-8 h-8 flex items-center justify-center rounded-full bg-opacity-20 group-hover:bg-opacity-30 menu-messages">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
         </div>
-        <span class="text-white group-hover:text-[#06b6d4] transition duration-200">Messages</span>
+        <span class="menu-messages">Messages</span>
       </a>
 
-      <!-- Notifications - Alert (Amber) -->
-      <a href="notifications.html" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition duration-200 group">
-        <div class="w-8 h-8 flex items-center justify-center bg-[#f59e0b]/20 rounded-full text-[#f59e0b]">
+      <!-- Notifications - Alert -->
+      <a href="notifications.html" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1E1E1E] transition duration-200 group">
+        <div class="w-8 h-8 flex items-center justify-center rounded-full bg-opacity-20 group-hover:bg-opacity-30 menu-notifications">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
           </svg>
         </div>
-        <span class="text-white group-hover:text-[#f59e0b] transition duration-200">Notifications</span>
+        <span class="menu-notifications">Notifications</span>
       </a>
-      
-      <!-- Memories - Nostalgia (Purple) -->
-      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition duration-200 group">
-        <div class="w-8 h-8 flex items-center justify-center bg-[#8b5cf6]/20 rounded-full text-[#8b5cf6]">
+
+      <!-- Memories - Nostalgia -->
+      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1E1E1E] transition duration-200 group">
+        <div class="w-8 h-8 flex items-center justify-center rounded-full bg-opacity-20 group-hover:bg-opacity-30 menu-memories">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
         </div>
-        <span class="text-white group-hover:text-[#8b5cf6] transition duration-200">Memories</span>
+        <span class="menu-memories">Memories</span>
       </a>
 
-      <!-- Saved Posts - Bookmark (Pink) -->
-      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition duration-200 group">
-        <div class="w-8 h-8 flex items-center justify-center bg-[#ec4899]/20 rounded-full text-[#ec4899]">
+      <!-- Saved Posts - Pink -->
+      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1E1E1E] transition duration-200 group">
+        <div class="w-8 h-8 flex items-center justify-center rounded-full bg-opacity-20 group-hover:bg-opacity-30 menu-saved">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
           </svg>
         </div>
-        <span class="text-white group-hover:text-[#ec4899] transition duration-200">Saved Posts</span>
+        <span class="menu-saved">Saved Posts</span>
       </a>
 
-      <!-- Groups - Community (Green) -->
-      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition duration-200 group">
-        <div class="w-8 h-8 flex items-center justify-center bg-[#10b981]/20 rounded-full text-[#10b981]">
+      <!-- Groups - Teal -->
+      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1E1E1E] transition duration-200 group">
+        <div class="w-8 h-8 flex items-center justify-center rounded-full bg-opacity-20 group-hover:bg-opacity-30 menu-groups">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
         </div>
-        <span class="text-white group-hover:text-[#10b981] transition duration-200">Groups</span>
-      </a>
-      
-      <!-- Reels - Video/Entertainment (Red) -->
-      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition duration-200 group">
-        <div class="w-8 h-8 flex items-center justify-center bg-[#ef4444]/20 rounded-full text-[#ef4444]">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-          </svg>
-        </div>
-        <span class="text-white group-hover:text-[#ef4444] transition duration-200">Reels</span>
+        <span class="menu-groups">Groups</span>
       </a>
 
-      <!-- Ads Request - Business (Indigo) -->
-      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition duration-200 group">
-        <div class="w-8 h-8 flex items-center justify-center bg-[#6366f1]/20 rounded-full text-[#6366f1]">
+      <!-- Ads Request - Indigo -->
+      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1E1E1E] transition duration-200 group">
+        <div class="w-8 h-8 flex items-center justify-center rounded-full bg-opacity-20 group-hover:bg-opacity-30 menu-ads">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
           </svg>
         </div>
-        <span class="text-white group-hover:text-[#6366f1] transition duration-200">Ads Request</span>
+        <span class="menu-ads">Ads Request</span>
       </a>
-        
-      <!-- Birthday Reminder -->
-      <a href="birthday-reminders.html" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition duration-200 group">
-        <div class="w-8 h-8 flex items-center justify-center bg-[#eab308]/20 rounded-full text-[#eab308]">
+
+      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1E1E1E] transition duration-200 group">
+        <div class="w-8 h-8 flex items-center justify-center rounded-full bg-opacity-20 group-hover:bg-opacity-30 menu-courses">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+        </div>
+        <span class="menu-courses">Courses</span>
+      </a>
+
+      <!-- Birthday Reminder - Amber -->
+      <a href="birthday-reminders.html" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1E1E1E] transition duration-200 group">
+        <div class="w-8 h-8 flex items-center justify-center rounded-full bg-opacity-20 group-hover:bg-opacity-30 menu-birthday">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.701 2.701 0 00-1.5-.454M9 6v2m3-2v2m3-2v2M9 3h.01M12 3h.01M15 3h.01M21 21v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7h18zm-3-9v-2a2 2 0 00-2-2H8a2 2 0 00-2 2v2h12z" />
           </svg>
         </div>
-        <span class="text-white group-hover:text-[#eab308] transition duration-200">Birthday Reminder</span>
-        
-        <!-- Birthday notification badge -->
-        <span id="birthday-notification-badge" class="hidden ml-auto bg-[#d4af37] text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+        <span class="menu-birthday">Birthday Reminder</span>
+        <span id="birthday-notification-badge" class="hidden ml-auto bg-[#f59e0b] text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
           <span id="birthday-count">0</span>
         </span>
       </a>
-                
-      <!-- Users Activity - Live (Emerald) -->
-      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition duration-200 group">
-        <div class="w-8 h-8 flex items-center justify-center bg-[#10b981]/20 rounded-full text-[#10b981]">
+
+      <!-- Users Activity - Emerald -->
+      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1E1E1E] transition duration-200 group">
+        <div class="w-8 h-8 flex items-center justify-center rounded-full bg-opacity-20 group-hover:bg-opacity-30 menu-activity">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
           </svg>
         </div>
-        <span class="text-white group-hover:text-[#10b981] transition duration-200">Users Activity</span>
+        <span class="menu-activity">Users Activity</span>
         <span class="ml-auto flex items-center">
           <span class="relative flex h-2 w-2">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10b981] opacity-75"></span>
@@ -150,27 +154,26 @@
         </span>
       </a>
 
-      <!-- Queries - Help (Sky Blue) -->
-      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition duration-200 group">
-        <div class="w-8 h-8 flex items-center justify-center bg-[#0ea5e9]/20 rounded-full text-[#0ea5e9]">
+      <!-- Queries - Sky Blue -->
+      <a href="#" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1E1E1E] transition duration-200 group">
+        <div class="w-8 h-8 flex items-center justify-center rounded-full bg-opacity-20 group-hover:bg-opacity-30 menu-queries">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
-        <span class="text-white group-hover:text-[#0ea5e9] transition duration-200">Queries</span>
+        <span class="menu-queries">Queries</span>
       </a>
 
-      <!-- Job Links (Emerald Green + Gold) -->
-      <a href="job-links.html" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition duration-200 group">
-        <div class="w-8 h-8 flex items-center justify-center bg-[#6366f1]/20 rounded-full text-[#6366f1]">
+      <!-- Job Links - Violet -->
+      <a href="job-links.html" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1E1E1E] transition duration-200 group">
+        <div class="w-8 h-8 flex items-center justify-center rounded-full bg-opacity-20 group-hover:bg-opacity-30 menu-jobs">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
           </svg>
         </div>
-        <span class="text-white group-hover:text-[#d4af37] transition duration-200">Job Links</span>
+        <span class="menu-jobs">Job Links</span>
       </a>
-    </div>   
-  </div>
+    </div>
 
   <!-- Main header section -->
   <div class="fixed top-4 left-0 w-full px-6 z-40 flex items-center justify-between pointer-events-none">
@@ -182,7 +185,7 @@
     </button>
 
     <div class="flex items-center gap-6 ml-16">
-      <h1 class="text-3xl font-extrabold text-[#d4af37] drop-shadow-md pointer-events-auto" style="font-family: 'Great Vibes', cursive;">
+      <h1 class="text-4xl font-extrabold text-[#8E44AD] drop-shadow-md pointer-events-auto" style="font-family: 'Great Vibes', cursive;">
         Rejection
       </h1>
       
@@ -192,16 +195,16 @@
           type="text" 
           id="search-friends" 
           placeholder="Search Friends..." 
-          class="bg-[#1a1a1a] border border-[#50c878] rounded-full py-2 pl-10 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent w-64 transition-all duration-300"
+          class="bg-[#1E1E1E] border border-[#8E44AD] rounded-full py-2 pl-10 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-[#8E44AD] focus:border-transparent w-64 transition-all duration-300"
         >
-        <svg class="absolute left-3 top-2.5 h-5 w-5 text-[#50c878]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="absolute left-3 top-2.5 h-5 w-5 text-[#8E44AD]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
         </svg>
         
         <!-- Search Results Dropdown -->
-        <div id="search-results" class="absolute top-12 left-0 w-full bg-[#1a1a1a] border border-[#50c878]/50 rounded-lg shadow-lg z-50 hidden max-h-96 overflow-y-auto">
+        <div id="search-results" class="absolute top-12 left-0 w-full bg-[#1E1E1E] border border-[#8E44AD]/50 rounded-lg shadow-lg z-50 hidden max-h-96 overflow-y-auto">
           <div id="search-loading" class="hidden p-4 text-center text-gray-400">
-            <svg class="animate-spin h-5 w-5 mx-auto text-[#50c878]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <svg class="animate-spin h-5 w-5 mx-auto text-[#8E44AD]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
@@ -212,125 +215,122 @@
     </div>
     
     <div class="flex items-center gap-4 pointer-events-auto min-w-[250px] justify-end pr-4">
-      <!-- Dark/Light Mode Toggle -->
-      <button id="theme-toggle" class="p-1.5 rounded-full hover:bg-[#1a1a1a] transition duration-200">
-        <svg id="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#d4af37]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-        </svg>
-        <svg id="theme-icon-light" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#d4af37] hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-        </svg>
-      </button>
+    
 
       <!-- Profile Section -->
       <div class="relative group w-10 h-10">
-        <img id="profile-pic" src="Images/default-avatar.png" alt="Profile" class="w-full h-full rounded-full border-2 border-[#50c878] object-cover">
-        <label for="profile-upload" class="absolute bottom-0 right-0 bg-[#50c878] text-white rounded-full text-xs w-4 h-3 flex items-center justify-center cursor-pointer hover:bg-[#3da865] transition">+</label>
+        <img id="profile-pic" src="Images/default-avatar.png" alt="Profile" class="w-full h-full rounded-full border-2 border-[#8E44AD] object-cover">
+        <label for="profile-upload" class="absolute bottom-0 right-0 bg-[#8E44AD] text-white rounded-full text-xs w-4 h-3 flex items-center justify-center cursor-pointer hover:bg-[#7D3C98] transition">+</label>
         <input type="file" id="profile-upload" accept="image/*" class="hidden" />
       </div>
       <a href="profile.html"
-        class="text-white font-semibold text-lg hover:underline hover:underline-offset-4 hover:decoration-[#d4af37] transition duration-200 whitespace-nowrap pl-2">
+        class="text-white font-semibold text-lg hover:underline hover:underline-offset-4 hover:decoration-[#8E44AD] transition duration-200 whitespace-nowrap pl-2">
         Welcome, <span id="user-name">Guest</span>
       </a>
     </div>
   </div>
 
   <!-- Sidebar -->
-  <aside id="sidebar" class="sidebar bg-[#1a1a1a]/95 backdrop-blur-sm w-64 h-full fixed top-0 left-0 z-40 transform -translate-x-full flex flex-col border-r border-[#50c878]/30 shadow-xl">
-    <button id="close-sidebar" class="absolute top-4 right-4 text-[#d4af37] hover:text-white focus:outline-none transition duration-200">
-      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    </button>
-    <div class="px-6 pt-8 pb-6 border-b border-[#50c878]/20">
-      <h1 class="text-5xl font-extrabold text-[#50c878] drop-shadow-md" style="font-family: 'Great Vibes', cursive;">
-        Rejection
-      </h1>
-    </div>
-    
-    <div class="flex-1 overflow-y-auto px-4 py-6">
-      <nav class="flex flex-col gap-1">
-        <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#50c878]/10 text-white hover:text-[#d4af37] transition duration-200 group">
-          <div class="w-8 h-8 flex items-center justify-center bg-[#50c878]/20 rounded-full text-[#50c878] group-hover:bg-[#d4af37]/20 group-hover:text-[#d4af37] transition duration-200">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-            </svg>
-          </div>
-          <span>Home</span>
-        </a>
-        
-        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#50c878]/10 text-white hover:text-[#d4af37] transition duration-200 group">
-          <div class="w-8 h-8 flex items-center justify-center bg-[#3b82f6]/20 rounded-full text-[#3b82f6] group-hover:bg-[#d4af37]/20 group-hover:text-[#d4af37] transition duration-200">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-          <span>Search</span>
-        </a>
-        
-        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#50c878]/10 text-white hover:text-[#d4af37] transition duration-200 group">
-          <div class="w-8 h-8 flex items-center justify-center bg-[#8b5cf6]/20 rounded-full text-[#8b5cf6] group-hover:bg-[#d4af37]/20 group-hover:text-[#d4af37] transition duration-200">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-            </svg>
-          </div>
-          <span>Comments</span>
-        </a>
-        
-        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#50c878]/10 text-white hover:text-[#d4af37] transition duration-200 group">
-          <div class="w-8 h-8 flex items-center justify-center bg-[#ec4899]/20 rounded-full text-[#ec4899] group-hover:bg-[#d4af37]/20 group-hover:text-[#d4af37] transition duration-200">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-          </div>
-          <span>Mails</span>
-        </a>
-      </nav>
-      
-      <div class="mt-6 pt-6 border-t border-[#50c878]/20">
+    <aside id="sidebar" class="sidebar bg-[#1E1E1E]/95 backdrop-blur-sm w-64 h-full fixed top-0 left-0 z-40 transform -translate-x-full flex flex-col border-r border-[#8E44AD]/30 shadow-xl">
+      <button id="close-sidebar" class="absolute top-4 right-4 text-[#8E44AD] hover:text-white focus:outline-none transition duration-200">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+      <div class="px-6 pt-8 pb-6 border-b border-[#8E44AD]/20">
+        <div class="flex items-center gap-4">
+          <h1 class="text-4xl font-extrabold gradient-text drop-shadow-lg tracking-wide" style="font-family: 'Great Vibes', cursive;">
+          Rejection
+        </h1>
+          <img src="Images/reorganization.png" alt="Rejection Icon" class="w-8 h-8">
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto px-4 py-6">
         <nav class="flex flex-col gap-1">
-          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#50c878]/10 text-white hover:text-[#d4af37] transition duration-200 group">
-            <div class="w-8 h-8 flex items-center justify-center bg-[#0ea5e9]/20 rounded-full text-[#0ea5e9] group-hover:bg-[#d4af37]/20 group-hover:text-[#d4af37] transition duration-200">
+          <!-- Home (Primary - Magenta Purple) -->
+          <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#8E44AD]/10 transition duration-200 group">
+            <div class="w-8 h-8 flex items-center justify-center rounded-full bg-[#8E44AD]/20 text-[#8E44AD] group-hover:bg-[#8E44AD]/30 transition duration-200">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+            </div>
+            <span class="text-[#8E44AD]">Home</span>
+          </a>
+          
+          <!-- Search (White) -->
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#8E44AD]/10 transition duration-200 group">
+            <div class="w-8 h-8 flex items-center justify-center rounded-full bg-white/20 text-white group-hover:bg-white/30 transition duration-200">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <span class="text-white group-hover:text-[#8E44AD]">Search</span>
+          </a>
+          
+          <!-- Comments (Blue) -->
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#3b82f6]/10 transition duration-200 group">
+            <div class="w-8 h-8 flex items-center justify-center rounded-full bg-[#3b82f6]/20 text-[#3b82f6] group-hover:bg-[#3b82f6]/30 transition duration-200">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+              </svg>
+            </div>
+            <span class="text-[#3b82f6] group-hover:text-[#60a5fa]">Comments</span>
+          </a>
+          
+          <!-- Mails (Cyan) -->
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#06b6d4]/10 transition duration-200 group">
+            <div class="w-8 h-8 flex items-center justify-center rounded-full bg-[#06b6d4]/20 text-[#06b6d4] group-hover:bg-[#06b6d4]/30 transition duration-200">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <span class="text-[#06b6d4] group-hover:text-[#22d3ee]">Mails</span>
+          </a>
+          
+          <!-- Settings (Sky Blue) -->
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#0ea5e9]/10 transition duration-200 group">
+            <div class="w-8 h-8 flex items-center justify-center rounded-full bg-[#0ea5e9]/20 text-[#0ea5e9] group-hover:bg-[#0ea5e9]/30 transition duration-200">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
-            <span>Settings</span>
+            <span class="text-[#0ea5e9] group-hover:text-[#38bdf8]">Settings</span>
           </a>
-          
-          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#50c878]/10 text-white hover:text-[#d4af37] transition duration-200 group">
-            <div class="w-8 h-8 flex items-center justify-center bg-[#f59e0b]/20 rounded-full text-[#f59e0b] group-hover:bg-[#d4af37]/20 group-hover:text-[#d4af37] transition duration-200">
+
+          <!-- Report Bug (Amber) -->
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#f59e0b]/10 transition duration-200 group">
+            <div class="w-8 h-8 flex items-center justify-center rounded-full bg-[#f59e0b]/20 text-[#f59e0b] group-hover:bg-[#f59e0b]/30 transition duration-200">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
-            <span>Report a Bug</span>
+            <span class="text-[#f59e0b] group-hover:text-[#fbbf24]">Report a Bug</span>
           </a>
         </nav>
       </div>
       
+      <!-- Log Out (Danger - Red) -->
       <div class="mt-auto pt-6">
-          <a href="signin.html" onclick="logout()" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-500/10 text-red-400 hover:text-red-300 transition duration-200 group">
-            <div class="w-8 h-8 flex items-center justify-center bg-red-500/20 rounded-full text-red-500 group-hover:bg-red-500/30 group-hover:text-red-400 transition duration-200">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-            </div>
-            <span class="font-medium">Log Out</span>
-          </a>
-        </div>
+        <a href="signin.html" onclick="logout()" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#ef4444]/10 transition duration-200 group">
+          <div class="w-8 h-8 flex items-center justify-center rounded-full bg-[#ef4444]/20 text-[#ef4444] group-hover:bg-[#ef4444]/30 transition duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+          </div>
+          <span class="text-[#ef4444] group-hover:text-[#f87171] font-medium">Log Out</span>
+        </a>
       </div>
     </aside>
 
-
   <!-- Page Loader -->
-    <div id="page-loader" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-gradient-to-b from-black via-[#0f1f17] to-[#0a0a0a] transition-opacity duration-700">
+    <div id="page-loader" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-gradient-to-b from-[#1E1E1E] via-[#2A0E35] to-[#1E1E1E] transition-opacity duration-700">
       <!-- Spinner Ring -->
       <div class="relative w-32 h-32 mb-6">
-        <!-- Spinning Emerald-Gold-Ivory ring -->
+        <!-- Spinning Magenta Purple ring -->
         <div class="absolute inset-0 border-4 border-dashed rounded-full animate-spin"
-            style="border-color: transparent; border-top-color: #50c878; border-right-color: #d4af37; border-bottom-color: #fffff0;">
+            style="border-color: transparent; border-top-color: #8E44AD; border-right-color: #8E44AD; border-bottom-color: #8E44AD;">
         </div>
 
         <!-- Center Icon -->
@@ -339,14 +339,11 @@
         </div>
      </div>
 
-
     <!-- "Rejection" Text -->
-    <div class="text-5xl font-extrabold text-[#d4af37] drop-shadow-md pointer-events-auto" style="font-family: 'Great Vibes', cursive;">
+    <div class="text-5xl font-extrabold text-[#8E44AD] drop-shadow-md pointer-events-auto" style="font-family: 'Great Vibes', cursive;">
       Rejection
     </div>
   </div>
-
-
 
   <script>
     document.addEventListener("DOMContentLoaded", async () => {

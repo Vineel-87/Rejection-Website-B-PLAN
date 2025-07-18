@@ -67,7 +67,7 @@ async function verifyOTP() {
 
     const result = await response.json();
     resultText.textContent = "Account verified successfully!";
-    resultText.className = "text-green-400 text-center";
+    resultText.className = "text-[#50c878] text-center";
     
     // Enable sign in button
     document.getElementById("signin-button").disabled = false;
@@ -76,7 +76,7 @@ async function verifyOTP() {
     };
   } catch (err) {
     resultText.textContent = err.message;
-    resultText.className = "text-red-400 text-center";
+    resultText.className = "text-[#FF073A] text-center";
   } finally {
     verifyBtn.disabled = false;
     verifyBtn.innerHTML = originalBtnText;
@@ -86,9 +86,9 @@ async function verifyOTP() {
 function showAlert(message, type = "info") {
   const alertDiv = document.createElement("div");
   alertDiv.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg z-50 ${
-    type === "error" ? "bg-red-600" : 
-    type === "success" ? "bg-green-600" : "bg-blue-600"
-  } text-white`;
+    type === "error" ? "bg-[#FF073A]" : 
+    type === "success" ? "bg-[#50c878]" : "bg-[#0a0a0a]"
+  } text-white border border-[#FF073A]/50`;
   alertDiv.textContent = message;
   
   document.body.appendChild(alertDiv);

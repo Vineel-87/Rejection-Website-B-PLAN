@@ -1,9 +1,14 @@
-// birthday-reminders.js - Database Integrated Version
+// birthday-reminders.js - Vanta Black + Infra Red Theme
 const API_BASE_URL = 'http://localhost:5000';
 
-// Confetti functions (unchanged)
+let allBirthdays = []; // Add this at the top
+
+const BIRTHDAYS_PER_PAGE = 30;
+const BIRTHDAYS_PER_ROW = 5;
+
+// Confetti functions (updated colors)
 function createConfetti() {
-  const colors = ['#d4af37', '#50c878', '#ff6b6b', '#48dbfb', '#f368e0'];
+  const colors = ['#FF073A', '#ff3860', '#ff073a', '#ff6b6b', '#ff073a'];
   const container = document.querySelector('.birthday-card');
   
   for (let i = 0; i < 50; i++) {
@@ -46,7 +51,6 @@ function addConfettiStyle() {
   document.head.appendChild(style);
 }
 
-// Update marquee with today's birthdays
 function updateBirthdayMarquee(todayBirthdays) {
   const marqueeContent = document.getElementById('marquee-content');
   const marqueeContainer = document.getElementById('birthday-marquee');
@@ -57,22 +61,22 @@ function updateBirthdayMarquee(todayBirthdays) {
     
     let content = '';
     if (todayBirthdays.length === 1) {
-      content = `🎉 Wishing ${todayBirthdays[0].username} a very Happy Birthday! May your day be filled with joy! 🎉`;
+      content = `🎉 Wishing ${todayBirthdays[0].username} a very Happy Birthday! 🎉`;
     } else {
       const names = todayBirthdays.map(bday => bday.username);
       const last = names.pop();
       content = `🎉 Wishing ${names.join(', ')} and ${last} a very Happy Birthday! 🎉`;
     }
     
-    // Repeat the message 3 times for smooth marquee
-    marqueeContent.innerHTML = `${content} • ${content} • ${content}`;
-    createConfetti();
+    // Only set the content once (no duplicates)
+    marqueeContent.textContent = content;
   } else {
     marqueeContainer.style.display = 'none';
   }
 }
 
-// Birthday Notes functionality with database
+
+// Birthday Notes functionality
 async function setupBirthdayNotes() {
   const token = localStorage.getItem("token");
   if (!token) return;
@@ -81,7 +85,6 @@ async function setupBirthdayNotes() {
   const saveButton = document.getElementById('save-notes');
   
   try {
-    // Load saved notes from database
     const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
       headers: {
         "Authorization": `Bearer ${token}`
@@ -98,7 +101,6 @@ async function setupBirthdayNotes() {
     console.error("Error loading birthday notes:", error);
   }
   
-  // Save notes to database
   saveButton.addEventListener('click', async () => {
     const notes = notesTextarea.value;
     
@@ -113,13 +115,12 @@ async function setupBirthdayNotes() {
       });
 
       if (response.ok) {
-        // Show confirmation
         const originalText = saveButton.textContent;
         saveButton.textContent = 'Saved!';
-        saveButton.classList.add('bg-[#3da865]');
+        saveButton.classList.add('bg-[#cc0029]');
         setTimeout(() => {
           saveButton.textContent = originalText;
-          saveButton.classList.remove('bg-[#3da865]');
+          saveButton.classList.remove('bg-[#cc0029]');
         }, 2000);
       }
     } catch (error) {
@@ -136,11 +137,11 @@ function updateSidebarUpcoming(upcomingBirthdays) {
     let html = '';
     upcomingBirthdays.slice(0, 3).forEach(bday => {
       html += `
-        <div class="flex items-center gap-3 p-2 bg-[#1a1a1a]/50 rounded-lg border border-[#50c878]/20">
-          <img src="${bday.profilePic}" class="w-8 h-8 rounded-full border border-[#50c878]">
+        <div class="flex items-center gap-3 p-2 bg-[#0a0a0a]/50 rounded-lg border border-[#FF073A]/20">
+          <img src="${bday.profilePic}" class="w-8 h-8 rounded-full border border-[#FF073A]">
           <div>
             <div class="text-sm font-medium">${bday.username}</div>
-            <div class="text-xs text-[#d4af37]">${bday.daysUntil === 1 ? 'Tomorrow' : `${bday.daysUntil} days`}</div>
+            <div class="text-xs text-[#FF073A]">${bday.daysUntil === 1 ? 'Tomorrow' : `${bday.daysUntil} days`}</div>
           </div>
         </div>
       `;
@@ -156,7 +157,7 @@ function updateSidebarUpcoming(upcomingBirthdays) {
   }
 }
 
-// Load profile data for vertical container from database
+// Load profile data
 async function loadVerticalProfile() {
   const token = localStorage.getItem("token");
   if (!token) return;
@@ -165,7 +166,7 @@ async function loadVerticalProfile() {
   const verticalUsername = document.getElementById("vertical-username");
   
   try {
-    const response = await fetch(`${API_BASE_URL}/api/user`, {
+    const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
       headers: {
         "Authorization": `Bearer ${token}`
       }
@@ -173,12 +174,11 @@ async function loadVerticalProfile() {
     
     if (response.ok) {
       const user = await response.json();
-      // Handle avatar URL properly
       const avatarUrl = user.avatar 
         ? user.avatar.startsWith('http') 
           ? user.avatar 
           : `${API_BASE_URL}${user.avatar}`
-        : `https://www.gravatar.com/avatar/${CryptoJS.MD5(user.email.trim().toLowerCase())}?d=identicon&s=200`;
+        : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || user.email.split('@')[0])}&background=random`;
       
       verticalProfilePic.src = avatarUrl;
       verticalUsername.textContent = user.name || user.email.split('@')[0];
@@ -195,15 +195,12 @@ function getDaysUntilBirthday(birthday) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
-  // Create this year's birthday date
   const thisYearBirthday = new Date(today.getFullYear(), birthday.getMonth(), birthday.getDate());
   thisYearBirthday.setHours(0, 0, 0, 0);
   
-  // Calculate difference in days
   const diffTime = thisYearBirthday - today;
   let daysUntil = Math.floor(diffTime / (1000 * 60 * 60 * 24));
   
-  // If birthday already passed this year, calculate for next year
   if (daysUntil < 0) {
     const nextYearBirthday = new Date(today.getFullYear() + 1, birthday.getMonth(), birthday.getDate());
     nextYearBirthday.setHours(0, 0, 0, 0);
@@ -213,6 +210,108 @@ function getDaysUntilBirthday(birthday) {
   
   return daysUntil;
 }
+
+// Display birthdays in the specified container
+function displayBirthdays(birthdays, containerId, isGrid = true) {
+  const container = document.getElementById(containerId);
+  
+  if (!birthdays || birthdays.length === 0) {
+    container.innerHTML = `<p class="text-gray-400 text-center py-8">No birthdays found</p>`;
+    return;
+  }
+
+  if (isGrid) {
+    // Display as grid using createBirthdayAvatar
+    container.innerHTML = birthdays.map(bday => createBirthdayAvatar(bday)).join('');
+  } else {
+    // Display as list items
+    container.innerHTML = birthdays.map(bday => createBirthdayListItem(bday)).join('');
+  }
+}
+
+// Add this new function for list items
+function createBirthdayListItem(bday) {
+  if (!bday.dob) return '';
+  
+  const dob = new Date(bday.dob);
+  if (isNaN(dob.getTime())) return '';
+  
+  const avatarUrl = bday.avatar || 
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(bday.name || bday.email.split('@')[0])}&background=random`;
+  
+  return `
+    <div class="flex items-center gap-4 p-3 hover:bg-[#1E1E1E]/50 rounded-lg cursor-pointer transition"
+         onclick="window.location.href='profile.html?email=${encodeURIComponent(bday.email)}'">
+      <div class="relative w-12 h-12">
+        <img src="${avatarUrl}" alt="${bday.name || bday.email.split('@')[0]}" 
+             class="w-full h-full rounded-full object-cover border-2 ${bday.isToday ? 'border-[#FF073A] animate-pulse' : 'border-[#8E44AD]'}">
+        ${bday.isToday ? `
+          <div class="absolute -top-1 -right-1 w-4 h-4 bg-[#FF073A] rounded-full flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-2 w-2 text-black" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        ` : ''}
+      </div>
+      <div class="flex-1 min-w-0">
+        <h3 class="text-sm font-medium text-white truncate">${bday.name || bday.email.split('@')[0]}</h3>
+        <p class="text-xs text-[#8E44AD]">${dob.getDate()} ${dob.toLocaleString('default', { month: 'short' })}</p>
+      </div>
+      ${bday.isToday ? `
+        <span class="bg-[#FF073A] text-white text-xs px-2 py-1 rounded-full">Today</span>
+      ` : ''}
+    </div>
+  `;
+}
+
+// Create birthday avatar element
+function createBirthdayAvatar(bday) {
+  if (!bday.dob) return '';
+  
+  const dob = new Date(bday.dob);
+  if (isNaN(dob.getTime())) return '';
+  
+  const avatarUrl = bday.profilePic || 
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(bday.name || bday.email.split('@')[0])}&background=random`;
+  
+  return `
+    <div class="flex flex-col items-center" onclick="window.location.href='profile.html?email=${encodeURIComponent(bday.email)}'">
+      <div class="relative w-16 h-16 mb-2">
+        <img src="${avatarUrl}" alt="${bday.name || bday.email.split('@')[0]}" 
+             class="w-full h-full rounded-full object-cover border-2 ${bday.isToday ? 'border-[#FF073A] animate-pulse' : 'border-[#FF073A]'}">
+        ${bday.isToday ? `
+          <div class="absolute -top-1 -right-1 w-4 h-4 bg-[#FF073A] rounded-full flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-2 w-2 text-black" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        ` : ''}
+      </div>
+      <span class="text-xs text-center text-white truncate w-full">${bday.name || bday.email.split('@')[0]}</span>
+      <span class="text-xs text-[#FF073A]">${dob.getDate()} ${dob.toLocaleString('default', { month: 'short' })}</span>
+    </div>
+  `;
+}
+
+// Month filter functionality
+document.getElementById('month-filter').addEventListener('change', function() {
+  const selectedMonth = parseInt(this.value);
+  const allBirthdaysContainer = document.getElementById('all-birthdays');
+  
+  if (this.value === 'all') {
+    // Show all birthdays
+    displayBirthdays(allBirthdays, 'all-birthdays', true);
+    return;
+  }
+  
+  // Filter birthdays by selected month
+  const filteredBirthdays = allBirthdays.filter(bday => {
+    const dob = new Date(bday.dob);
+    return dob.getMonth() === selectedMonth;
+  });
+  
+  displayBirthdays(filteredBirthdays, 'all-birthdays', true);
+});
 
 // Main initialization
 document.addEventListener("DOMContentLoaded", async () => {
@@ -225,69 +324,101 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("today-birthdays").innerHTML = `
       <div class="text-center py-8">
         <p class="text-gray-400 mb-4">Please sign in to view birthday reminders</p>
-        <a href="signin.html" class="bg-[#50c878] hover:bg-[#3da865] text-white px-4 py-2 rounded-lg transition">Sign In</a>
+        <a href="signin.html" class="bg-[#FF073A] hover:bg-[#cc0029] text-white px-4 py-2 rounded-lg transition">Sign In</a>
       </div>
     `;
     return;
   }
 
   try {
-    // Get friends list from database
-    const friendsResponse = await fetch(`${API_BASE_URL}/api/user/friends`, {
+    // First fetch the current user's profile to get their ID
+    const userResponse = await fetch(`${API_BASE_URL}/api/user/profile`, {
       headers: {
         "Authorization": `Bearer ${token}`
       }
     });
     
-    if (!friendsResponse.ok) {
+    if (!userResponse.ok) {
+      throw new Error("Failed to fetch user profile");
+    }
+    
+    const currentUser = await userResponse.json();
+    
+    // Then fetch friends with profile data
+    const response = await fetch(`${API_BASE_URL}/api/user/friends`, {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+    
+    if (!response.ok) {
       throw new Error("Failed to fetch friends list");
     }
     
-    const friends = await friendsResponse.json();
+    const friends = await response.json();
+    
+    // Initialize arrays (using the global allBirthdays)
     const todayBirthdays = [];
     const upcomingBirthdays = [];
-    const allBirthdays = [];
+    allBirthdays.length = 0; // Clear existing birthdays
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Process each friend's birthday
+    // Fetch profile data for each friend to get their DOB
     for (const friend of friends) {
-      if (!friend.dob) continue;
+      try {
+        const profileResponse = await fetch(`${API_BASE_URL}/api/user/by-email/${encodeURIComponent(friend.email)}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+        
+        if (!profileResponse.ok) continue;
+        
+        const profile = await profileResponse.json();
+        
+        if (!profile.dob) continue;
 
-      const dob = new Date(friend.dob);
-      if (isNaN(dob.getTime())) continue;
+        const dob = new Date(profile.dob);
+        if (isNaN(dob.getTime())) continue;
 
-      const daysUntil = getDaysUntilBirthday(dob);
+        const daysUntil = getDaysUntilBirthday(dob);
 
-      // Generate proper avatar URL
-      const avatarUrl = friend.avatar 
-        ? friend.avatar.startsWith('http') 
-          ? friend.avatar 
-          : `${API_BASE_URL}${friend.avatar}`
-        : `https://www.gravatar.com/avatar/${CryptoJS.MD5(friend.email.trim().toLowerCase())}?d=identicon&s=200`;
+        // Construct proper avatar URL
+        const avatarUrl = profile.avatar 
+          ? profile.avatar.startsWith('http') 
+            ? profile.avatar 
+            : `${API_BASE_URL}${profile.avatar}`
+          : `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name || profile.email.split('@')[0])}&background=random`;
 
-      const birthdayItem = {
-        id: friend.id,
-        email: friend.email,
-        username: friend.name || friend.email.split('@')[0],
-        profilePic: avatarUrl,
-        date: dob,
-        formattedDate: formatDate(dob),
-        daysUntil,
-        isToday: daysUntil === 0
-      };
+        const birthdayItem = {
+          id: profile.id,
+          email: profile.email,
+          name: profile.name,
+          username: profile.name || profile.email.split('@')[0],
+          profilePic: avatarUrl,
+          avatar: avatarUrl,
+          dob: profile.dob,
+          date: dob,
+          formattedDate: formatDate(dob),
+          daysUntil,
+          isToday: daysUntil === 0
+        };
 
-      allBirthdays.push(birthdayItem);
+        // Add to the global allBirthdays array
+        allBirthdays.push(birthdayItem);
 
-      if (daysUntil === 0) {
-        todayBirthdays.push(birthdayItem);
-      } else if (daysUntil > 0 && daysUntil <= 30) {
-        upcomingBirthdays.push(birthdayItem);
+        if (daysUntil === 0) {
+          todayBirthdays.push(birthdayItem);
+        } else if (daysUntil > 0 && daysUntil <= 30) {
+          upcomingBirthdays.push(birthdayItem);
+        }
+      } catch (error) {
+        console.error("Error processing friend:", friend, error);
       }
     }
 
-    // Rest of the code remains the same...
     upcomingBirthdays.sort((a, b) => a.daysUntil - b.daysUntil);
     
     allBirthdays.sort((a, b) => {
@@ -298,9 +429,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       return aMonth === bMonth ? aDay - bDay : aMonth - bMonth;
     });
 
-    displayBirthdays(todayBirthdays, 'today-birthdays', true);
-    displayBirthdays(upcomingBirthdays, 'upcoming-birthdays', true);
-    displayBirthdays(allBirthdays, 'all-birthdays', false);
+    displayBirthdays(todayBirthdays, 'today-birthdays', false);
+    displayBirthdays(upcomingBirthdays, 'upcoming-birthdays', false);
+    displayBirthdays(allBirthdays, 'all-birthdays', true);
 
     updateBirthdayMarquee(todayBirthdays);
     updateSidebarUpcoming(upcomingBirthdays);
@@ -309,84 +440,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Initialization error:", error);
     document.getElementById("today-birthdays").innerHTML = `
       <div class="text-center py-8">
-        <p class="text-gray-400">Failed to load birthday data</p>
+        <p class="text-gray-400">Failed to load birthday data: ${error.message}</p>
       </div>
     `;
   }
 });
 
-// Helper functions
-function displayBirthdays(birthdays, containerId, showDaysUntil) {
-  const container = document.getElementById(containerId);
-  if (!birthdays || birthdays.length === 0) {
-    if (containerId === 'today-birthdays') {
-      container.innerHTML = '<p class="text-gray-400 text-center py-8">No birthdays today</p>';
-    } else if (containerId === 'upcoming-birthdays') {
-      container.innerHTML = '<p class="text-gray-400 text-center py-8">No upcoming birthdays in the next 30 days</p>';
-    } else {
-      container.innerHTML = '<p class="text-gray-400 text-center py-8 col-span-2">No birthdays found</p>';
-    }
-    return;
-  }
-
-  if (containerId === 'all-birthdays') {
-    const grouped = groupByMonth(birthdays);
-    container.innerHTML = Object.entries(grouped).map(([month, bdays]) => `
-      <div class="col-span-2">
-        <h3 class="text-lg font-semibold text-[#d4af37] mb-2">${month}</h3>
-        <div class="space-y-3">
-          ${bdays.map(bday => createBirthdayCard(bday, showDaysUntil)).join('')}
-        </div>
-      </div>
-    `).join('');
-  } else {
-    container.innerHTML = birthdays.map(bday => createBirthdayCard(bday, showDaysUntil)).join('');
-  }
-}
-
-function createBirthdayCard(bday, showDaysUntil) {
-  // Generate fallback avatar URL if no avatar is provided
-  const avatarUrl = bday.profilePic || 
-    `https://www.gravatar.com/avatar/${CryptoJS.MD5(bday.email.trim().toLowerCase())}?d=identicon&s=200`;
-  
-  return `
-    <div class="flex items-center gap-4 p-3 hover:bg-[#252525] rounded-lg transition group cursor-pointer" onclick="window.location.href='profile.html?email=${encodeURIComponent(bday.email)}'">
-      <div class="relative">
-        <img src="${avatarUrl}" alt="${bday.username}" 
-             class="w-12 h-12 rounded-full object-cover border-2 ${bday.isToday ? 'border-[#d4af37] animate-pulse' : 'border-[#50c878]'}">
-        ${bday.isToday ? `
-          <div class="absolute -top-1 -right-1 w-5 h-5 bg-[#d4af37] rounded-full flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-black" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-            </svg>
-          </div>
-        ` : ''}
-      </div>
-      <div class="flex-1">
-        <h3 class="font-semibold group-hover:text-[#d4af37] transition">${bday.username}</h3>
-        <p class="text-sm text-gray-400">${bday.formattedDate}</p>
-      </div>
-      ${showDaysUntil ? `
-        <span class="bg-[#d4af37]/20 text-[#d4af37] px-3 py-1 rounded-full text-sm font-medium">
-          ${bday.isToday ? 'Today!' : bday.daysUntil === 1 ? 'Tomorrow' : `${bday.daysUntil} days`}
-        </span>
-      ` : ''}
-    </div>
-  `;
-}
-
-function groupByMonth(birthdays) {
-  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  return birthdays.reduce((acc, bday) => {
-    const month = months[bday.date.getMonth()];
-    if (!acc[month]) acc[month] = [];
-    acc[month].push(bday);
-    return acc;
-  }, {});
-}
-
 function formatDate(date) {
-  return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  if (!(date instanceof Date)) {
+    date = new Date(date);
+  }
+
+  return date.toLocaleDateString('en-US', { 
+    month: 'long', 
+    day: 'numeric', 
+    year: 'numeric' 
+  });
 }
 
 // Make functions available globally

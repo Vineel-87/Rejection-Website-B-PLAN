@@ -10,12 +10,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 
-<body class="bg-[#0f0f0f] text-white min-h-screen flex flex-col font-[Poppins]">
+<body class="bg-slate-900 text-white min-h-screen flex flex-col font-[Poppins]">
 
   <!-- 💬 Rules Modal -->
   <div id="rules-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
-    <div class="bg-[#1a1a1a] text-white rounded-2xl p-10 w-[95%] max-w-3xl shadow-2xl border-2 border-[#50c878]">
-      <h2 class="text-3xl font-bold text-[#d4af37] mb-6 text-center">🚨 Community Guidelines</h2>
+    <div class="bg-slate-800 text-white rounded-2xl p-10 w-[95%] max-w-3xl shadow-2xl border-2 border-purple-600">
+      <h2 class="text-3xl font-bold text-purple-500 mb-6 text-center">🚨 Community Guidelines</h2>
       <ul class="text-lg text-gray-300 space-y-3 list-none pl-2">
         <li>🔴 No offensive or abusive language.</li>
         <li>🔞 No adult images, videos, or inappropriate usernames.</li>
@@ -28,7 +28,7 @@
         <li>✅ Be kind, be real, and build a safe space for all.</li>
       </ul>
       <div class="flex justify-center mt-8">
-        <button id="agree-button" class="px-8 py-3 bg-[#50c878] hover:bg-[#3da865] hover:shadow-lg hover:scale-105 rounded-full text-white text-lg font-semibold transition-all duration-300">
+        <button id="agree-button" class="px-8 py-3 bg-purple-600 hover:bg-purple-700 hover:shadow-lg hover:scale-105 rounded-full text-white text-lg font-semibold transition-all duration-300">
           ✅ I Agree, Enter
         </button>
       </div>
@@ -37,37 +37,37 @@
 
   <!-- 🌐 Language Modal -->
   <div id="language-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden z-40 flex items-center justify-center">
-    <div class="bg-[#1a1a1a] rounded-2xl p-10 w-[95%] max-w-6xl text-white">
-      <h2 class="text-3xl font-bold text-[#d4af37] text-center mb-6">🌐 Select Your Preferred Language</h2>
+    <div class="bg-slate-800 rounded-2xl p-10 w-[95%] max-w-6xl text-white">
+      <h2 class="text-3xl font-bold text-purple-500 text-center mb-6">🌐 Select Your Preferred Language</h2>
       <div class="grid grid-cols-3 gap-4 text-center text-lg mb-6">
         <!-- All 24 language buttons -->
-        <button class="language-btn bg-[#252525] hover:bg-[#50c878] hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="en">English</button>
-        <button class="language-btn bg-[#252525] hover:bg-[#50c878] hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="hi">हिन्दी</button>
-        <button class="language-btn bg-[#252525] hover:bg-[#50c878] hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="kn">ಕನ್ನಡ</button>
-        <button class="language-btn bg-[#252525] hover:bg-[#50c878] hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="ta">தமிழ்</button>
-        <button class="language-btn bg-[#252525] hover:bg-[#50c878] hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="te">తెలుగు</button>
-        <button class="language-btn bg-[#252525] hover:bg-[#50c878] hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="ml">മലയാളം</button>
-        <button class="language-btn bg-[#252525] hover:bg-[#50c878] hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="bn">বাংলা</button>
-        <button class="language-btn bg-[#252525] hover:bg-[#50c878] hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="ur">اردو</button>
-        <button class="language-btn bg-[#252525] hover:bg-[#50c878] hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="fr">Français</button>
-        <button class="language-btn bg-[#252525] hover:bg-[#50c878] hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="de">Deutsch</button>
-        <button class="language-btn bg-[#252525] hover:bg-[#50c878] hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="ru">Русский</button>
-        <button class="language-btn bg-[#252525] hover:bg-[#50c878] hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="es">Español</button>
-        <button class="language-btn bg-[#252525] hover:bg-[#50c878] hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="it">Italiano</button>
-        <button class="language-btn bg-[#252525] hover:bg-[#50c878] hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="zh">中文</button>
-        <button class="language-btn bg-[#252525] hover:bg-[#50c878] hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="ja">日本語</button>
-        <button class="language-btn bg-[#252525] hover:bg-[#50c878] hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="ko">한국어</button>
-        <button class="language-btn bg-[#252525] hover:bg-[#50c878] hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="vi">Tiếng Việt</button>
-        <button class="language-btn bg-[#252525] hover:bg-[#50c878] hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="tr">Türkçe</button>
-        <button class="language-btn bg-[#252525] hover:bg-[#50c878] hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="fa">فارسی</button>
-        <button class="language-btn bg-[#252525] hover:bg-[#50c878] hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="pt">Português</button>
-        <button class="language-btn bg-[#252525] hover:bg-[#50c878] hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="pl">Polski</button>
-        <button class="language-btn bg-[#252525] hover:bg-[#50c878] hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="nl">Nederlands</button>
-        <button class="language-btn bg-[#252525] hover:bg-[#50c878] hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="th">ไทย</button>
-        <button class="language-btn bg-[#252525] hover:bg-[#50c878] hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="ar">العربية</button>
+        <button class="language-btn bg-slate-700 hover:bg-purple-600 hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="en">English</button>
+        <button class="language-btn bg-slate-700 hover:bg-purple-600 hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="hi">हिन्दी</button>
+        <button class="language-btn bg-slate-700 hover:bg-purple-600 hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="kn">ಕನ್ನಡ</button>
+        <button class="language-btn bg-slate-700 hover:bg-purple-600 hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="ta">தமிழ்</button>
+        <button class="language-btn bg-slate-700 hover:bg-purple-600 hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="te">తెలుగు</button>
+        <button class="language-btn bg-slate-700 hover:bg-purple-600 hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="ml">മലയാളം</button>
+        <button class="language-btn bg-slate-700 hover:bg-purple-600 hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="bn">বাংলা</button>
+        <button class="language-btn bg-slate-700 hover:bg-purple-600 hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="ur">اردو</button>
+        <button class="language-btn bg-slate-700 hover:bg-purple-600 hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="fr">Français</button>
+        <button class="language-btn bg-slate-700 hover:bg-purple-600 hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="de">Deutsch</button>
+        <button class="language-btn bg-slate-700 hover:bg-purple-600 hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="ru">Русский</button>
+        <button class="language-btn bg-slate-700 hover:bg-purple-600 hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="es">Español</button>
+        <button class="language-btn bg-slate-700 hover:bg-purple-600 hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="it">Italiano</button>
+        <button class="language-btn bg-slate-700 hover:bg-purple-600 hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="zh">中文</button>
+        <button class="language-btn bg-slate-700 hover:bg-purple-600 hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="ja">日本語</button>
+        <button class="language-btn bg-slate-700 hover:bg-purple-600 hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="ko">한국어</button>
+        <button class="language-btn bg-slate-700 hover:bg-purple-600 hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="vi">Tiếng Việt</button>
+        <button class="language-btn bg-slate-700 hover:bg-purple-600 hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="tr">Türkçe</button>
+        <button class="language-btn bg-slate-700 hover:bg-purple-600 hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="fa">فارسی</button>
+        <button class="language-btn bg-slate-700 hover:bg-purple-600 hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="pt">Português</button>
+        <button class="language-btn bg-slate-700 hover:bg-purple-600 hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="pl">Polski</button>
+        <button class="language-btn bg-slate-700 hover:bg-purple-600 hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="nl">Nederlands</button>
+        <button class="language-btn bg-slate-700 hover:bg-purple-600 hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="th">ไทย</button>
+        <button class="language-btn bg-slate-700 hover:bg-purple-600 hover:scale-105 transform transition-all duration-300 py-2 px-3 rounded text-white shadow-sm" data-lang="ar">العربية</button>
       </div>
       <div class="text-center">
-        <button id="lang-agree-btn" disabled class="px-8 py-3 bg-[#50c878] hover:bg-[#3da865] hover:shadow-lg rounded-full text-white text-lg font-semibold transition-all duration-300 disabled:opacity-50">
+        <button id="lang-agree-btn" disabled class="px-8 py-3 bg-purple-600 hover:bg-purple-700 hover:shadow-lg rounded-full text-white text-lg font-semibold transition-all duration-300 disabled:opacity-50">
           ✅ Confirm Language
         </button>
       </div>
@@ -75,10 +75,10 @@
   </div>
 
    <!-- 🧭 Navbar -->
-    <nav class="flex justify-between items-center px-6 py-4 bg-[#1a1a1a] shadow-md border-b border-[#50c878]/30">
-      <h1 class="text-4xl font-bold text-[#d4af37]" style="font-family: 'Great Vibes', cursive;">Rejection</h1>
+    <nav class="flex justify-between items-center px-6 py-4 bg-slate-800 shadow-md border-b border-purple-600/30">
+      <h1 class="text-4xl font-bold text-purple-500" style="font-family: 'Great Vibes', cursive;">Rejection</h1>
       <div>
-        <button onclick="openLanguageModal()" class="mx-2 text-gray-300 hover:text-[#d4af37] font-semibold transition duration-200">🌐 Language</button>
+        <button onclick="openLanguageModal()" class="mx-2 text-gray-300 hover:text-purple-400 font-semibold transition duration-200">🌐 Language</button>
       </div>
     </nav>
 
@@ -95,33 +95,33 @@
   <!-- 🎯 Main Page Content -->
   <div id="page-content" class="hidden">
     <main class="flex-grow flex flex-col justify-center items-center text-center px-6 py-12 space-y-6">
-      <h2 class="text-5xl font-extrabold text-[#d4af37] mb-4">Welcome to Rejection</h2>
+      <h2 class="text-5xl font-extrabold text-purple-500 mb-4">Welcome to Rejection</h2>
       <p class="text-lg text-gray-400 max-w-2xl mb-6">
         A place where students, friends, or anonymous users join rooms to talk freely about exams, jobs, struggles & life.
       </p>
       <div class="flex flex-col md:flex-row items-center justify-center gap-4">
-        <a href="signup.html" class="px-6 py-3 bg-[#50c878] hover:bg-[#3da865] hover:shadow-lg hover:scale-105 rounded-full text-white font-semibold transition-all duration-300">Create New Account</a>
-        <a href="SignIn.html" class="px-6 py-3 bg-[#252525] hover:bg-[#1a1a1a] hover:scale-105 hover:shadow-md rounded-full text-white font-semibold transition-all duration-300">Already Created</a>
+        <a href="signup.html" class="px-6 py-3 bg-purple-600 hover:bg-purple-700 hover:shadow-lg hover:scale-105 rounded-full text-white font-semibold transition-all duration-300">Create New Account</a>
+        <a href="SignIn.html" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 hover:scale-105 hover:shadow-md rounded-full text-white font-semibold transition-all duration-300">Already Created</a>
       </div>
       <div class="mt-6">
-        <a href="#" class="inline-block text-[#d4af37] font-bold hover:text-[#50c878] hover:underline transition duration-300">Forgot Password?</a>
+        <a href="#" class="inline-block text-purple-400 font-bold hover:text-purple-300 hover:underline transition duration-300">Forgot Password?</a>
       </div>
     </main>
 
     <div class="h-96"></div>
 
-    <footer class="bg-[#1a1a1a] text-white text-center py-4 border-t border-[#50c878]/30">
+    <footer class="bg-slate-800 text-white text-center py-4 border-t border-purple-600/30">
       © 2025 Rejection. All rights reserved.
     </footer>
 
-    <div class="bg-[#1a1a1a] text-white w-full px-6 py-4 shadow-inner border-t border-[#50c878]/30">
+    <div class="bg-slate-800 text-white w-full px-6 py-4 shadow-inner border-t border-purple-600/30">
       <div class="max-w-screen-xl mx-auto flex justify-end">
         <div class="flex flex-wrap gap-6 font-semibold text-sm">
-          <a href="privacy.html" class="hover:text-[#d4af37] hover:underline transition duration-300">Privacy</a>
-          <a href="Help.html" class="hover:text-[#d4af37] hover:underline transition duration-300">Help</a>
-          <a href="FAQ.html" class="hover:text-[#d4af37] hover:underline transition duration-300">FAQ</a>
-          <a href="Support.html" class="hover:text-[#d4af37] hover:underline transition duration-300">Support</a>
-          <a href="About.html" class="hover:text-[#d4af37] hover:underline transition duration-300">About Us</a>
+          <a href="privacy.html" class="hover:text-purple-400 hover:underline transition duration-300">Privacy</a>
+          <a href="Help.html" class="hover:text-purple-400 hover:underline transition duration-300">Help</a>
+          <a href="FAQ.html" class="hover:text-purple-400 hover:underline transition duration-300">FAQ</a>
+          <a href="Support.html" class="hover:text-purple-400 hover:underline transition duration-300">Support</a>
+          <a href="About.html" class="hover:text-purple-400 hover:underline transition duration-300">About Us</a>
         </div>
       </div>
     </div>

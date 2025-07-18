@@ -1,27 +1,34 @@
+/* Magenta Purple + Slate Black + Moon Silver Theme */
 .gradient-header {
-  background: linear-gradient(135deg, #50c878 0%, #3da865 50%, #d4af37 100%);
+  background: linear-gradient(135deg, #1E1E1E 0%, #2A0E35 50%, #8E44AD 100%);
 }
+
 .gradient-text {
-  background: linear-gradient(90deg, #50c878, #d4af37);
+  background: linear-gradient(90deg, #1E1E1E, #8E44AD);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
+
 .input-focus {
   transition: all 0.3s ease;
 }
+
 .input-focus:focus {
-  box-shadow: 0 0 0 3px rgba(80, 200, 120, 0.3);
-  border-color: #d4af37;
+  box-shadow: 0 0 0 3px rgba(142, 68, 173, 0.3);
+  border-color: #8E44AD;
 }
+
 .scroll-container::-webkit-scrollbar {
   width: 6px;
 }
+
 .scroll-container::-webkit-scrollbar-track {
-  background: #1a1a1a;
+  background: #1E1E1E;
 }
+
 .scroll-container::-webkit-scrollbar-thumb {
-  background: linear-gradient(#50c878, #d4af37);
+  background: linear-gradient(#1E1E1E, #8E44AD);
   border-radius: 3px;
 }
 
@@ -42,69 +49,175 @@
   }
 }
   
-  /* Add these styles to profile.css */
-  #profile-username {
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    display: inline-block;
-    vertical-align: middle;
-  }
+/* Profile text elements */
+#profile-username {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  vertical-align: middle;
+}
 
-  #profile-bio {
-    max-width: 100%;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    white-space: normal;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
+#profile-bio {
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
-  /* For the action buttons container */
-  .bg-\[\#1a1a1a\] {
-    min-height: 100px; /* Ensure minimum height */
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
+/* Action buttons container */
+.bg-\[\#000000\] {
+  background-color: #1E1E1E;
+  min-height: 100px;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  border-color: #8E44AD/30;
+}
 
-  /* For the buttons themselves */
-  #add-friend-btn, 
-  #request-sent-btn, 
-  #accept-request-btn, 
-  #decline-request-btn, 
-  #connected-btn, 
-  #remove-connection-btn,
-  #block-btn,
-  #message-btn {
-    white-space: nowrap;
-    min-width: fit-content;
-  }
+/* Buttons */
+#add-friend-btn, 
+#request-sent-btn, 
+#accept-request-btn, 
+#decline-request-btn, 
+#connected-btn, 
+#remove-connection-btn,
+#block-btn,
+#message-btn {
+  white-space: nowrap;
+  min-width: fit-content;
+}
 
-  /* Responsive adjustments for buttons */
-  @media (max-width: 640px) {
-    .flex-wrap {
-      justify-content: center;
-    }
-    
-    .bg-\[\#1a1a1a\] {
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-    }
-    
-    #profile-username, #profile-bio {
-      text-align: center;
-    }
-  }
+/* Button states */
+#add-friend-btn {
+  background: linear-gradient(to right, #1E1E1E, #8E44AD);
+}
+#request-sent-btn {
+  background: linear-gradient(to right, #1E1E1E, #7D3C98);
+}
+#accept-request-btn {
+  background: linear-gradient(to right, #1E1E1E, #8E44AD);
+}
+#decline-request-btn {
+  background: linear-gradient(to right, #1E1E1E, #7D3C98);
+}
+#connected-btn {
+  background: #1E1E1E;
+  border-color: #8E44AD;
+}
+#remove-connection-btn {
+  background: linear-gradient(to right, #1E1E1E, #7D3C98);
+}
+#block-btn {
+  background: linear-gradient(to right, #1E1E1E, #7D3C98);
+}
+#message-btn {
+  background: linear-gradient(to right, #1E1E1E, #8E44AD);
+}
 
-  #page-loader img {
-    box-shadow: 0 0 20px #50c878;
-    transition: transform 0.3s ease-in-out;
+/* Responsive adjustments for buttons */
+@media (max-width: 640px) {
+  .flex-wrap {
+    justify-content: center;
   }
   
-  #page-loader img:hover {
-    transform: scale(1.1);
+  .bg-\[\#000000\] {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
+  
+  #profile-username, #profile-bio {
+    text-align: center;
+  }
+}
+
+/* Loader effects */
+#page-loader img {
+  box-shadow: 0 0 20px #8E44AD;
+  transition: transform 0.3s ease-in-out;
+}
+
+#page-loader img:hover {
+  transform: scale(1.1);
+}
+
+/* Modal styling */
+#editor-modal {
+  background-color: rgba(30, 30, 30, 0.9);
+  border-color: #8E44AD;
+}
+
+/* Section headers */
+.text-\[\#FF073A\] {
+  color: #8E44AD;
+}
+
+/* Social media icons */
+.text-\[\#3b5998\]:hover { color: #8b9dc3; }
+.text-\[\#E1306C\]:hover { color: #F77737; }
+.text-\[\#0077B5\]:hover { color: #00A0DC; }
+.text-\[\#0088CC\]:hover { color: #2CA5E0; }
+.text-\[\#FFFC00\]:hover { color: #FFF59D; }
+.text-\[\#181717\]:hover { color: #333; }
+.text-\[\#000000\]:hover { color: #333; }
+
+/* Text colors */
+.text-\[\#E6E6FA\] {
+  color: #E6E6FA; /* Moon Silver for primary text */
+}
+
+.text-gray-400 {
+  color: #A0A0A0; /* Lighter gray for secondary text */
+}
+
+/* Border colors */
+.border-\[\#8E44AD\]\/30 {
+  border-color: rgba(142, 68, 173, 0.3);
+}
+
+/* Background colors */
+.bg-\[\#1E1E1E\] {
+  background-color: #1E1E1E; /* Slate Black */
+}
+
+.bg-\[\#2A0E35\] {
+  background-color: #2A0E35; /* Darker purple for gradients */
+}
+
+/* Hover states */
+.hover\:text-\[\#8E44AD\]:hover {
+  color: #8E44AD;
+}
+
+.hover\:bg-\[\#2A0E35\]:hover {
+  background-color: #2A0E35;
+}
+
+/* Button hover states */
+#add-friend-btn:hover,
+#accept-request-btn:hover,
+#message-btn:hover {
+  background: linear-gradient(to right, #8E44AD, #1E1E1E);
+}
+
+#request-sent-btn:hover,
+#decline-request-btn:hover,
+#remove-connection-btn:hover,
+#block-btn:hover {
+  background: linear-gradient(to right, #7D3C98, #1E1E1E);
+}
+
+/* Form elements */
+input[type="range"] {
+  accent-color: #8E44AD;
+}
+
+/* Scroll container */
+.scroll-container {
+  scrollbar-color: #8E44AD #1E1E1E;
+}
