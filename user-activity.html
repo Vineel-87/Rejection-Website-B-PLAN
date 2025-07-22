@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User Activity | Rejection</title>
+  <link rel="stylesheet" href="css/user-activity.css" />
+  <link rel="icon" href="Images/reorganization.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+
+<body class="bg-[#1E1E1E] text-white min-h-screen flex font-[Poppins]">
+  <!-- Background header bar -->
+  <div class="fixed top-0 left-0 w-full h-16 bg-[#1E1E1E]/90 backdrop-blur-sm z-30 border-b border-[#8E44AD]/30 flex items-center justify-between px-6">
+    <!-- Back button and Rejection brand -->
+    <div class="flex items-center gap-4">
+      <a href="dashboard.html" class="flex items-center gap-2 group">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#8E44AD] group-hover:text-[#AD7BE9] transition duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        <h1 class="text-3xl font-extrabold text-[#8E44AD] drop-shadow-md" style="font-family: 'Great Vibes', cursive;">
+          Rejection
+        </h1>
+      </a>
+    </div>
+
+    <!-- User profile section -->
+    <div class="flex items-center gap-4">
+      <div class="relative group w-10 h-10">
+        <img id="profile-pic" src="Images/default-avatar.png" alt="Profile" class="w-full h-full rounded-full border-2 border-[#8E44AD] object-cover">
+      </div>
+      <span id="username" class="text-white font-semibold">Loading...</span>
+    </div>
+  </div>
+
+  <!-- Replace the activity container section with this -->
+    <div class="container mx-auto px-4 pt-24 pb-16"> <!-- Added padding for fixed header and graph -->
+    <!-- Main content grid -->
+    <div class="grid grid-cols-1 gap-8">
+        <!-- Activity Graph Card -->
+        <div class="bg-[#1E1E1E]/50 rounded-xl p-6 border border-[#8E44AD]/20 backdrop-blur-sm">
+         <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold text-white">Your Activity</h2>
+            <div class="flex items-center gap-4">
+                <div class="text-sm text-gray-400">
+                <span id="current-date"></span>
+                </div>
+                <div class="text-sm text-[#8E44AD] font-medium">
+                Total: <span id="total-time">0m</span>
+                </div>
+            </div>
+            </div>
+
+        <div class="relative h-64">
+            <canvas id="activity-graph"></canvas>
+        </div>
+        
+        <!-- Add this right after the Activity Graph Card div -->
+        <div class="bg-[#1E1E1E]/50 rounded-xl p-6 border border-[#8E44AD]/20 backdrop-blur-sm mt-6">
+        <details class="group">
+            <summary class="flex items-center justify-between cursor-pointer text-[#AD7BE9] hover:text-[#8E44AD] transition">
+            <h3 class="font-semibold">How to Read This Graph</h3>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform group-open:rotate-180 transition" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+            </summary>
+            <div class="mt-4 text-sm text-gray-300 space-y-3">
+            <div class="flex items-start gap-3">
+                <div class="mt-1 w-3 h-3 rounded-full bg-[#8E44AD] flex-shrink-0"></div>
+                <p><strong class="text-white">Purple Line</strong> shows your activity level throughout the day</p>
+            </div>
+            <div class="flex items-start gap-3">
+                <div class="mt-1 w-3 h-3 rounded-full bg-[#8E44AD]/20 flex-shrink-0"></div>
+                <p><strong class="text-white">Shaded Area</strong> represents total active time</p>
+            </div>
+            <div class="flex items-start gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mt-1 text-white flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                </svg>
+                <p><strong class="text-white">X-Axis (Bottom):</strong> Time of day (e.g. 9AM, 2PM)</p>
+            </div>
+            <div class="flex items-start gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mt-1 text-white flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                </svg>
+                <p><strong class="text-white">Y-Axis (Left):</strong> Active minutes per hour</p>
+            </div>
+            <div class="pt-2 border-t border-[#8E44AD]/20">
+                <p><strong class="text-white">Reading Trends:</strong></p>
+                <ul class="list-disc pl-5 space-y-1 mt-2">
+                <li><strong>Peaks:</strong> High activity periods</li>
+                <li><strong>Valleys:</strong> Low activity/breaks</li>
+                <li><strong>Steep slopes:</strong> Rapid changes in activity</li>
+                </ul>
+            </div>
+            </div>
+        </details>
+      </div>
+      
+      <div class="bg-[#1E1E1E]/50 rounded-xl p-6 border border-[#8E44AD]/20 backdrop-blur-sm mt-6">
+          <h3 class="text-xl font-semibold text-white mb-4">Activity History</h3>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="text-left text-gray-400 border-b border-[#8E44AD]/20">
+                  <th class="pb-2">Date</th>
+                  <th class="pb-2">Total Time</th>
+                  <th class="pb-2">Status</th>
+                </tr>
+              </thead>
+              <tbody id="activity-history">
+                <!-- History items will be inserted here -->
+              </tbody>
+            </table>
+          </div>
+        </div>            
+      </div>
+    </div>
+  </div>
+
+  <!-- Page Loader -->
+  <div id="page-loader" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-gradient-to-b from-[#1E1E1E] via-[#2A0E35] to-[#1E1E1E] transition-opacity duration-700">
+    <!-- Spinner Ring -->
+    <div class="relative w-32 h-32 mb-6">
+      <!-- Spinning Magenta Purple ring -->
+      <div class="absolute inset-0 border-4 border-dashed rounded-full animate-spin"
+          style="border-color: transparent; border-top-color: #8E44AD; border-right-color: #8E44AD; border-bottom-color: #8E44AD;">
+      </div>
+
+      <!-- Center Icon -->
+      <div class="absolute inset-0 flex items-center justify-center">
+        <img src="Images/reorganization.png" alt="Loading Icon" class="w-20 h-20 rounded-full shadow-2xl" />
+      </div>
+    </div>
+
+    <!-- "Rejection" Text -->
+    <div class="text-5xl font-extrabold text-[#8E44AD] drop-shadow-md pointer-events-auto" style="font-family: 'Great Vibes', cursive;">
+      Rejection
+    </div>
+  </div>
+
+  <script src="JS/user-activity.js"></script>
+  <script src="JS/activity-graph.js"></script>
+
+</body>
+</html>

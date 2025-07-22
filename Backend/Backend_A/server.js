@@ -1499,6 +1499,199 @@ app.post("/api/user/bookmark", authenticateToken, async (req, res) => {
   }
 });
 
+// Activity tracking endpoints
+app.post("/api/activity/start", authenticateToken, async (req, res) => {
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        
+        // End any existing active session
+        await connection.query(
+            "UPDATE user_activity SET end_time = CURRENT_TIMESTAMP WHERE user_id = ? AND end_time IS NULL",
+            [req.user.userId]
+        );
+        
+        // Start new session with UUID
+        const [result] = await connection.query(
+            "INSERT INTO user_activity (id, user_id) VALUES (UUID(), ?)",
+            [req.user.userId]
+        );
+        
+        // Get the inserted session ID
+        const [session] = await connection.query(
+            "SELECT id FROM user_activity WHERE user_id = ? ORDER BY start_time DESC LIMIT 1",
+            [req.user.userId]
+        );
+        
+        res.status(200).json({ sessionId: session[0].id });
+    } catch (error) {
+        console.error("Activity start error:", error);
+        res.status(500).json({ message: "Failed to start activity tracking" });
+    } finally {
+        if (connection) await connection.release();
+    }
+});
+
+
+app.post("/api/activity/end", authenticateToken, async (req, res) => {
+    const { sessionId } = req.body;
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        
+        await connection.query(
+            `UPDATE user_activity 
+             SET end_time = CURRENT_TIMESTAMP,
+                 duration_seconds = TIMESTAMPDIFF(SECOND, start_time, CURRENT_TIMESTAMP)
+             WHERE id = ? AND user_id = ?`,
+            [sessionId, req.user.userId]
+        );
+        
+        res.status(200).json({ message: "Session ended" });
+    } catch (error) {
+        console.error("Activity end error:", error);
+        res.status(500).json({ message: "Failed to end activity tracking" });
+    } finally {
+        if (connection) await connection.release();
+    }
+});
+
+app.post("/api/activity/heartbeat", authenticateToken, async (req, res) => {
+    const { sessionId } = req.body;
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        
+        // Just update the end time to keep session active
+        await connection.query(
+            `UPDATE user_activity 
+             SET end_time = CURRENT_TIMESTAMP,
+                 duration_seconds = TIMESTAMPDIFF(SECOND, start_time, CURRENT_TIMESTAMP)
+             WHERE id = ? AND user_id = ? AND end_time IS NULL`,
+            [sessionId, req.user.userId]
+        );
+        
+        res.status(200).json({ message: "Heartbeat received" });
+    } catch (error) {
+        console.error("Activity heartbeat error:", error);
+        res.status(500).json({ message: "Failed to update activity" });
+    } finally {
+        if (connection) await connection.release();
+    }
+});
+
+// Update the activity/today endpoint to handle cases where duration_seconds might be NULL
+// Update the activity/today endpoint to ensure it returns proper data
+app.get("/api/activity/today", authenticateToken, async (req, res) => {
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        
+        // Get total time today
+        const [totalResult] = await connection.query(
+            `SELECT COALESCE(SUM(duration_seconds), 0) as totalSeconds
+             FROM user_activity
+             WHERE user_id = ? AND DATE(start_time) = CURDATE()`,
+            [req.user.userId]
+        );
+        
+        // Get hourly breakdown - improved query to handle gaps
+        const [hourlyResult] = await connection.query(
+            `SELECT 
+                HOUR(start_time) as hour,
+                COALESCE(SUM(duration_seconds), 0) as seconds
+             FROM user_activity
+             WHERE user_id = ? AND DATE(start_time) = CURDATE()
+             GROUP BY HOUR(start_time)
+             ORDER BY hour`,
+            [req.user.userId]
+        );
+        
+        // Create a complete 24-hour array with 0 for missing hours
+        const completeHourlyData = Array.from({ length: 24 }, (_, i) => {
+            const hourData = hourlyResult.find(item => item.hour === i);
+            return {
+                hour: i,
+                seconds: hourData ? hourData.seconds : 0
+            };
+        });
+        
+        res.status(200).json({
+            totalSeconds: totalResult[0].totalSeconds,
+            hourlyData: completeHourlyData
+        });
+    } catch (error) {
+        console.error("Activity data error:", error);
+        res.status(500).json({ message: "Failed to get activity data" });
+    } finally {
+        if (connection) await connection.release();
+    }
+});
+
+// Add this route to server2.js
+app.get('/api/v2/activity/data', authenticateToken, async (req, res) => {
+    const { range, date } = req.query;
+    const userId = req.user.userId;
+
+    try {
+        let query;
+        let params = [userId];
+        
+        if (range === 'day') {
+            query = `
+                SELECT HOUR(start_time) as hour, 
+                       SUM(duration_seconds) as seconds
+                FROM user_activity
+                WHERE user_id = ? AND DATE(start_time) = ?
+                GROUP BY HOUR(start_time)
+                ORDER BY hour
+            `;
+            params.push(date);
+        } else if (range === 'week') {
+            query = `
+                SELECT DATE(start_time) as date,
+                       SUM(duration_seconds) as seconds
+                FROM user_activity
+                WHERE user_id = ? AND YEARWEEK(start_time, 1) = YEARWEEK(?, 1)
+                GROUP BY DATE(start_time)
+                ORDER BY date
+            `;
+            params.push(date);
+        } else if (range === 'month') {
+            query = `
+                SELECT WEEK(start_time, 1) as week,
+                       SUM(duration_seconds) as seconds
+                FROM user_activity
+                WHERE user_id = ? AND YEAR(start_time) = YEAR(?) AND MONTH(start_time) = MONTH(?)
+                GROUP BY WEEK(start_time, 1)
+                ORDER BY week
+            `;
+            params.push(date, date);
+        } else { // year
+            query = `
+                SELECT MONTH(start_time) as month,
+                       SUM(duration_seconds) as seconds
+                FROM user_activity
+                WHERE user_id = ? AND YEAR(start_time) = YEAR(?)
+                GROUP BY MONTH(start_time)
+                ORDER BY month
+            `;
+            params.push(date);
+        }
+
+        const connection = await pool.getConnection();
+        const [results] = await connection.query(query, params);
+        connection.release();
+
+        res.json({
+            hourlyData: results,
+            totalSeconds: results.reduce((sum, item) => sum + (item.seconds || 0), 0)
+        });
+    } catch (error) {
+        console.error("Activity data error:", error);
+        res.status(500).json({ message: "Failed to fetch activity data" });
+    }
+});
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {

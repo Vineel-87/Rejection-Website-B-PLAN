@@ -1,7 +1,9 @@
-CREATE DATABASE IF NOT EXISTS job_tracker;
+CREATE DATABASE IF NOT EXISTS job_tracker 
+DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 USE job_tracker;
 
--- Users table (unchanged)
+-- Users table
 CREATE TABLE IF NOT EXISTS users (
   id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
   email VARCHAR(255) UNIQUE NOT NULL,
@@ -15,9 +17,9 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_email (email)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB COMMENT 'User accounts table';
 
--- Job posts table (added indexes)
+-- Job posts table
 CREATE TABLE IF NOT EXISTS job_posts (
   id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
   userId VARCHAR(36) NOT NULL,
@@ -37,10 +39,11 @@ CREATE TABLE IF NOT EXISTS job_posts (
   FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
   INDEX idx_user (userId),
   INDEX idx_company (company),
-  INDEX idx_status (status)
-) ENGINE=InnoDB;
+  INDEX idx_status (status),
+  INDEX idx_date_posted (datePosted)
+) ENGINE=InnoDB COMMENT 'Job postings table';
 
--- User profiles table (unchanged)
+-- User profiles table
 CREATE TABLE IF NOT EXISTS user_profiles (
   id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
   user_id VARCHAR(36) NOT NULL,
@@ -60,41 +63,23 @@ CREATE TABLE IF NOT EXISTS user_profiles (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   UNIQUE KEY (user_id)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB COMMENT 'Extended user profile data';
 
--- Friends table (Unchanged)
-CREATE TABLE IF NOT EXISTS friends (
+
+-- Add this to your job_posts.sql file
+CREATE TABLE IF NOT EXISTS user_activity (
   id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
   user_id VARCHAR(36) NOT NULL,
-  friend_id VARCHAR(36) NOT NULL,
-  status ENUM('pending', 'accepted', 'rejected') DEFAULT 'pending',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  end_time TIMESTAMP NULL,
+  duration_seconds INT DEFAULT 0,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  FOREIGN KEY (friend_id) REFERENCES users(id) ON DELETE CASCADE,
-  UNIQUE KEY (user_id, friend_id)
-) ENGINE=InnoDB;
+  INDEX idx_user (user_id),
+  INDEX idx_time (start_time)
+) ENGINE=InnoDB COMMENT 'User activity tracking table';
 
-CREATE TABLE IF NOT EXISTS favorites (
-  id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-  user_id VARCHAR(36) NOT NULL,
-  favorite_user_id VARCHAR(36) NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  FOREIGN KEY (favorite_user_id) REFERENCES users(id) ON DELETE CASCADE,
-  UNIQUE KEY (user_id, favorite_user_id)
-) ENGINE=InnoDB;
-
-CREATE TABLE IF NOT EXISTS bookmarks (
-  id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-  user_id VARCHAR(36) NOT NULL,
-  bookmark_user_id VARCHAR(36) NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  FOREIGN KEY (bookmark_user_id) REFERENCES users(id) ON DELETE CASCADE,
-  UNIQUE KEY (user_id, bookmark_user_id)
-) ENGINE=InnoDB;
-
-ALTER TABLE user_profiles 
-ADD COLUMN latitude DECIMAL(10, 8),
-ADD COLUMN longitude DECIMAL(11, 8);
+ALTER TABLE user_activity 
+MODIFY COLUMN start_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+MODIFY COLUMN end_time TIMESTAMP NULL,
+MODIFY COLUMN duration_seconds INT NOT NULL DEFAULT 0,
+ADD INDEX idx_date (start_time);

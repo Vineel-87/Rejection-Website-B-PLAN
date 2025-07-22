@@ -1,0 +1,41 @@
+/* Activity Graph Styles */
+#activity-graph {
+    width: 100%;
+    height: 100%;
+}
+
+/* Remove the fixed padding from body */
+body {
+    padding-bottom: 0;
+}
+
+/* Add some spacing for the fixed header */
+.container {
+    padding-top: 80px;
+    padding-bottom: 40px;
+}
+
+/* Add these styles to user-activity.css */
+#activity-history tr:last-child {
+    border-bottom: none;
+}
+
+#activity-history td {
+    padding: 12px 8px;
+}
+
+#activity-history tr:hover {
+    background-color: rgba(142, 68, 173, 0.05);
+}
+
+/* Add to user-activity.css */
+#activity-history {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#activity-history th {
+    text-align: left;
+    padding: 12px 8px;
+    font-weight: 600;
+}
